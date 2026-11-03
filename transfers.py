@@ -51,6 +51,10 @@ def owner_email(ticket):
 
 
 def ticket_eligible(ticket, transfer=None):
+    if ticket.product_slug in ("bilhete-familia", "bilhete-acessibilidade"):
+        # These include companion/children data and eligibility conditions.
+        # The organisation reviews their changes through the existing editor.
+        return False
     if ticket.order.status != "paid" or ticket.checked_in_at:
         return False
     if transfer:
