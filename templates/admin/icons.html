@@ -1,0 +1,16 @@
+{% macro icon(name) -%}
+{% set shapes = {
+ 'home': 'M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z',
+ 'sales': 'M4 19h16M6 15l5-5 4 3 5-8M15 5h5v5',
+ 'orders': 'M6 3h12v18l-3-2-3 2-3-2-3 2ZM9 8h6M9 12h6',
+ 'content': 'M5 3h10l4 4v14H5ZM14 3v5h5M8 12h8M8 16h6',
+ 'gallery': 'M3 4h18v16H3ZM3 16l6-6 5 5 3-3 4 4M16 8h.01',
+ 'team': 'M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M21 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
+ 'newsletter': 'M3 5h18v14H3ZM3 6l9 7 9-7',
+ 'email': 'M3 5h18v14H3ZM3 6l9 7 9-7M16 3l3-2 3 2',
+ 'appearance': 'M12 3a9 9 0 1 0 0 18c2 0 3-1 2-3s0-3 2-3h2c2 0 3-2 3-4a9 9 0 0 0-9-8ZM7 10h.01M10 6h.01M15 7h.01M6 15h.01',
+ 'transfer': 'M4 7h16l-4-4M20 17H4l4 4M20 7l-4 4M4 17l4-4',
+ 'more': 'M4 6h16M4 12h16M4 18h16'
+} %}
+<svg class="app-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="{{ shapes.get(name, shapes['home']) }}"/></svg>
+{%- endmacro %}
