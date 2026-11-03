@@ -353,6 +353,8 @@ def build_ticket_email_html(order, domain, tickets=None, recipient_name=None):
         order_total=order.total,
         terms_url=f"{domain}{_localized_path('/infos/faq', lang_code)}",
         terms_url_label=s["terms_link_text"],
+        customer_portal_url=domain.rstrip("/") + "/account/login",
+        customer_portal_label={"pt":"A minha área de cliente", "en":"My customer account", "fr":"Mon espace client"}.get(lang_code,"My customer account"),
         contact_url=f"{domain}{_localized_path('/infos/faq', lang_code)}",
         # Dados legais da empresa (nome, NIF, morada) para o rodapé -- ainda
         # por preencher (o João tem de os dar); o template já sabe omitir

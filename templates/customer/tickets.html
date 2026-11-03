@@ -1,0 +1,1 @@
+{% extends 'customer/base.html' %}{% block content %}<div class="page-heading"><div><p class="app-overline">O TEU ACESSO AO FESTIVAL</p><h1>Os meus bilhetes</h1></div></div>{% with tickets=pagination.items %}{% include 'customer/_tickets.html' %}{% endwith %}{% include 'customer/_pagination.html' %}{% endblock %}

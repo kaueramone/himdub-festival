@@ -47,6 +47,7 @@
         <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
         <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
         <a href="{{ url_for('main.gallery') }}">Gallery</a>
+        <a href="{{ url_for('customer.dashboard') }}">A minha conta</a>
         <div class="main-nav__dropdown">
           <button type="button" class="main-nav__dropdown-btn">{{ _('Infos') }} <span aria-hidden="true">▾</span></button>
           <div class="main-nav__dropdown-menu">
@@ -87,6 +88,7 @@
     <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
     <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
     <a href="{{ url_for('main.gallery') }}">Gallery</a>
+    <a href="{{ url_for('customer.dashboard') }}">A minha conta</a>
     <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
     <a href="{{ url_for('main.sustainability') }}">{{ _('Sustainability') }}</a>
     <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
@@ -132,6 +134,7 @@
 
       <div class="site-footer__links">
         <a href="{{ url_for('main.faq') }}">{{ _('Terms & help') }}</a>
+        <a href="{{ url_for('customer.dashboard') }}">Área de cliente</a>
         <a href="{{ url_for('main.ticket_transfer') }}">Trocar titular de um bilhete</a>
         <button type="button" id="cartToggle" class="site-footer__cart-btn">{{ _('Carrinho') }}</button>
       </div>

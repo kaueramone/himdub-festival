@@ -54,7 +54,7 @@ def init_security(app):
         response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
         if request.path.startswith(("/admin", "/checkin", "/checkout")):
             response.headers["Cache-Control"] = "private, no-store"
-        if request.path.startswith(('/newsletter/', '/ticket-transfer')):
+        if request.path.startswith(('/newsletter/', '/ticket-transfer', '/account')):
             response.headers['Cache-Control']='private, no-store'
             response.headers['Referrer-Policy']='no-referrer'
         if '/admin/join/' in request.path or request.endpoint == 'admin.team':

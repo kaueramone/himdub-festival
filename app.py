@@ -167,6 +167,8 @@ def create_app():
     app.register_blueprint(shop_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(checkin_bp)
+    from customer_portal import customer_bp
+    app.register_blueprint(customer_bp)
 
     from db_migrate import run as run_migrations
     @app.cli.command("db-upgrade")

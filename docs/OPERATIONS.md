@@ -201,3 +201,37 @@ A newsletter usa `RESEND_NEWSLETTER_SEGMENT_ID` e uma chave separada
 existente não precisa de ser substituída. Depois de configurar, validar
 consentimento, confirmação explícita, sincronização e cancelamento com um
 endereço de teste autorizado. Nunca importar compradores automaticamente.
+
+## Área de cliente
+
+`/account/login` envia um link de acesso por email. O token aleatório tem
+256 bits, é guardado apenas como hash, expira em 20 minutos e é consumido
+atomicamente após confirmação por POST com CSRF. A simples abertura do email
+ou visita automática ao link não inicia sessão. A sessão de cliente dura no
+máximo 12 horas; sair revoga as sessões de cliente desse utilizador. As contas
+administrativas continuam independentes. As rotas privadas usam no-store e
+no-referrer; os tokens nos caminhos são ocultados nos logs do Gunicorn.
+
+As tabelas aditivas são `customer_accounts`, `customer_access_tokens` e
+`customer_requests`, criadas por `db-upgrade`. A conta só é criada depois da
+verificação do email. As encomendas anteriores são associadas ao email de
+compra verificado; não se importam contactos nem se subscreve a newsletter.
+Quem recebe um bilhete vê apenas esse bilhete. A encomenda original continua
+restrita ao comprador; o comprador deixa de poder descarregar um bilhete que
+já pertença a outro email. Bilhetes cancelados, reembolsados ou utilizados
+não podem ser descarregados nem gerar pedidos de alteração.
+
+Nome e telefone do perfil não modificam encomendas antigas nem titulares.
+Os pedidos de correcção de nome, troca de titular e ajuda ficam numa fila em
+`/admin/customer-requests`, com resposta visível na conta. Fechar um pedido não
+edita o bilhete, não cobra taxas e não substitui QR: o operador usa as ferramentas
+de bilhetes existentes após verificar titularidade e condições. Se o serviço
+automático de transferência estiver activo, o portal também permite iniciar
+esse fluxo, conservando a confirmação por email e o pagamento da taxa.
+
+O acesso à conta aparece no menu, na confirmação de checkout e nos novos emails
+de bilhetes. Os emails de acesso e de confirmação da newsletter partilham o
+modelo `emails/brand_base.html`, com cores e logótipo do festival. A área de
+cliente desta primeira versão está em português; os textos dos bilhetes e as
+encomendas mantêm os dados e idiomas registados. Validar conteúdos e traduções
+adicionais antes de alargar a interface a outros idiomas.

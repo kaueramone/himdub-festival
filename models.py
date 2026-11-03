@@ -230,6 +230,44 @@ class PageBlock(db.Model):
     published = db.Column(db.Boolean, default=False, nullable=False)
 
 
+class CustomerAccount(db.Model):
+    __tablename__ = "customer_accounts"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(180), unique=True, nullable=False)
+    name = db.Column(db.String(120), default="")
+    phone = db.Column(db.String(40), default="")
+    session_version = db.Column(db.Integer, default=1, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+
+class CustomerAccessToken(db.Model):
+    __tablename__ = "customer_access_tokens"
+    token_hash = db.Column(db.String(64), primary_key=True)
+    email = db.Column(db.String(180), nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used_at = db.Column(db.DateTime)
+
+
+class CustomerRequest(db.Model):
+    __tablename__ = "customer_requests"
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey("customer_accounts.id"), nullable=False, index=True)
+    ticket_id = db.Column(db.Integer, db.ForeignKey("tickets.id"), nullable=False, index=True)
+    active_ticket_id = db.Column(db.Integer, unique=True)
+    code_hash = db.Column(db.String(64), nullable=False)
+    kind = db.Column(db.String(24), nullable=False)
+    requested_name = db.Column(db.String(120), default="")
+    requested_email = db.Column(db.String(180), default="")
+    message = db.Column(db.Text, default="")
+    status = db.Column(db.String(24), default="pending", nullable=False)
+    response = db.Column(db.Text, default="")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    resolved_at = db.Column(db.DateTime)
+    customer = db.relationship("CustomerAccount")
+    ticket = db.relationship("Ticket")
+
+
 class TicketConfiguration(db.Model):
     __tablename__ = "ticket_configurations"
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), primary_key=True)

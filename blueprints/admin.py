@@ -753,3 +753,6 @@ init_transfers(main_bp, admin_bp, admin_required)
 
 from ticket_sales import init_ticket_sales
 init_ticket_sales(admin_bp, admin_required)
+
+from customer_portal import init_customer_admin
+init_customer_admin(admin_bp, admin_required)
