@@ -26,7 +26,8 @@ As credenciais devem ser mantidas num gestor de palavras-passe.
 3. Em produção, configurar uma `SECRET_KEY` privada e aleatória no Render.
    O arranque passa a recusar a ausência dessa variável em Render ou com
    `DOMAIN` HTTPS. Não publicar esta alteração antes de confirmar a variável.
-4. Não executar `seed.py`, migrações ou testes contra a base de produção.
+4. Não executar `seed.py` nem testes contra a base de produção. Executar apenas
+   as migrações de lançamento revistas, após verificar o backup.
 5. Validar localmente antes de qualquer deploy. A configuração real de
    arranque do Render deve ser conferida; o `Procfile` não prova qual está ativa.
 
@@ -56,18 +57,21 @@ ligações recarregadas. O Render usa o cliente OAuth pré-registado `codex`,
 conforme as instruções oficiais; o consentimento tem as permissões da conta,
 mas a configuração local também limita as ferramentas a consultas.
 
-O serviço Render `himdub-festival` ainda indica o URL antigo do repositório
-do João e deploy automático da branch `main`. A entrada é `gunicorn app:app`,
-com a raiz do repositório como diretório de trabalho. Antes de trocar a origem,
-confirmar a integração GitHub e preparar o deploy; não basta alterar o remote
-da cópia local. A infraestrutura de produção não foi alterada nesta preparação.
+O serviço Render `himdub-festival` passou para `kaueramone/himdub-festival`,
+branch `main`, com deploy automático após os testes de CI passarem.
+O arranque é `gunicorn --config gunicorn.conf.py app:app`, na raiz do repositório.
+O Python é fixado na série 3.13 por `.python-version`. A verificação `/healthz`
+confirma a ligação e o esquema da base de dados. A base e os domínios existentes
+foram preservados. As migrações e a preparação inicial das contas correm no
+pre-deploy com o consumidor de emails desligado nesse processo.
 
 ## Bunny
 
-A conta foi validada em 03/11/2026 por consultas à API: ainda sem zonas de
-armazenamento ou CDN. Os vídeos estão em `static/video/`. A migração exige
-criar as zonas, carregar os ficheiros, validar reprodução e só depois definir
-`CDN_BASE_URL` no Render. A chave de gestão Bunny nunca é enviada ao browser.
+A conta do festival tem armazenamento e CDN próprios. Os três vídeos e o áudio
+foram carregados, verificados e servidos por
+`CDN_BASE_URL=https://himdubfestival-media.b-cdn.net`. Os objetos mantêm os
+caminhos `static/video/` e `static/audio/`. A chave de gestão Bunny nunca é
+enviada ao browser nem é necessária no Render para reproduzir estes conteúdos.
 
 ## Organização e histórico
 
@@ -77,12 +81,11 @@ aninhada foi preservada na pasta privada superior
 em `audit/bootstrap-duplicate-comparison.json`. O template exclusivo da cópia
 antiga continua nesse arquivo. `_to_delete/` permanece local e ignorado.
 
-A origem aponta para https://github.com/himdub/himdub-festival.git.
-Ainda não foi criado nem publicado um repositório em kaueramone.
-Antes da importação, rever o relatório privado de segredos e decidir entre
-histórico saneado ou uma importação limpa. Remover um valor do código atual
-não o remove dos commits antigos. O scan local é parcial e não constitui
-garantia de ausência de segredos.
+A origem publicada é https://github.com/kaueramone/himdub-festival.git.
+Foi feita uma importação limpa: o histórico legado não foi publicado.
+Não publicar referências antigas com `git push --all` ou `--mirror`.
+Os scans do código e do histórico publicado não encontraram credenciais;
+um scan não constitui garantia de ausência de segredos.
 
 O histórico contém uma chave de sessão predefinida e uma palavra-passe
 predefinida de bloqueio do site. Confirmar se foram utilizadas em produção;
@@ -90,10 +93,13 @@ se sim, substituí-las no serviço antes de publicar o histórico. A substituiç
 da chave de sessão termina as sessões existentes. A correção local não
 substitui automaticamente as variáveis já configuradas no Render.
 
-## Sequência acordada para a primeira versão em kaueramone
+## Registo da migração de 03/11/2026
 
-Destino indicado pelo responsável: https://github.com/kaueramone/himdub-festival.git.
-Esta indicação não significa que a importação ou a troca no Render já tenham ocorrido.
+Destino publicado e ligado ao Render: https://github.com/kaueramone/himdub-festival.git.
+O backup foi criado no Render antes de executar a migração aditiva.
+A conferência posterior preservou 418 encomendas e 444 bilhetes.
+Foi substituída a chave de sessão e preparado um acesso individual com MFA;
+as sessões antigas e as palavras-passe partilhadas deixam de dar acesso administrativo.
 
 1. Trabalhar na aplicação ativa desta pasta e concluir as correções de segurança
    e as otimizações identificadas na auditoria. A limpeza inicial não encerra
@@ -111,8 +117,7 @@ Esta indicação não significa que a importação ou a troca no Render já tenh
    automático, confirmar branch e commit e validar o deploy antes de o
    considerar concluído. Manter a base de dados e as configurações do serviço.
 
-Até ao passo 4, o site em produção continua com a origem atual no Render.
-A implementação das novas ferramentas administrativas segue o escopo
+A sequência acima documenta o procedimento seguido. A implementação das novas ferramentas administrativas segue o escopo
 contratado e não deve ser confundida com esta limpeza da versão recebida.
 
 
@@ -139,6 +144,14 @@ do arranque. Criar as contas da equipa e configurar os autenticadores no lançam
 da nova administração: as passwords partilhadas são recusadas em produção.
 A proteção de unicidade não remove nem corrige pulseiras antigas automaticamente.
 Em 03/11/2026, uma consulta de leitura à produção não encontrou duplicados.
+
+O comando `staff-bootstrap` cria apenas a primeira conta a partir de variáveis
+temporárias privadas. Com contas existentes, não altera acessos por defeito.
+Para recuperação explícita de MFA, `STAFF_BOOTSTRAP_ROTATE_MFA=true`, juntamente
+com `STAFF_BOOTSTRAP_EMAIL` e um novo `STAFF_BOOTSTRAP_TOTP_SECRET`, substitui o
+segredo apenas do administrador ativo indicado, revoga sessões e regista a ação.
+Retirar estas variáveis temporárias após confirmar a operação. Nunca incluir
+segredos, QR de configuração ou passwords nos logs, documentação ou Git.
 
 Os eventos de reembolso integral invalidam a entrada associada. Reembolsos parciais
 exigem uma política funcional própria; o código não presume que anulam todos os
