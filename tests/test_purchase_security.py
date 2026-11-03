@@ -255,6 +255,21 @@ class PurchaseSecurityTests(unittest.TestCase):
         self.assertEqual(totp_counter("GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", "287082", timestamp=59), 1)
         self.assertIsNone(totp_counter("GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", "000000", timestamp=59))
 
+    def test_staff_bootstrap_is_private_and_does_not_overwrite_accounts(self):
+        from models import AdminUser
+        from werkzeug.security import generate_password_hash
+        environment = {"STAFF_BOOTSTRAP_EMAIL": "staff@example.invalid",
+                       "STAFF_BOOTSTRAP_PASSWORD_HASH": generate_password_hash("synthetic-bootstrap-password"),
+                       "STAFF_BOOTSTRAP_TOTP_SECRET": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"}
+        with patch.dict(os.environ, environment):
+            first = self.app.test_cli_runner().invoke(args=["staff-bootstrap"])
+            second = self.app.test_cli_runner().invoke(args=["staff-bootstrap"])
+        self.assertEqual(first.exit_code, 0)
+        self.assertEqual(second.exit_code, 0)
+        self.assertEqual(AdminUser.query.count(), 1)
+        self.assertNotIn(environment["STAFF_BOOTSTRAP_TOTP_SECRET"], first.output)
+        self.assertNotIn(environment["STAFF_BOOTSTRAP_PASSWORD_HASH"], first.output)
+
     def test_concurrent_webhooks_issue_each_ticket_once(self):
         if db.engine.dialect.name != "postgresql":
             self.skipTest("Row-lock concurrency runs in the PostgreSQL CI job")

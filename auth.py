@@ -6,6 +6,7 @@ import base64
 import hmac
 import struct
 import time
+import os
 from urllib.parse import quote
 
 import click
@@ -55,7 +56,7 @@ def check_login_throttle(identifier):
             db.session.rollback()
             abort(429, description="Demasiadas tentativas. Tenta novamente dentro de 15 minutos.")
         row.attempts += 1
-    db.session.commit()
+        db.session.commit()
 
 
 def totp_counter(secret, code, timestamp=None):
@@ -96,6 +97,22 @@ def authenticate(email, password):
 
 
 def init_auth(app):
+    @app.cli.command("staff-bootstrap")
+    def staff_bootstrap():
+        """Provision the first staff account from temporary, private deployment variables."""
+        if AdminUser.query.count():
+            click.echo("Já existem contas; não foi alterado nenhum acesso.")
+            return
+        email = os.environ.get("STAFF_BOOTSTRAP_EMAIL", "").strip().lower()
+        password_hash = os.environ.get("STAFF_BOOTSTRAP_PASSWORD_HASH", "")
+        secret = os.environ.get("STAFF_BOOTSTRAP_TOTP_SECRET", "")
+        if ("@" not in email or len(email) > 180 or not password_hash.startswith("scrypt:")
+                or len(secret) != 32 or any(c not in "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" for c in secret)):
+            raise click.ClickException("Faltam os acessos privados de preparação da primeira conta.")
+        db.session.add(AdminUser(email=email, role="admin", password_hash=password_hash, totp_secret=secret))
+        db.session.commit()
+        click.echo("Primeira conta administrativa preparada com MFA.")
+
     @app.cli.command("user-add")
     @click.argument("email")
     @click.option("--role", type=click.Choice(["admin", "checkin"]), default="admin")
