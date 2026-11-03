@@ -6,13 +6,13 @@
 
 <section class="hero" id="hero">
   <div class="hero__video-wrap" id="heroVideoWrap">
-    <video
+    {% if not page_settings or page_settings.mode=='original' %}<video
       class="hero__video"
       id="heroVideo"
       poster="{{ url_for('static', filename='img/hero-poster.jpg') }}"
       muted loop playsinline preload="auto">
       <source src="{{ cdn_url('video/hero-bg.mp4') }}" type="video/mp4">
-    </video>
+    </video>{% endif %}
     <div class="hero__video-scrim"></div>
   </div>
 

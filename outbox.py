@@ -26,9 +26,11 @@ def _revision(order, email, name, tickets):
     return hashlib.sha256(json.dumps(snapshot, ensure_ascii=False).encode()).hexdigest()
 
 
-def enqueue_order_emails(order, event_id=""):
+def enqueue_order_emails(order, event_id="", recipients=None):
     db.session.flush()
     for email, name, tickets in _groups(order):
+        if recipients is not None and email.lower() not in recipients:
+            continue
         revision = _revision(order, email, name, tickets)
         key = hashlib.sha256((revision + event_id).encode()).hexdigest() if event_id else revision
         if db.session.get(EmailDelivery, key) is None:
@@ -114,6 +116,8 @@ def init_outbox(app):
         while not stop.wait(5):
             try:
                 process_pending(app)
+                from website_jobs import process_website_jobs
+                process_website_jobs(app)
             except Exception:
                 app.logger.warning("Email queue temporarily unavailable")
     threading.Thread(target=consume, name="email-outbox", daemon=True).start()

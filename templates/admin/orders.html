@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 {% block title %}Encomendas — Admin{% endblock %}
 
 {% block content %}
@@ -27,50 +27,7 @@
       </div>
     </div>
 
-    {% if not real_sales_launch_at %}
-      <p class="admin-stats-note" style="opacity:0.7; font-size:0.82rem; margin:-14px 0 18px;">
-        Os números abaixo mostram tudo o que há na base de dados, testes incluídos -- normal enquanto ainda estiveres a testar o checkout. Quando carregares em "Ativar contagem de vendas reais" (mais abaixo), estes números passam logo a zero e só voltam a contar a partir das vendas feitas dali em diante.
-      </p>
-    {% endif %}
-    <div class="stat-grid admin-summary">
-      <div class="stat-card"><span class="stat-card__num">€{{ '%.0f'|format(revenue) }}</span><span>receita confirmada</span></div>
-      <div class="stat-card"><span class="stat-card__num">{{ paid_count }}</span><span>encomendas pagas</span></div>
-      <div class="stat-card"><span class="stat-card__num">{{ comp_count }}</span><span>bilhetes de cortesia</span></div>
-      <a href="{{ url_for('admin.orders', status='pending') }}" class="stat-card stat-card--link"><span class="stat-card__num">{{ pending_count }}</span><span>a aguardar pagamento</span></a>
-      <div class="stat-card"><span class="stat-card__num">{{ checked_in_count }}/{{ total_tickets }}</span><span>bilhetes com check-in</span></div>
-    </div>
-
-    {% for w in low_stock_warnings %}
-      <div class="admin-alert">
-        ⚠️ Faltam apenas <strong>{{ w.remaining }}</strong> bilhete{{ 's' if w.remaining != 1 }} real{{ 's' if w.remaining != 1 }} para o <strong>{{ w.label }}</strong> do Full Pass terminar.
-      </div>
-    {% endfor %}
-
-    {# Interruptor do 2nd batch (ver batches.py real_sales_launch_at) -- só
-       carregar neste botão no dia exato em que o site passar a usar o
-       domínio final himdubfestival.com. Antes disso, nenhuma venda conta
-       para o limite real de 150 bilhetes que fecha o Early Bird. #}
-    <div class="admin-real-sales {{ 'is-active' if real_sales_launch_at }}">
-      {% if real_sales_launch_at %}
-        <span>✓ Contagem de vendas reais ativada em {{ (real_sales_launch_at | local_time).strftime("%d/%m/%Y às %H:%M") }} (hora de Portugal) -- só bilhetes pagos a sério no Stripe a partir daqui contam para o 2nd batch.</span>
-      {% else %}
-        <span>A contagem de vendas reais do 1º lote (que decide quando o 2º lote abre) ainda não está ativada -- nada do que já se vendeu até agora (incluindo compras a sério feitas para testar) conta para o limite.</span>
-        <form method="post" action="{{ url_for('admin.activate_real_sales') }}" style="display:flex; gap:8px; align-items:center;" onsubmit="return confirm('Isto liga, de vez, a contagem de vendas reais do 1º lote -- a partir de AGORA. Tudo o que já foi vendido até este clique (mesmo compras a sério, de teste) fica de fora da contagem. Só confirmes isto quando o site já estiver mesmo no domínio final himdubfestival.com. Confirmas?');">
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="password" name="confirm_password" placeholder="Password de admin" required style="padding:6px 10px; border-radius:6px; border:1px solid rgba(201,154,70,0.4); background:rgba(0,0,0,0.2); color:inherit; font-size:0.82rem;">
-          <button type="submit" class="btn btn--outline btn--small">Ativar contagem de vendas reais</button>
-        </form>
-      {% endif %}
-    </div>
-
-    {% if tickets_sold %}
-      <h3 class="admin-subtitle">Vendidos por tipo</h3>
-      <div class="admin-tickets">
-        {% for name, qty in tickets_sold %}
-          <div class="admin-tickets__row"><span>{{ name }}</span><strong>{{ qty }}</strong></div>
-        {% endfor %}
-      </div>
-    {% endif %}
+    <p class="app-hint">Para contar bilhetes por tipo ou por período, usa <a href="{{ url_for('admin.sales') }}">Vendas de bilhetes →</a>. Aqui podes gerir cada encomenda.</p>
 
     <form method="get" action="{{ url_for('admin.orders') }}" class="admin-search">
       {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}

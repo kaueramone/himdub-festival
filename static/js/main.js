@@ -2,7 +2,21 @@
    HIM DUB FESTIVAL — interações e animações (vanilla JS, sem dependências)
    ========================================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+let pageEvents = new AbortController();
+let pageCleanups = [];
+function canNavigateWithMusic(href) {
+  const url=new URL(href,window.location.href);
+  const path=url.pathname.replace(/^\/(en|fr)(?=\/|$)/,'')||'/';
+  return url.origin===window.location.origin && (/^\/(?:gallery(?:\/\d+)?|infos\/(?:faq|sustainability|partners|contact)|line-up(?:\/[a-z0-9-]+)?)$/.test(path) || ['/', '/tickets','/the-experience','/glamping-village','/participate','/the-festival','/the-map','/ambassadors'].includes(path));
+}
+if(window.Turbo) window.Turbo.session.drive=false;
+function initFestivalPage() {
+  document.documentElement.lang=document.body.dataset.siteLang||'pt';
+  pageEvents.abort(); pageEvents=new AbortController();
+  pageCleanups.forEach(cleanup=>cleanup()); pageCleanups=[];
+  document.body.style.overflow='';
+  document.querySelectorAll('a[href]').forEach(a=>{if(canNavigateWithMusic(a.href)&&!a.target&&!a.hasAttribute('download'))a.dataset.turbo='true';});
+  document.querySelectorAll('form').forEach(form=>{form.dataset.turbo='false';});
   initScrollProgress();
   initHeaderScrollState();
   initMobileNav();
@@ -14,7 +28,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initCart();
   initLangPills();
   initHeroArrowWhoosh();
-});
+}
+document.addEventListener('turbo:load',initFestivalPage);
+document.addEventListener('DOMContentLoaded',()=>{if(!window.Turbo)initFestivalPage();});
+document.addEventListener('turbo:before-cache',()=>{pageEvents.abort();pageCleanups.forEach(cleanup=>cleanup());pageCleanups=[];});
 
 /* --------------------------------------------------------------------- */
 /* Seletor de idioma (decorativo — sem tradução real ainda)              */
@@ -42,7 +59,7 @@ function initScrollProgress() {
     const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
     bar.style.width = pct + "%";
   };
-  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("scroll", update, { passive: true, signal: pageEvents.signal });
   update();
 }
 
@@ -55,7 +72,7 @@ function initHeaderScrollState() {
   const update = () => {
     header.classList.toggle("is-scrolled", window.scrollY > 40);
   };
-  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("scroll", update, { passive: true, signal: pageEvents.signal });
   update();
 }
 
@@ -120,6 +137,7 @@ function initScrollReveal() {
   );
 
   items.forEach((el) => observer.observe(el));
+  pageCleanups.push(()=>observer.disconnect());
 }
 
 function animateCounter(el) {
@@ -172,12 +190,13 @@ function initHeroVideo() {
       });
     }, { threshold: 0.05 });
     visObserver.observe(hero);
+    pageCleanups.push(()=>visObserver.disconnect());
   }
   document.addEventListener("visibilitychange", () => {
     if (reduceMotion) return;
     if (document.hidden) video.pause();
     else if (hero.getBoundingClientRect().bottom > 0) video.play().catch(() => {});
-  });
+  }, {signal:pageEvents.signal});
 }
 
 /* --------------------------------------------------------------------- */
@@ -210,13 +229,14 @@ function initImmersiveVideos() {
         });
       }, { threshold: 0.05 });
       observer.observe(hero);
+      pageCleanups.push(()=>observer.disconnect());
     }
 
     document.addEventListener("visibilitychange", () => {
       if (reduceMotion) return;
       if (document.hidden) video.pause();
       else video.play().catch(() => {});
-    });
+    }, {signal:pageEvents.signal});
   });
 }
 
@@ -233,54 +253,34 @@ function initImmersiveVideos() {
 /* mesmo site.                                                            */
 /* --------------------------------------------------------------------- */
 function initBackgroundMusic() {
-  const audio = document.getElementById("bgMusic");
-  const btn = document.getElementById("musicToggle");
-  if (!audio || !btn) return;
-
-  const PLAYING_KEY = "himdub_music_playing";
-  const TIME_KEY = "himdub_music_time";
-
-  function setPlayingUI(isPlaying) {
-    btn.classList.toggle("is-playing", isPlaying);
-    btn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
-    const label = isPlaying ? btn.dataset.labelPause : btn.dataset.labelPlay;
-    if (label) btn.setAttribute("aria-label", label);
+  const audio=document.getElementById('bgMusic');
+  const button=document.getElementById('musicToggle');
+  if(!audio||!button)return;
+  const read=(key,fallback)=>{try{return sessionStorage.getItem(key)??fallback;}catch{return fallback;}};
+  const write=(key,value)=>{try{sessionStorage.setItem(key,value);}catch{/* Storage may be unavailable. */}};
+  function update(){
+    const active=!audio.paused;
+    const current=document.getElementById('musicToggle');
+    if(current){current.classList.toggle('is-playing',active);current.setAttribute('aria-pressed',String(active));current.setAttribute('aria-label',active?current.dataset.labelPause:current.dataset.labelPlay);}
+    if('mediaSession' in navigator)navigator.mediaSession.playbackState=active?'playing':'paused';
   }
-
-  // Retoma automaticamente se, na página anterior, a música estava a tocar.
-  if (localStorage.getItem(PLAYING_KEY) === "1") {
-    const savedTime = parseFloat(sessionStorage.getItem(TIME_KEY) || "0");
-    if (savedTime > 0) {
-      audio.addEventListener("loadedmetadata", () => { audio.currentTime = savedTime; }, { once: true });
+  async function play(){try{await audio.play();write('himdub_music_playing','1');}catch{update();}}
+  function pause(){audio.pause();write('himdub_music_playing','0');}
+  if(!audio.himdubInitialized){
+    audio.himdubInitialized=true;
+    audio.addEventListener('play',update);audio.addEventListener('pause',update);
+    audio.addEventListener('timeupdate',()=>write('himdub_music_time',String(audio.currentTime)));
+    const time=parseFloat(read('himdub_music_time','0'));
+    if(Number.isFinite(time)&&time>0)audio.addEventListener('loadedmetadata',()=>{if(time<audio.duration)audio.currentTime=time;},{once:true});
+    if('mediaSession' in navigator){
+      if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:'Fally Ranking (Remix)',artist:'V.I.V.E.K',album:'HIM Dub Festival'});
+      for(const [action,handler] of [['play',play],['pause',pause],['stop',pause]]){try{navigator.mediaSession.setActionHandler(action,handler);}catch{/* Optional device support. */}}
     }
-    const playPromise = audio.play();
-    if (playPromise && playPromise.then) {
-      playPromise.then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
-    } else {
-      setPlayingUI(true);
-    }
+    if(read('himdub_music_playing','')!=='0')play();
+    // If autoplay is blocked, the explicit play button remains available.
   }
-
-  btn.addEventListener("click", () => {
-    if (audio.paused) {
-      audio.play().then(() => {
-        setPlayingUI(true);
-        localStorage.setItem(PLAYING_KEY, "1");
-      }).catch(() => {});
-    } else {
-      audio.pause();
-      setPlayingUI(false);
-      localStorage.setItem(PLAYING_KEY, "0");
-    }
-  });
-
-  // Guarda o instante atual regularmente, para a próxima página retomar dali.
-  audio.addEventListener("timeupdate", () => {
-    sessionStorage.setItem(TIME_KEY, String(audio.currentTime));
-  });
-  window.addEventListener("beforeunload", () => {
-    sessionStorage.setItem(TIME_KEY, String(audio.currentTime));
-  });
+  button.addEventListener('click',()=>audio.paused?play():pause());
+  update();
 }
 
 /* --------------------------------------------------------------------- */
@@ -331,7 +331,7 @@ function initHeroArrowWhoosh() {
    arrastar (telemóvel, ver initSwipeNav). */
 function navigateWithWhoosh(href, direction, reduceMotion) {
   if (reduceMotion) {
-    window.location.href = href;
+    if(window.Turbo&&canNavigateWithMusic(href))window.Turbo.visit(href);else window.location.href=href;
     return;
   }
 
@@ -347,7 +347,7 @@ function navigateWithWhoosh(href, direction, reduceMotion) {
   const go = () => {
     if (navigated) return;
     navigated = true;
-    window.location.href = href;
+    if(window.Turbo&&canNavigateWithMusic(href))window.Turbo.visit(href);else window.location.href=href;
   };
   document.body.addEventListener("animationend", go, { once: true });
   setTimeout(go, 480); // rede de segurança caso o evento animationend não dispare
@@ -544,6 +544,7 @@ function initTestimonialCarousel() {
   carousel.addEventListener("mouseenter", stopAutoplay);
   carousel.addEventListener("mouseleave", startAutoplay);
   startAutoplay();
+  pageCleanups.push(stopAutoplay);
 }
 
 /* --------------------------------------------------------------------- */

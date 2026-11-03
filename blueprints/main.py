@@ -6,6 +6,20 @@ from i18n import localized_url_for as url_for
 
 main_bp = Blueprint("main", __name__)
 
+
+@main_bp.route('/gallery')
+def gallery():
+    from models import GalleryAlbum
+    return render_template('gallery.html', album=None,
+        albums=GalleryAlbum.query.filter_by(published=True).order_by(GalleryAlbum.sort_order,GalleryAlbum.id.desc()).all())
+
+
+@main_bp.route('/gallery/<int:album_id>')
+def gallery_album(album_id):
+    from models import GalleryAlbum
+    album=GalleryAlbum.query.filter_by(id=album_id,published=True).first_or_404()
+    return render_template('gallery.html',album=album)
+
 # Fotos de cada área (ver templates/area_detail.html) -- ficheiros em
 # static/img/areas/, ja redimensionados para a web. So as areas listadas
 # aqui tem pagina propria; as restantes ficam so como cartao simples em
@@ -185,9 +199,5 @@ def contact():
 
 @main_bp.route("/newsletter", methods=["POST"])
 def newsletter():
-    email = request.form.get("email", "").strip()
-    if email:
-        flash(_("As inscrições na newsletter ainda não estão disponíveis. Tenta novamente em breve."), "error")
-    else:
-        flash(_("Introduz um email válido."), "error")
-    return redirect(url_for("main.home"))
+    from newsletter import subscribe
+    return subscribe()

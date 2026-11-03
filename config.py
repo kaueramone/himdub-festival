@@ -98,6 +98,8 @@ class Config:
     RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
     RESEND_FROM_EMAIL = os.environ.get("RESEND_FROM_EMAIL", "bilhetes@himdubfestival.com")
     EMAILS_LIVE = bool(RESEND_API_KEY)
+    RESEND_NEWSLETTER_SEGMENT_ID = os.environ.get('RESEND_NEWSLETTER_SEGMENT_ID','')
+    RESEND_MARKETING_API_KEY = os.environ.get('RESEND_MARKETING_API_KEY',RESEND_API_KEY)
     EMAIL_WORKER_ENABLED = PRODUCTION and os.environ.get("EMAIL_WORKER_ENABLED", "true").lower() == "true"
 
     FESTIVAL_DATES = "23 a 29 de agosto de 2027"

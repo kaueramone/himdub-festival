@@ -100,7 +100,7 @@ def index():
     login_required/admin_required de cada rota tratam disso)."""
     if session.get("admin_role") == ROLE_CHECKIN:
         return redirect(url_for("checkin.scan"))
-    return redirect(url_for("admin.orders"))
+    return redirect(url_for("admin.dashboard"))
 
 
 @admin_bp.route("/login", methods=["GET", "POST"])
@@ -113,10 +113,10 @@ def login():
         email = request.form.get("email", "").strip().lower()[:180]
         check_login_throttle(email or "legacy")
         if email and authenticate(email, submitted):
-            target = url_for("checkin.scan") if session.get("admin_role") == ROLE_CHECKIN else local_redirect(request.args.get("next"), url_for("admin.orders"))
+            target = url_for("checkin.scan") if session.get("admin_role") == ROLE_CHECKIN else local_redirect(request.args.get("next"), url_for("admin.dashboard"))
             return redirect(target)
         if not current_app.config.get("ALLOW_LEGACY_LOGIN") or email:
-            flash("Email ou palavra-passe incorretos.", "error")
+            flash("Verifica o email, a palavra-passe e o código do autenticador.", "error")
             return render_template("admin/login.html"), 401
 
         # hmac.compare_digest em vez de "==" -- uma comparação normal de
@@ -735,3 +735,18 @@ def issue_ticket():
         form_email=form_email,
         form_quantity=form_quantity,
     )
+
+
+from admin_invites import init_invites
+from admin_reports import init_reports
+from cms import init_cms
+init_invites(admin_bp, admin_required)
+init_reports(admin_bp, admin_required, _write_sheet)
+init_cms(admin_bp, admin_required)
+
+from newsletter import init_newsletter
+from blueprints.main import main_bp
+init_newsletter(main_bp, admin_bp, admin_required)
+
+from transfers import init_transfers
+init_transfers(main_bp, admin_bp, admin_required)

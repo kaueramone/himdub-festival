@@ -37,6 +37,8 @@ def init_security(app):
     def protect_mutations():
         if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
             return
+        if request.path.startswith(('/admin/content/edit', '/admin/appearance', '/admin/gallery/')):
+            request.max_content_length = 16 * 1024 * 1024
         # This endpoint authenticates the original payload with Stripe's signature.
         if request.endpoint == "shop.stripe_webhook":
             return
@@ -52,4 +54,9 @@ def init_security(app):
         response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
         if request.path.startswith(("/admin", "/checkin", "/checkout")):
             response.headers["Cache-Control"] = "private, no-store"
+        if request.path.startswith(('/newsletter/', '/ticket-transfer')):
+            response.headers['Cache-Control']='private, no-store'
+            response.headers['Referrer-Policy']='no-referrer'
+        if '/admin/join/' in request.path or request.endpoint == 'admin.team':
+            response.headers['Referrer-Policy'] = 'no-referrer'
         return response

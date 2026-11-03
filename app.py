@@ -7,6 +7,8 @@ A app fica disponivel em http://127.0.0.1:5000
 """
 
 from flask import Flask, g, request, url_for
+import hashlib
+from pathlib import Path
 from flask_babel import Babel
 from config import Config
 from extensions import db
@@ -29,6 +31,9 @@ from i18n import (
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    asset_files=['js/main.js','js/admin.js','js/gallery.js','css/admin.css','css/managed.css']
+    app.jinja_env.globals['asset_version']=hashlib.sha256(b''.join(
+        (Path(app.static_folder)/name).read_bytes() for name in asset_files)).hexdigest()[:12]
     from security import init_security
     init_security(app)
     from auth import init_auth
@@ -45,6 +50,8 @@ def create_app():
     app.wsgi_app = LanguagePrefixMiddleware(app.wsgi_app, ["en", "fr"])
 
     db.init_app(app)
+    from cms import page_context
+    app.context_processor(page_context)
     Babel(app, locale_selector=get_locale)
 
     @app.before_request
@@ -127,6 +134,13 @@ def create_app():
     # Converte horas UTC (como vêm da base de dados) para hora de Portugal
     # antes de aparecerem no admin/check-in -- ver festival_time.py.
     app.jinja_env.filters["local_time"] = to_local_time
+    app.jinja_env.filters['money'] = lambda value: f'{float(value):,.2f}'.replace(',', '\u202f').replace('.', ',')
+    app.jinja_env.filters['order_status'] = lambda value: {
+        'paid':'Pago','comp':'Cortesia','pending':'Por pagar','processing':'Em confirmação',
+        'cancelled':'Cancelado','refunded':'Reembolsado','demo-paid':'Teste',
+        'awaiting_email':'Por confirmar email','pending_payment':'A aguardar taxa',
+        'completed':'Concluído','refund_pending':'Reembolso em curso',
+    }.get(value,value)
 
     def cdn_url(path):
         """URL de um ficheiro estatico "pesado" (video, audio) que pode vir

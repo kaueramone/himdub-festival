@@ -181,6 +181,123 @@ class LoginThrottle(db.Model):
     attempts = db.Column(db.Integer, default=0, nullable=False)
 
 
+class AdminInvite(db.Model):
+    __tablename__ = "admin_invites"
+    id = db.Column(db.Integer, primary_key=True)
+    token_hash = db.Column(db.String(64), unique=True, nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey("admin_users.id"), nullable=False)
+    email = db.Column(db.String(180), default="")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used_at = db.Column(db.DateTime)
+    revoked = db.Column(db.Boolean, default=False, nullable=False)
+
+
+class AdminEnrollment(db.Model):
+    __tablename__ = "admin_enrollments"
+    id = db.Column(db.String(64), primary_key=True)
+    invite_id = db.Column(db.Integer, db.ForeignKey("admin_invites.id"), nullable=False, index=True)
+    email = db.Column(db.String(180), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    totp_secret = db.Column(db.String(64), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+
+
+class PageAppearance(db.Model):
+    __tablename__ = "page_appearances"
+    key = db.Column(db.String(40), primary_key=True)
+    mode = db.Column(db.String(16), default="original", nullable=False)
+    image_url = db.Column(db.String(500), default="")
+    color_start = db.Column(db.String(7), default="#183629")
+    color_end = db.Column(db.String(7), default="#071d16")
+    layout = db.Column(db.String(16), default="cards")
+
+
+class PageBlock(db.Model):
+    __tablename__ = "page_blocks"
+    id = db.Column(db.Integer, primary_key=True)
+    page_key = db.Column(db.String(40), nullable=False, index=True)
+    title = db.Column(db.String(180), nullable=False)
+    text = db.Column(db.Text, default="")
+    image_url = db.Column(db.String(500), default="")
+    link_url = db.Column(db.String(500), default="")
+    link_label = db.Column(db.String(80), default="Saber mais")
+    title_en = db.Column(db.String(180), default="")
+    title_fr = db.Column(db.String(180), default="")
+    text_en = db.Column(db.Text, default="")
+    text_fr = db.Column(db.Text, default="")
+    sort_order = db.Column(db.Integer, default=0)
+    published = db.Column(db.Boolean, default=False, nullable=False)
+
+
+class GalleryAlbum(db.Model):
+    __tablename__ = "gallery_albums"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(180), nullable=False)
+    description = db.Column(db.Text, default="")
+    cover_url = db.Column(db.String(500), default="")
+    published = db.Column(db.Boolean, default=False, nullable=False)
+    sort_order = db.Column(db.Integer, default=0)
+    photos = db.relationship("GalleryPhoto", backref="album", cascade="all, delete-orphan", order_by="GalleryPhoto.sort_order, GalleryPhoto.id")
+
+
+class GalleryPhoto(db.Model):
+    __tablename__ = "gallery_photos"
+    id = db.Column(db.Integer, primary_key=True)
+    album_id = db.Column(db.Integer, db.ForeignKey("gallery_albums.id"), nullable=False, index=True)
+    image_url = db.Column(db.String(500), nullable=False)
+    caption = db.Column(db.String(255), default="")
+    sort_order = db.Column(db.Integer, default=0)
+
+
+class NewsletterSubscriber(db.Model):
+    __tablename__ = "newsletter_subscribers"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(180), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    requested_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    confirmed_at = db.Column(db.DateTime)
+    unsubscribed_at = db.Column(db.DateTime)
+    nonce = db.Column(db.String(64), nullable=False)
+    consent_text = db.Column(db.String(500), nullable=False)
+    provider_contact_id = db.Column(db.String(100), default="")
+    synced_at = db.Column(db.DateTime)
+
+
+class WebsiteJob(db.Model):
+    __tablename__ = "website_jobs"
+    id = db.Column(db.String(64), primary_key=True)
+    kind = db.Column(db.String(40), nullable=False)
+    payload = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default="pending", nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    available_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    first_attempt_at = db.Column(db.DateTime)
+    lease_until = db.Column(db.DateTime)
+    attempts = db.Column(db.Integer, default=0, nullable=False)
+    last_error = db.Column(db.String(100), default="")
+
+
+class TicketTransfer(db.Model):
+    __tablename__ = "ticket_transfers"
+    id = db.Column(db.String(40), primary_key=True)
+    ticket_id = db.Column(db.Integer, db.ForeignKey("tickets.id"), nullable=False, index=True)
+    active_ticket_id = db.Column(db.Integer, unique=True, nullable=True)
+    token_hash = db.Column(db.String(64), unique=True, nullable=False)
+    original_code_hash = db.Column(db.String(64), nullable=False)
+    original_email = db.Column(db.String(180), nullable=False)
+    new_name = db.Column(db.String(120), default="")
+    new_email = db.Column(db.String(180), default="")
+    fee_cents = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(30), default="awaiting_email", nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    checkout_expires_at = db.Column(db.DateTime)
+    stripe_session_id = db.Column(db.String(255), unique=True, nullable=True)
+    payment_intent = db.Column(db.String(255), default="")
+    completed_at = db.Column(db.DateTime)
+
+
 class AuditEvent(db.Model):
     __tablename__ = "audit_events"
     id = db.Column(db.Integer, primary_key=True)
@@ -344,6 +461,7 @@ class Ticket(db.Model):
     previous_codes = db.Column(db.Text, default="")
 
     order = db.relationship("Order", backref=db.backref("tickets", order_by="Ticket.id"))
+    order_item = db.relationship("OrderItem")
 
     @property
     def is_checked_in(self):

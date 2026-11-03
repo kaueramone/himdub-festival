@@ -6,10 +6,10 @@
 
 <section class="immersive-hero immersive-hero--tickets tickets-hero">
   <div class="immersive-hero__video-wrap">
-    <video class="immersive-hero__video" muted loop playsinline preload="auto"
+    {% if not page_settings or page_settings.mode=='original' %}<video class="immersive-hero__video" muted loop playsinline preload="auto"
       poster="{{ url_for('static', filename='img/tickets-poster.jpg') }}">
       <source src="{{ cdn_url('video/tickets-bg.mp4') }}" type="video/mp4">
-    </video>
+    </video>{% endif %}
   </div>
   {% with prev_url=url_for('main.home'), prev_label=_('Home'), next_url=url_for('shop.glamping'), next_label=_('Experience') %}
     {% include "partials/_hero_arrows.html" %}

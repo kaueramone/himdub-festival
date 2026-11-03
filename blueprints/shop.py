@@ -816,6 +816,9 @@ def stripe_webhook():
     try:
         event_type = event.get("type")
         obj = event.get("data", {}).get("object", {})
+        from transfers import handle_transfer_event
+        if event_type.startswith('checkout.session.') and handle_transfer_event(event_type,obj):
+            return '',200
         if event_type in ("checkout.session.completed", "checkout.session.async_payment_succeeded"):
             _confirm_stripe_payment(obj)
         elif event_type == "charge.refunded" and obj.get("refunded") is True:

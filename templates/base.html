@@ -5,12 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}HIM Dub Festival{% endblock %}</title>
   <meta name="description" content="{{ _('HIM Dub Festival — reggae, sound system e comunidade junto ao rio, em Sabugal, Portugal.') }}">
+  <meta name="turbo-cache-control" content="no-cache"><meta name="turbo-prefetch" content="false">
+  <script src="{{ url_for('static',filename='vendor/turbo.js') }}" defer data-turbo-track="reload"></script>
+  <script src="{{ url_for('static',filename='js/main.js',v=asset_version) }}" defer data-turbo-track="reload"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/managed.css',v=asset_version) }}" data-turbo-track="reload">
+  {% if page_settings and page_settings.mode!='original' %}<style data-turbo-track="dynamic">
+    body.custom-page-bg::before { {% if page_settings.mode=='image' %}background:linear-gradient(#0008,#0009),url("{{ page_settings.image_url }}") center/cover no-repeat;{% elif page_settings.mode=='gradient' %}background:linear-gradient(135deg,{{ page_settings.color_start }},{{ page_settings.color_end }});{% else %}background:{{ page_settings.color_start }};{% endif %} }
+  </style>{% endif %}
 </head>
-<body class="{% block body_class %}{% endblock %}">
+<body data-site-lang="{{ current_lang }}" class="{% block body_class %}{% endblock %} {{ 'custom-page-bg' if page_settings and page_settings.mode!='original' else '' }} {{ 'has-managed-content' if page_blocks else '' }}">
   {% set is_immersive = 'immersive-page' in self.body_class() %}
   <script>
     // Aplica já a animação de entrada "whoosh" (se viemos de um clique numa
@@ -39,6 +46,7 @@
         <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
         <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
         <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
+        <a href="{{ url_for('main.gallery') }}">Gallery</a>
         <div class="main-nav__dropdown">
           <button type="button" class="main-nav__dropdown-btn">{{ _('Infos') }} <span aria-hidden="true">▾</span></button>
           <div class="main-nav__dropdown-menu">
@@ -51,7 +59,7 @@
       </nav>
 
       {% if request.blueprint in ('main', 'shop') %}
-        <audio id="bgMusic" loop preload="none">
+        <audio id="bgMusic" data-turbo-permanent loop preload="none">
           <source src="{{ cdn_url('audio/bg-music.mp3') }}" type="audio/mpeg">
         </audio>
       {% endif %}
@@ -78,6 +86,7 @@
     <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
     <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
     <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
+    <a href="{{ url_for('main.gallery') }}">Gallery</a>
     <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
     <a href="{{ url_for('main.sustainability') }}">{{ _('Sustainability') }}</a>
     <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
@@ -103,6 +112,7 @@
 
   <main>
     {% block content %}{% endblock %}
+    {% include 'partials/_page_blocks.html' %}
   </main>
 
   <footer class="site-footer">
@@ -122,6 +132,7 @@
 
       <div class="site-footer__links">
         <a href="{{ url_for('main.faq') }}">{{ _('Terms & help') }}</a>
+        <a href="{{ url_for('main.ticket_transfer') }}">Trocar titular de um bilhete</a>
         <button type="button" id="cartToggle" class="site-footer__cart-btn">{{ _('Carrinho') }}</button>
       </div>
     </div>
@@ -131,6 +142,7 @@
       <form action="{{ url_for('main.newsletter') }}" method="post" class="newsletter-form">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="email" name="email" placeholder="{{ _('o-teu-email@exemplo.com') }}" required>
+        <label class="newsletter-consent"><input type="checkbox" name="consent" value="yes" required> Quero receber novidades do HIM Dub Festival por email. Posso cancelar a qualquer momento.</label>
         <button type="submit">{{ _('Subscrever') }}</button>
       </form>
       <div class="social-row">
@@ -164,7 +176,6 @@
   </aside>
   <div class="cart-drawer-backdrop" id="cartBackdrop"></div>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>
