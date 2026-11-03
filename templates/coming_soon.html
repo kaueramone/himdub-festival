@@ -41,7 +41,7 @@
     }
     .coming-soon__social a:hover { background: var(--cream); color: var(--bg-alt); }
   </style>
-</head>
+{% include 'partials/_app_icons.html' %}</head>
 <body>
   <div class="coming-soon">
     <img src="{{ url_for('static', filename='img/logo-him-dub.png') }}" alt="HIM Dub Festival" class="coming-soon__logo">

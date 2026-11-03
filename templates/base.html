@@ -16,7 +16,7 @@
   {% if page_settings and page_settings.mode!='original' %}<style data-turbo-track="dynamic">
     body.custom-page-bg::before { {% if page_settings.mode=='image' %}background:linear-gradient(#0008,#0009),url("{{ page_settings.image_url }}") center/cover no-repeat;{% elif page_settings.mode=='gradient' %}background:linear-gradient(135deg,{{ page_settings.color_start }},{{ page_settings.color_end }});{% else %}background:{{ page_settings.color_start }};{% endif %} }
   </style>{% endif %}
-</head>
+{% include 'partials/_app_icons.html' %}</head>
 <body data-site-lang="{{ current_lang }}" class="{% block body_class %}{% endblock %} {{ 'custom-page-bg' if page_settings and page_settings.mode!='original' else '' }} {{ 'has-managed-content' if page_blocks else '' }}">
   {% set is_immersive = 'immersive-page' in self.body_class() %}
   <script>

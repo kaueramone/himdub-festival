@@ -1,7 +1,7 @@
 {% from 'admin/icons.html' import icon as nav_icon %}
 <!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>{% block title %}Administração · HIM Dub{% endblock %}</title><meta name="robots" content="noindex,nofollow">
-<link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='css/admin.css',v=asset_version) }}"></head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='css/admin.css',v=asset_version) }}">{% include 'partials/_app_icons.html' %}</head>
 <body class="admin-app"><a class="skip-link" href="#admin-main">Saltar para o conteúdo</a>
 {% set links=[('admin.dashboard','Início','home'),('admin.sales','Vendas','sales'),('admin.orders','Encomendas','orders'),('admin.content','Conteúdos','content'),('admin.gallery','Galeria','gallery'),('admin.team','Equipa','team'),('admin.newsletter_admin','Newsletter','newsletter'),('admin.email_queue','Envios de bilhetes','email'),('admin.appearance','Aspeto do site','appearance'),('admin.transfers_admin','Troca de titular','transfer'),('admin.ticket_sales','Bilheteira','orders'),('admin.customer_requests','Pedidos de clientes','team')] %}
 <aside class="app-sidebar"><a class="app-brand" href="{{ url_for('admin.dashboard') }}"><img src="{{ url_for('static',filename='img/logo-him-dub.png') }}" alt="HIM Dub"><span>Administração</span></a>

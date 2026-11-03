@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "HIM Dub Festival",
+  "short_name": "HIM Dub",
+  "lang": "pt-PT",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#171d20",
+  "theme_color": "#171d20",
+  "icons": [
+    {
+      "src": "/static/icons/icon-app-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-app-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
