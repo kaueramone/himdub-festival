@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Bilhete não encontrado — Check-in{% endblock %}
+
+{% block content %}
+
+<section class="section section--result">
+  <div class="container narrow center-cta" data-reveal>
+    <span class="result-icon result-icon--cancel">!</span>
+    <h1>Bilhete não encontrado</h1>
+    <p>O código "{{ code }}" não corresponde a nenhum bilhete válido.</p>
+    <a href="{{ url_for('checkin.scan') }}" class="btn btn--primary">Tentar outra vez</a>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Bilhete {{ ticket.code }} — Check-in{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container narrow">
+    <p class="eyebrow" data-reveal>Check-in</p>
+    <h1 data-reveal>{{ ticket.product_name }}{% if ticket.variant %} ({{ ticket.variant }}){% endif %}</h1>
+    <p data-reveal>
+      Código: <strong>{{ ticket.code }}</strong><br>
+      Encomenda #{{ ticket.order_id }} — {{ ticket.order.name }} {% if session.get("admin_role") == "admin" %}({{ ticket.order.email }}){% endif %}
+      {%- if ticket.holder_name %}<br>Nome no bilhete: <strong>{{ ticket.holder_name }}</strong>{% endif %}
+      {%- if ticket.companion_name %}<br>Acompanhante: <strong>{{ ticket.companion_name }}</strong>{% endif %}
+      {%- if ticket.kids_names %}<br>Crianças: <strong>{{ ticket.formatted_kids_names }}</strong>{% endif %}
+    </p>
+
+    {% if ticket.is_checked_in %}
+      <div class="notice-box notice-box--danger" data-reveal>
+        ⚠️ <strong>Bilhete já usado.</strong> Fez check-in em {{ (ticket.checked_in_at | local_time).strftime("%d/%m/%Y %H:%M") }},
+        associado à pulseira <strong>{{ ticket.wristband_code }}</strong>. Não voltes a dar entrada com este
+        código -- se a pessoa que está à tua frente não tem essa pulseira, não é o dono deste bilhete.
+      </div>
+
+      {% if session.get("admin_role") == "admin" %}
+      <details class="checkin-override" data-reveal>
+        <summary>Foi mesmo um erro nosso (pulseira trocada/perdida) — corrigir</summary>
+        <form method="post" class="checkout-form" style="max-width:360px;margin-top:16px;">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="field">
+            <label for="wristband_code">Número da pulseira (GoFun)</label>
+            <input type="text" id="wristband_code" name="wristband_code" required value="{{ ticket.wristband_code }}">
+          </div>
+          <label>Justificação <input name="override_reason" maxlength="200" required></label>
+          <label class="checkin-override__confirm">
+            <input type="checkbox" name="confirm_override" value="yes" required>
+            Confirmo que quero substituir os dados de check-in deste bilhete.
+          </label>
+          <button type="submit" class="btn btn--outline btn--lg">Corrigir pulseira</button>
+        </form>
+      </details>
+      {% endif %}
+    {% else %}
+      <form method="post" class="checkout-form" data-reveal style="max-width:360px;">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+          <label for="wristband_code">Número da pulseira (GoFun)</label>
+          <input type="text" id="wristband_code" name="wristband_code" autofocus required value="{{ ticket.wristband_code }}">
+        </div>
+        <button type="submit" class="btn btn--primary btn--lg">Confirmar entrada</button>
+      </form>
+    {% endif %}
+
+    <div class="admin-filters" data-reveal style="margin-top:24px;">
+      <a href="{{ url_for('checkin.scan') }}">← Ler outro bilhete</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

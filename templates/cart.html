@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Carrinho') }} — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container narrow">
+    <p class="eyebrow" data-reveal>{{ _('O teu carrinho') }}</p>
+    <h1 data-reveal>{{ _('Resumo da encomenda') }}</h1>
+
+    {% if cart_lines %}
+      <table class="cart-table" data-reveal>
+        <thead>
+          <tr><th>{{ _('Produto') }}</th><th>{{ _('Preço') }}</th><th>{{ _('Qtd') }}</th><th>{{ _('Subtotal') }}</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for line in cart_lines %}
+            <tr>
+              <td class="cart-table__product">
+                {% if line.icon %}
+                  <span class="cart-line__swatch cart-line__swatch--icon">
+                    <img src="{{ url_for('static', filename='img/icons/' ~ line.icon ~ '.png') }}" alt="" loading="lazy">
+                  </span>
+                {% else %}
+                  <span class="cart-line__swatch {{ line.product.image_class }}"></span>
+                {% endif %}
+                <div>
+                  <strong>{{ line.product.localized_name }}</strong>
+                  {% if line.variant %}<small>{{ _('Tamanho:') }} {{ line.variant }}</small>{% endif %}
+                </div>
+              </td>
+              <td>€{{ '%.2f'|format(line.product.price) }}</td>
+              <td>
+                <form action="{{ url_for('shop.cart_update') }}" method="post" class="qty-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="key" value="{{ line.key }}">
+                  <input type="number" name="quantity" value="{{ line.quantity }}" min="1" max="10" onchange="this.form.submit()">
+                </form>
+              </td>
+              <td>€{{ '%.2f'|format(line.subtotal) }}</td>
+              <td>
+                <form action="{{ url_for('shop.cart_remove', key=line.key) }}" method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="link-remove" aria-label="{{ _('Remover') }}">{{ _('Remover') }}</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="cart-summary" data-reveal>
+        <span>{{ _('Total') }}</span>
+        <strong>€{{ '%.2f'|format(cart_total) }}</strong>
+      </div>
+
+      <div class="cart-actions" data-reveal>
+        <a href="{{ url_for('shop.tickets') }}" class="btn btn--outline">{{ _('Continuar a explorar') }}</a>
+        <a href="{{ url_for('shop.checkout') }}" class="btn btn--primary btn--lg">{{ _('Avançar para checkout') }}</a>
+      </div>
+    {% else %}
+      <p data-reveal>{% trans tickets_url=url_for('shop.tickets'), glamping_url=url_for('shop.glamping'), merch_url=url_for('shop.merchandise') %}O teu carrinho está vazio. Explora os <a href="{{ tickets_url }}">bilhetes</a>, o
+        <a href="{{ glamping_url }}">glamping</a> ou o <a href="{{ merch_url }}">merchandise</a>.{% endtrans %}</p>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

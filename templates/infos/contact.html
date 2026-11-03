@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Contact') }} — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<section class="page-hero page-hero--contact">
+  <div class="container" data-reveal>
+    <p class="eyebrow">{{ _('Infos') }}</p>
+    <h1>{{ _('Contact') }}</h1>
+
+    <div class="contact-grid">
+      <div>
+        <h4>{{ _('Informações gerais') }}</h4>
+        <a href="mailto:contact@himdubfestival.com">contact@himdubfestival.com</a>
+      </div>
+      <div>
+        <h4>{{ _('Bilhetes') }}</h4>
+        <a href="mailto:tickets@himdubfestival.com">tickets@himdubfestival.com</a>
+      </div>
+      <div>
+        <h4>{{ _('Artistas & Música') }}</h4>
+        <a href="mailto:artists@himdubfestival.com">artists@himdubfestival.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

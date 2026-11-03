@@ -1,0 +1,11 @@
+{# Setas de navegação esquerda/direita (efeito "whoosh"), usadas em todas as
+   páginas "imersivas" (Home, Tickets, Glamping, Merchandise, Participate).
+   Espera: prev_url, prev_label, next_url, next_label no contexto. #}
+<a href="{{ prev_url }}" class="hero-arrow hero-arrow--prev">
+  <span>{{ prev_label }}</span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+</a>
+<a href="{{ next_url }}" class="hero-arrow hero-arrow--next">
+  <span>{{ next_label }}</span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+</a>

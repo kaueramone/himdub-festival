@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ _('The map') }} — HIM Dub Festival{% endblock %}
+{% block body_class %}immersive-page{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero immersive-hero--map">
+  <div class="immersive-hero__scrim"></div>
+
+  {% with prev_url=url_for('shop.glamping'), prev_label=_('Experience'), next_url=url_for('main.participate'), next_label=_('Participate') %}
+    {% include "partials/_hero_arrows.html" %}
+  {% endwith %}
+
+  <div class="immersive-hero__content" data-reveal>
+    <p class="eyebrow">{{ _('Experience') }}</p>
+    <h1 class="immersive-hero__title">{{ _('The map') }}</h1>
+
+    <div class="map-panel">
+      <div class="map-panel__inner">
+        <img src="{{ url_for('static', filename='img/experience-map.png') }}" alt="{{ _('Mapa do recinto do festival') }}" class="map-panel__img">
+        <a href="{{ url_for('main.area_detail', slug='dub-temple') }}" class="map-hotspot map-hotspot--dub-temple" aria-label="Dub Temple"></a>
+        <a href="{{ url_for('main.area_detail', slug='river-station') }}" class="map-hotspot map-hotspot--river-station" aria-label="River Station"></a>
+        <a href="{{ url_for('main.area_detail', slug='roots-garden') }}" class="map-hotspot map-hotspot--roots-garden" aria-label="Roots Garden"></a>
+        <a href="{{ url_for('main.area_detail', slug='workshops') }}" class="map-hotspot map-hotspot--workshops" aria-label="{{ _('Workshops') }}"></a>
+        <a href="{{ url_for('main.area_detail', slug='lectures') }}" class="map-hotspot map-hotspot--lectures" aria-label="{{ _('Lectures') }}"></a>
+        <a href="{{ url_for('main.area_detail', slug='healing-area') }}" class="map-hotspot map-hotspot--healing-area" aria-label="{{ _('Healing Area') }}"></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__meta">
+    <div class="hero__meta-edition"><b>{{ _('6ª Edição') }}</b>{{ _(config.FESTIVAL_DATES) }}</div>
+    <div class="hero__meta-coords">40.418799, -7.045625</div>
+    <div class="hero__meta-right">
+      <div class="lang-pills">
+        {% for code in languages %}
+          <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_labels[code] }}</a>
+        {% endfor %}
+      </div>
+      {% include "partials/_music_toggle.html" %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

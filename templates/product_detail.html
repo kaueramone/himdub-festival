@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ product.localized_name }} — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<section class="section product-detail">
+  <div class="container product-detail__grid">
+    <div class="product-detail__visual {{ product.image_class }}" data-reveal></div>
+
+    <div class="product-detail__info" data-reveal>
+      <p class="eyebrow">{{ product.category|capitalize }}</p>
+      <h1>{{ product.localized_name }}</h1>
+      <p class="price price--lg">€{{ '%.2f'|format(product.price) }}</p>
+      <p class="product-detail__desc">{{ product.localized_description }}</p>
+
+      <form action="{{ url_for('shop.cart_add') }}" method="post" class="product-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+
+        {% if product.variant_list %}
+          <div class="field">
+            <label>{{ _('Tamanho') }}</label>
+            <div class="variant-picker">
+              {% for v in product.variant_list %}
+                <label class="variant-option">
+                  <input type="radio" name="variant" value="{{ v }}" {% if loop.first %}checked{% endif %}>
+                  <span>{{ v }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="field field--qty">
+          <label for="qty">{{ _('Quantidade') }}</label>
+          <input type="number" id="qty" name="quantity" value="1" min="1" max="10">
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--lg">{{ _('Adicionar ao carrinho') }}</button>
+      </form>
+
+      <a href="javascript:history.back()" class="link-arrow">{{ _('← Voltar') }}</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

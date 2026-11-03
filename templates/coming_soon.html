@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="{{ current_lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ _('Brevemente') }} — HIM Dub Festival</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Esta página não usa o resto do site (base.html) de propósito -- não
+       tem cabeçalho, menu nem rodapé, para ninguém conseguir "fugir" dela
+       e chegar a outra página enquanto o modo brevemente estiver ligado
+       (ver coming_soon.py / COMING_SOON_MODE em config.py). Só o essencial
+       aqui, o resto do estilo (cores, fontes) vem do style.css do site,
+       para ficar visualmente igual ao resto. */
+    .coming-soon {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; padding: 32px 24px;
+      background: radial-gradient(ellipse 90% 70% at 50% -10%, var(--maroon), transparent 60%),
+                  radial-gradient(ellipse 70% 60% at 100% 100%, var(--rust), transparent 65%),
+                  var(--bg-alt);
+    }
+    .coming-soon__logo { width: min(220px, 55vw); margin-bottom: 36px; }
+    .coming-soon__eyebrow {
+      font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--gold); font-size: clamp(1.4rem, 4vw, 2.1rem); margin: 0 0 18px;
+    }
+    .coming-soon__text {
+      max-width: 560px; color: var(--cream); font-size: clamp(1rem, 2.4vw, 1.2rem);
+      line-height: 1.6; margin: 0 0 28px;
+    }
+    .coming-soon__meta { color: var(--ink-soft); font-size: 0.85rem; letter-spacing: 0.03em; }
+    .coming-soon__social { display: flex; gap: 18px; margin-top: 28px; }
+    .coming-soon__social a {
+      color: var(--cream); font-family: var(--font-display); font-size: 0.85rem;
+      letter-spacing: 0.08em; text-decoration: none; border: 1px solid rgba(244,239,224,.3);
+      border-radius: 999px; padding: 8px 18px; transition: background 0.25s, color 0.25s;
+    }
+    .coming-soon__social a:hover { background: var(--cream); color: var(--bg-alt); }
+  </style>
+</head>
+<body>
+  <div class="coming-soon">
+    <img src="{{ url_for('static', filename='img/logo-him-dub.png') }}" alt="HIM Dub Festival" class="coming-soon__logo">
+    <p class="coming-soon__eyebrow">{{ _('Brevemente') }}</p>
+    <p class="coming-soon__text">{{ _('Estamos nos últimos preparativos. A venda de bilhetes abre hoje às 18h -- volta a visitar-nos daqui a pouco.') }}</p>
+    <p class="coming-soon__meta"><b>{{ _('6ª Edição') }}</b> · {{ _(config.FESTIVAL_DATES) }}</p>
+    <div class="coming-soon__social">
+      <a href="https://www.facebook.com/himdubfestivalofficial" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://www.instagram.com/himdubfestival/" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+</body>
+</html>

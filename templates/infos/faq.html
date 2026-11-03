@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}FAQ — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<section class="page-hero page-hero--faq">
+  <div class="container" data-reveal>
+    <p class="eyebrow">{{ _('Infos') }}</p>
+    <h1>{{ _('Perguntas Frequentes') }}</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="faq-rules-link" data-reveal>
+      {{ _('Para o regulamento completo do festival, consulta as') }}
+      <a href="https://himdubfestival.com/index.php/regras-e-normas-de-funcionamento/" target="_blank" rel="noopener">{{ _('Regras e Normas de Funcionamento') }}</a>.
+    </p>
+    <div class="accordion" data-reveal>
+      {% for question, answer in faqs %}
+        <details class="accordion__item">
+          <summary>{{ question }}</summary>
+          <div class="accordion__content"><p>{{ answer }}</p></div>
+        </details>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

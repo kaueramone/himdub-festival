@@ -1,0 +1,32 @@
+{# Widget de bilhética Notikumi -- desde 18/09/2026 os bilhetes passam a
+   vender-se inteiramente por aqui (pagamento, fatura, bilhete com QR, tudo
+   do lado da Notikumi). O carrinho/Stripe próprio do site deixou de ser
+   usado para bilhetes, mas fica montado no código (Product categoria
+   "ticket", rotas em shop.py) tal como aconteceu com o glamping, caso seja
+   preciso reativar no futuro.
+
+   O parâmetro `lang` só é enviado para inglês -- a Notikumi confirmou esse
+   valor. Para francês assumimos 'fr' por simetria (código ISO padrão), mas
+   ninguém confirmou que existe versão francesa do widget -- vale a pena
+   confirmar com eles e testar essa página a sério antes do lançamento. Para
+   português (idioma por defeito da conta) o script funciona sem `lang`. #}
+<script type="text/javascript" class="___ntk-widget">
+var _ntk = _ntk || [];
+_ntk.push({
+    channel: 'decibel-costume-lda',
+    content: 'decibel-costume-lda',
+    type: 5,
+    layout: 'widget',
+    resizer: true,
+    customCss: 'https://cdn.notikumi.com/css/widget/custom/decibel-costume-lda.css'{% if current_lang != 'pt' %},
+    lang: '{{ current_lang }}'{% endif %}
+
+});
+</script>
+<script type="text/javascript">
+(function () {
+    var nw = document.createElement('script'); nw.type = 'text/javascript'; nw.async = true;
+    nw.src = 'https://cdn.notikumi.com/js/widget/current/widget.min.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(nw, s);
+})();
+</script>

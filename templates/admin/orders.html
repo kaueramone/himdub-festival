@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}Encomendas — Admin{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Área reservada</p>
+    <div class="admin-header">
+      <h1>Encomendas</h1>
+      <div style="display:flex;gap:10px;">
+        <details class="admin-export">
+          <summary class="btn btn--outline btn--small">Exportar Excel</summary>
+          <div class="admin-export__panel">
+            <a href="{{ url_for('admin.export_excel') }}" class="admin-export__all">Exportar tudo</a>
+            <div class="admin-export__divider">ou escolhe um período</div>
+            <form method="get" action="{{ url_for('admin.export_excel') }}" class="admin-export__form">
+              <label>De <input type="date" name="start" required></label>
+              <label>Até <input type="date" name="end" required></label>
+              <button type="submit" class="btn btn--primary btn--small">Exportar período</button>
+            </form>
+          </div>
+        </details>
+        <a href="{{ url_for('admin.issue_ticket') }}" class="btn btn--outline btn--small">Emitir bilhete</a>
+        <a href="{{ url_for('checkin.scan') }}" class="btn btn--primary btn--small">Ler bilhetes (check-in)</a>
+        <a href="{{ url_for('admin.logout') }}" class="btn btn--outline btn--small">Sair</a>
+      </div>
+    </div>
+
+    {% if not real_sales_launch_at %}
+      <p class="admin-stats-note" style="opacity:0.7; font-size:0.82rem; margin:-14px 0 18px;">
+        Os números abaixo mostram tudo o que há na base de dados, testes incluídos -- normal enquanto ainda estiveres a testar o checkout. Quando carregares em "Ativar contagem de vendas reais" (mais abaixo), estes números passam logo a zero e só voltam a contar a partir das vendas feitas dali em diante.
+      </p>
+    {% endif %}
+    <div class="stat-grid admin-summary">
+      <div class="stat-card"><span class="stat-card__num">€{{ '%.0f'|format(revenue) }}</span><span>receita confirmada</span></div>
+      <div class="stat-card"><span class="stat-card__num">{{ paid_count }}</span><span>encomendas pagas</span></div>
+      <div class="stat-card"><span class="stat-card__num">{{ comp_count }}</span><span>bilhetes de cortesia</span></div>
+      <a href="{{ url_for('admin.orders', status='pending') }}" class="stat-card stat-card--link"><span class="stat-card__num">{{ pending_count }}</span><span>a aguardar pagamento</span></a>
+      <div class="stat-card"><span class="stat-card__num">{{ checked_in_count }}/{{ total_tickets }}</span><span>bilhetes com check-in</span></div>
+    </div>
+
+    {% for w in low_stock_warnings %}
+      <div class="admin-alert">
+        ⚠️ Faltam apenas <strong>{{ w.remaining }}</strong> bilhete{{ 's' if w.remaining != 1 }} real{{ 's' if w.remaining != 1 }} para o <strong>{{ w.label }}</strong> do Full Pass terminar.
+      </div>
+    {% endfor %}
+
+    {# Interruptor do 2nd batch (ver batches.py real_sales_launch_at) -- só
+       carregar neste botão no dia exato em que o site passar a usar o
+       domínio final himdubfestival.com. Antes disso, nenhuma venda conta
+       para o limite real de 150 bilhetes que fecha o Early Bird. #}
+    <div class="admin-real-sales {{ 'is-active' if real_sales_launch_at }}">
+      {% if real_sales_launch_at %}
+        <span>✓ Contagem de vendas reais ativada em {{ (real_sales_launch_at | local_time).strftime("%d/%m/%Y às %H:%M") }} (hora de Portugal) -- só bilhetes pagos a sério no Stripe a partir daqui contam para o 2nd batch.</span>
+      {% else %}
+        <span>A contagem de vendas reais do 1º lote (que decide quando o 2º lote abre) ainda não está ativada -- nada do que já se vendeu até agora (incluindo compras a sério feitas para testar) conta para o limite.</span>
+        <form method="post" action="{{ url_for('admin.activate_real_sales') }}" style="display:flex; gap:8px; align-items:center;" onsubmit="return confirm('Isto liga, de vez, a contagem de vendas reais do 1º lote -- a partir de AGORA. Tudo o que já foi vendido até este clique (mesmo compras a sério, de teste) fica de fora da contagem. Só confirmes isto quando o site já estiver mesmo no domínio final himdubfestival.com. Confirmas?');">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="password" name="confirm_password" placeholder="Password de admin" required style="padding:6px 10px; border-radius:6px; border:1px solid rgba(201,154,70,0.4); background:rgba(0,0,0,0.2); color:inherit; font-size:0.82rem;">
+          <button type="submit" class="btn btn--outline btn--small">Ativar contagem de vendas reais</button>
+        </form>
+      {% endif %}
+    </div>
+
+    {% if tickets_sold %}
+      <h3 class="admin-subtitle">Vendidos por tipo</h3>
+      <div class="admin-tickets">
+        {% for name, qty in tickets_sold %}
+          <div class="admin-tickets__row"><span>{{ name }}</span><strong>{{ qty }}</strong></div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="get" action="{{ url_for('admin.orders') }}" class="admin-search">
+      {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Pesquisar por nome, email ou código do bilhete…" class="admin-search__input">
+      <button type="submit" class="btn btn--outline btn--small">Pesquisar</button>
+      {% if search_query %}
+        <a href="{{ url_for('admin.orders', status=status_filter or None) }}" class="admin-search__clear">Limpar</a>
+      {% endif %}
+    </form>
+
+    <div class="admin-filters">
+      <a href="{{ url_for('admin.orders', q=search_query or None) }}" class="{{ 'is-active' if not status_filter }}">Todas</a>
+      <a href="{{ url_for('admin.orders', status='paid', q=search_query or None) }}" class="{{ 'is-active' if status_filter == 'paid' }}">Pagas</a>
+      <a href="{{ url_for('admin.orders', status='demo-paid', q=search_query or None) }}" class="{{ 'is-active' if status_filter == 'demo-paid' }}">Demo</a>
+      <a href="{{ url_for('admin.orders', status='comp', q=search_query or None) }}" class="{{ 'is-active' if status_filter == 'comp' }}">Cortesia</a>
+      <a href="{{ url_for('admin.orders', status='pending', q=search_query or None) }}" class="{{ 'is-active' if status_filter == 'pending' }}">Pendentes</a>
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Data</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>País</th>
+            <th>Itens</th>
+            <th>Bilhetes (check-in)</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            <tr>
+              <td>{{ order.id }}</td>
+              <td>{{ (order.created_at | local_time).strftime("%d/%m/%Y %H:%M") }}</td>
+              <td>{{ order.name }}</td>
+              <td>{{ order.email }}</td>
+              <td>{{ order.country or '—' }}</td>
+              <td>
+                {% for item in order.items %}
+                  {{ item.quantity }}× {{ item.product_name }}{% if item.variant %} ({{ item.variant }}){% endif %}{% if item.companion_name %} — Acompanhante: {{ item.companion_name }}{% endif %}{% if item.kids_names %} — {{ item.formatted_kids_names }}{% endif %}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                {% if order.tickets %}
+                  {% for ticket in order.tickets %}
+                    <a href="{{ url_for('checkin.ticket_detail', code=ticket.code) }}" class="admin-status {{ 'admin-status--paid' if ticket.is_checked_in else 'admin-status--pending' }}" style="margin:0 4px 4px 0;display:inline-block;">
+                      {{ ticket.code }}{% if ticket.holder_name %} — {{ ticket.holder_name }}{% endif %}{% if ticket.is_checked_in %} ✓{% endif %}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span class="admin-status">—</span>
+                {% endif %}
+              </td>
+              <td>€{{ '%.2f'|format(order.total) }}</td>
+              <td><span class="admin-status admin-status--{{ order.status }}">{{ order.status }}</span></td>
+              <td>
+                {% if order.tickets %}
+                  <form method="post" action="{{ url_for('admin.resend_ticket', order_id=order.id) }}" class="admin-inline-form" onsubmit="return confirm('Reenviar o email com o(s) bilhete(s) desta encomenda?');">
+<input type="hidden" name="resend_key" value="{{ new_form_nonce() }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="status" value="{{ status_filter }}">
+                    <input type="hidden" name="q" value="{{ search_query }}">
+                    <button type="submit" class="btn btn--outline btn--small">Reenviar bilhete</button>
+                  </form>
+                  {# Reaproveita o estilo do dropdown "Exportar Excel" (.admin-export) só pela aparência -- nada a ver com exportação. #}
+                  <details class="admin-export" style="display:inline-block; margin-left:6px;">
+                    <summary class="btn btn--outline btn--small">Editar bilhete</summary>
+                    <div class="admin-export__panel">
+                      <form method="post" action="{{ url_for('admin.edit_order_name', order_id=order.id) }}" class="admin-export__form" onsubmit="return confirm('Isto vai gerar um código novo para o(s) bilhete(s) desta encomenda -- o(s) bilhete(s) antigo(s), já enviado(s) por email, deixam de funcionar no check-in. Depois disto ainda precisas de carregar em \'Reenviar bilhete\' para o cliente receber o bilhete corrigido (já vai para o email novo, se o mudares). Continuar?');">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="status" value="{{ status_filter }}">
+                        <input type="hidden" name="q" value="{{ search_query }}">
+                        <label>Nome correto
+                          <input type="text" name="new_name" value="{{ order.name }}" required style="padding:8px 12px; border-radius:8px; border:1px solid rgba(244,239,224,.2); background:rgba(244,239,224,.06); color:inherit; font-family:inherit; font-size:0.85rem; width:100%;">
+                        </label>
+                        <label>Email correto
+                          <input type="email" name="new_email" value="{{ order.email }}" required style="padding:8px 12px; border-radius:8px; border:1px solid rgba(244,239,224,.2); background:rgba(244,239,224,.06); color:inherit; font-family:inherit; font-size:0.85rem; width:100%;">
+                        </label>
+                        {# Um campo de nome (e, opcionalmente, de email) por bilhete "normal"
+                           (tudo exceto Acessibilidade/Família, que mantêm o seu próprio
+                           acompanhante/lista de crianças -- ver COMPANION_NAME_SLUG/
+                           KIDS_NAMES_SLUG em blueprints/shop.py) -- pedido do João, para numa
+                           encomenda com vários bilhetes iguais dar para corrigir/atribuir um
+                           nome diferente a cada um e, se for preciso, reencaminhar cada
+                           bilhete a sério para o email de quem o vai usar (em vez de irem
+                           todos só para o email do comprador). O campo de email fica vazio
+                           por omissão -- só quem tiver aqui um email próprio é que passa a
+                           receber o seu bilhete à parte (ver send_ticket_email em emailing.py). #}
+                        {% set editable_tickets = order.tickets | selectattr('product_slug', 'ne', 'bilhete-acessibilidade') | selectattr('product_slug', 'ne', 'bilhete-familia') | sort(attribute='id') | list %}
+                        {% if editable_tickets %}
+                          <div style="display:flex; flex-direction:column; gap:12px; margin:2px 0 4px;">
+                            <span style="font-size:0.78rem; opacity:0.75;">Nome e email em cada bilhete</span>
+                            {% for ticket in editable_tickets %}
+                              <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span style="font-size:0.78rem;">{{ ticket.product_name }}{% if ticket.variant %} ({{ ticket.variant }}){% endif %} — {{ ticket.code }}</span>
+                                <label style="font-size:0.78rem;">Nome
+                                  <input type="text" name="ticket_name_{{ ticket.id }}" value="{{ ticket.holder_name or order.name }}" required style="padding:8px 12px; border-radius:8px; border:1px solid rgba(244,239,224,.2); background:rgba(244,239,224,.06); color:inherit; font-family:inherit; font-size:0.85rem; width:100%;">
+                                </label>
+                                <label style="font-size:0.78rem;">Email próprio deste bilhete (opcional -- vazio = vai junto para {{ order.email }})
+                                  <input type="email" name="ticket_email_{{ ticket.id }}" value="{{ ticket.holder_email }}" placeholder="deixar vazio para não separar" style="padding:8px 12px; border-radius:8px; border:1px solid rgba(244,239,224,.2); background:rgba(244,239,224,.06); color:inherit; font-family:inherit; font-size:0.85rem; width:100%;">
+                                </label>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn--primary btn--small">Guardar e invalidar bilhete antigo</button>
+                      </form>
+                    </div>
+                  </details>
+                {% else %}
+                  <span class="admin-status">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="10">{{ 'Nenhuma encomenda encontrada.' if (search_query or status_filter) else 'Ainda não há encomendas.' }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<p class="container"><a href="{{ url_for('admin.email_queue') }}">Ver fila de emails</a></p>
+<nav aria-label="Paginação das encomendas" class="container admin-filters">
+  {% if pagination.has_prev %}<a href="{{ url_for('admin.orders', page=pagination.prev_num, status=status_filter or None, q=search_query or None) }}">← Anterior</a>{% endif %}
+  <span>Página {{ pagination.page }} de {{ pagination.pages or 1 }} · {{ pagination.total }} encomendas</span>
+  {% if pagination.has_next %}<a href="{{ url_for('admin.orders', page=pagination.next_num, status=status_filter or None, q=search_query or None) }}">Seguinte →</a>{% endif %}
+</nav>
+{% endblock %}

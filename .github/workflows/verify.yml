@@ -1,0 +1,39 @@
+name: Verify
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.12', '3.13']
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: himdub_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -r requirements.txt
+      - name: SQLite regression tests
+        run: python -m unittest discover -s tests -v
+      - name: PostgreSQL regression and concurrency tests
+        env:
+          HIMDUB_TEST_DATABASE_URL: postgresql://test:test@localhost:5432/himdub_test
+        run: python -m unittest discover -s tests -v
+      - name: JavaScript syntax
+        run: node --check static/js/main.js && node --check static/js/checkin.js

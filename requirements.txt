@@ -1,0 +1,21 @@
+-c constraints.txt
+Flask==3.1.3
+Flask-SQLAlchemy==3.1.1
+Flask-Babel==4.0.0
+python-dotenv==1.2.2
+stripe==10.12.0
+qrcode[pil]==7.4.2
+requests==2.33.0
+openpyxl==3.1.5
+# tzdata: a base de dados de fusos horários que o zoneinfo (usado em
+# festival_time.py, para mostrar horas na hora de Portugal) precisa --
+# o Linux/Render normalmente já a tem instalada a nível do sistema, mas o
+# Windows não, por isso instalamos sempre esta versão do Python para
+# funcionar em qualquer sítio (dev local no PyCharm incluído).
+tzdata==2024.2
+
+# Producao (Render): gunicorn e o servidor a serio que substitui o
+# `python app.py` de desenvolvimento; psycopg2-binary e o driver que liga
+# o SQLAlchemy a uma base de dados PostgreSQL (em vez do SQLite local).
+gunicorn==23.0.0
+psycopg2-binary==2.9.10

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Line Up') }} — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<div class="lineup-photo-bg">
+  <section class="page-hero page-hero--lineup page-hero--lineup-index">
+    <div class="container" data-reveal>
+      <p class="eyebrow">{{ _('Line Up') }}</p>
+      <h1>{{ _('As áreas do festival') }}</h1>
+      <p class="page-hero__lede">{{ _('A lista de artistas está a ser fechada — entretanto, conhece as áreas que vão dar vida ao recinto.') }}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="area-grid area-grid--full">
+        {% for area in areas %}
+          {% if area.slug %}
+            <a href="{{ url_for('main.area_detail', slug=area.slug) }}" class="area-card area-card--lg" data-reveal data-reveal-delay="{{ loop.index0 * 60 }}">
+              <span class="area-card__index">0{{ loop.index }}</span>
+              <h3>{{ area.name }}</h3>
+              <p>{{ area.desc }}</p>
+            </a>
+          {% else %}
+            <div class="area-card area-card--lg" data-reveal data-reveal-delay="{{ loop.index0 * 60 }}">
+              <span class="area-card__index">0{{ loop.index }}</span>
+              <h3>{{ area.name }}</h3>
+              <p>{{ area.desc }}</p>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
+
+<section class="section section--dark section--cta-strip">
+  <div class="container center-cta" data-reveal>
+    <h2>{{ _('Queres tocar no HIM Dub?') }}</h2>
+    <p>{% trans %}Envia a tua proposta artística para <a href="mailto:artists@himdubfestival.com">artists@himdubfestival.com</a>{% endtrans %}</p>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Partners') }} — HIM Dub Festival{% endblock %}
+{% block body_class %}immersive-page{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero immersive-hero--partners">
+  {% with prev_url=url_for('main.sustainability'), prev_label=_('Sustainability'), next_url=url_for('main.contact'), next_label=_('Contact') %}
+    {% include "partials/_hero_arrows.html" %}
+  {% endwith %}
+
+  <div class="immersive-hero__content" data-reveal>
+    <h1 class="sr-only">{{ _('Promotores, Parceiros e Apoios') }}</h1>
+
+    <div class="partners-groups">
+      <div class="partners-group partners-group--promoters" data-reveal>
+        <h2>{{ _('Promotores') }}</h2>
+        <div class="partners-group__logos">
+          <span class="partner-item">
+            <img src="{{ url_for('static', filename='img/logo-uprising.png') }}" alt="Uprising — Projects for a better good">
+          </span>
+          <span class="partner-item">
+            <img src="{{ url_for('static', filename='img/logo-nomad-embassy.png') }}" alt="Nomad Embassy Sound System">
+          </span>
+        </div>
+      </div>
+
+      <div class="partners-group partners-group--partners" data-reveal data-reveal-delay="80">
+        <h2>{{ _('Parceiros') }}</h2>
+        <div class="partners-group__logos">
+          <span class="partner-item">
+            <img src="{{ url_for('static', filename='img/logo-ashabon.png') }}" alt="Ashabon — Pure Castile Soap">
+          </span>
+          <span class="partner-item">
+            <img src="{{ url_for('static', filename='img/logo-sementes-vivas.png') }}" alt="Sementes Vivas">
+          </span>
+        </div>
+      </div>
+
+      <div class="partners-group partners-group--support" data-reveal data-reveal-delay="160">
+        <h2>{{ _('Apoio') }}</h2>
+        <div class="partners-group__logos">
+          <span class="partner-item partner-item--wide">
+            <img src="{{ url_for('static', filename='img/logo-visit-portugal.png') }}" alt="Visit Portugal">
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__meta">
+    <div class="hero__meta-edition"><b>{{ _('6ª Edição') }}</b>{{ _(config.FESTIVAL_DATES) }}</div>
+    <div class="hero__meta-coords">40.418799, -7.045625</div>
+    <div class="hero__meta-right">
+      <div class="lang-pills">
+        {% for code in languages %}
+          <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_labels[code] }}</a>
+        {% endfor %}
+      </div>
+      {% include "partials/_music_toggle.html" %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

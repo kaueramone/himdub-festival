@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="{{ current_lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}HIM Dub Festival{% endblock %}</title>
+  <meta name="description" content="{{ _('HIM Dub Festival — reggae, sound system e comunidade junto ao rio, em Sabugal, Portugal.') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% set is_immersive = 'immersive-page' in self.body_class() %}
+  <script>
+    // Aplica já a animação de entrada "whoosh" (se viemos de um clique numa
+    // seta do hero), antes do resto da página pintar — evita um "flash" da
+    // página já na posição final antes de a animação começar.
+    (function () {
+      try {
+        var dir = sessionStorage.getItem("himdub_whoosh_enter");
+        if (dir) {
+          document.body.classList.add(dir === "next" ? "whoosh-enter-next" : "whoosh-enter-prev");
+          sessionStorage.removeItem("himdub_whoosh_enter");
+        }
+      } catch (e) { /* sessionStorage indisponível — ignora, sem efeito de entrada */ }
+    })();
+  </script>
+
+  <div class="progress-bar" id="scrollProgress"></div>
+
+  <header class="site-header" id="siteHeader">
+    <div class="container site-header__inner">
+      <a href="{{ url_for('main.home') }}" class="brand">
+        <img src="{{ url_for('static', filename='img/logo-him-dub.png') }}" alt="HIM Dub Festival" class="brand__logo">
+      </a>
+
+      <nav class="main-nav" id="mainNav">
+        <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
+        <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
+        <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
+        <div class="main-nav__dropdown">
+          <button type="button" class="main-nav__dropdown-btn">{{ _('Infos') }} <span aria-hidden="true">▾</span></button>
+          <div class="main-nav__dropdown-menu">
+            <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
+            <a href="{{ url_for('main.sustainability') }}">{{ _('Sustainability') }}</a>
+            <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
+            <a href="{{ url_for('main.contact') }}">{{ _('Contact') }}</a>
+          </div>
+        </div>
+      </nav>
+
+      {% if request.blueprint in ('main', 'shop') %}
+        <audio id="bgMusic" loop preload="none">
+          <source src="{{ cdn_url('audio/bg-music.mp3') }}" type="audio/mpeg">
+        </audio>
+      {% endif %}
+
+      <div class="site-header__actions">
+        {% if request.blueprint in ('main', 'shop') %}
+          <div class="lang-switch" id="langSwitch">
+            {% for code in languages %}
+              <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_labels[code] }}</a>
+            {% endfor %}
+          </div>
+          {% if not is_immersive %}
+            {% include "partials/_music_toggle.html" %}
+          {% endif %}
+        {% endif %}
+        <button type="button" class="hamburger" id="hamburgerBtn" aria-label="{{ _('Abrir menu') }}" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
+    <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
+    <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
+    <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
+    <a href="{{ url_for('main.sustainability') }}">{{ _('Sustainability') }}</a>
+    <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
+    <a href="{{ url_for('main.contact') }}">{{ _('Contact') }}</a>
+    {% if request.blueprint in ('main', 'shop') %}
+      <div class="lang-switch lang-switch--mobile">
+        {% for code in languages %}
+          <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_names[code] }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-stack">
+        {% for category, message in messages %}
+          <div class="flash flash--{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__grid">
+      <div class="site-footer__links">
+        <a href="{{ url_for('main.contact') }}">{{ _('Contact') }}</a>
+        <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
+        <a href="{{ url_for('main.faq') }}">{{ _('Support') }}</a>
+      </div>
+
+      <div class="site-footer__tagline">
+        {# Frase de marca -- fica sempre em inglês nas 3 línguas do site
+           (mesma regra dos nomes dos bilhetes), por isso não passa por
+           _(), que traduziria a partir do português. #}
+        <p class="site-footer__tagline-text">Music is<br>the most high</p>
+      </div>
+
+      <div class="site-footer__links">
+        <a href="{{ url_for('main.faq') }}">{{ _('Terms & help') }}</a>
+        <button type="button" id="cartToggle" class="site-footer__cart-btn">{{ _('Carrinho') }}</button>
+      </div>
+    </div>
+
+    <div class="site-footer__newsletter">
+      <p>{{ _('Novidades do festival diretas ao teu email —') }}</p>
+      <form action="{{ url_for('main.newsletter') }}" method="post" class="newsletter-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="email" name="email" placeholder="{{ _('o-teu-email@exemplo.com') }}" required>
+        <button type="submit">{{ _('Subscrever') }}</button>
+      </form>
+      <div class="social-row">
+        <a href="https://www.facebook.com/himdubfestivalofficial" aria-label="Facebook" target="_blank" rel="noopener">FB</a>
+        <a href="https://www.instagram.com/himdubfestival/" aria-label="Instagram" target="_blank" rel="noopener">IG</a>
+        <a href="https://www.youtube.com/@himdubfestival" aria-label="YouTube" target="_blank" rel="noopener">YT</a>
+      </div>
+    </div>
+
+    <div class="container site-footer__bottom">
+      <p>&copy; 2027 HIM Dub Festival. {{ _('Todos os direitos reservados.') }}</p>
+    </div>
+  </footer>
+
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer__header">
+      <h3>{{ _('O teu carrinho') }}</h3>
+      <button type="button" class="icon-btn" id="cartClose" aria-label="{{ _('Fechar carrinho') }}">&times;</button>
+    </div>
+    <div class="cart-drawer__body" id="cartDrawerBody">
+      {% include "partials/_cart_lines.html" %}
+    </div>
+    <div class="cart-drawer__footer">
+      <div class="cart-drawer__total">
+        <span>{{ _('Total') }}</span>
+        <strong id="cartDrawerTotal">€{{ '%.2f'|format(cart_total or 0) }}</strong>
+      </div>
+      <a href="{{ url_for('shop.view_cart') }}" class="btn btn--outline">{{ _('Ver carrinho') }}</a>
+      <a href="{{ url_for('shop.checkout') }}" class="btn btn--primary">{{ _('Checkout') }}</a>
+    </div>
+  </aside>
+  <div class="cart-drawer-backdrop" id="cartBackdrop"></div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

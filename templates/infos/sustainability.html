@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Sustainability') }} — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<div class="sustainability-photo-bg">
+  <section class="page-hero page-hero--sustainability">
+    <div class="container" data-reveal>
+      <p class="eyebrow">{{ _('Infos') }}</p>
+      <h1>{{ _('Sustentabilidade') }}</h1>
+      <p class="page-hero__lede">{{ _('O festival é construído sobre ideologia ecológica e soberania alimentar com produtos locais.') }}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="eco-grid">
+        {% for card in eco_cards %}
+          <div class="eco-card" data-reveal data-reveal-delay="{{ loop.index0 * 60 }}">
+            <div class="eco-card__head">
+              <span class="eco-card__dot" style="background: {{ card.color }};"></span>
+              <h3>{{ card.title }}</h3>
+            </div>
+            <p>{{ card.desc }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}HIM Dub Festival — {{ _(config.FESTIVAL_DATES) }}{% endblock %}
+{% block body_class %}immersive-page home-page{% endblock %}
+
+{% block content %}
+
+<section class="hero" id="hero">
+  <div class="hero__video-wrap" id="heroVideoWrap">
+    <video
+      class="hero__video"
+      id="heroVideo"
+      poster="{{ url_for('static', filename='img/hero-poster.jpg') }}"
+      muted loop playsinline preload="auto">
+      <source src="{{ cdn_url('video/hero-bg.mp4') }}" type="video/mp4">
+    </video>
+    <div class="hero__video-scrim"></div>
+  </div>
+
+  {% with prev_url=url_for('main.participate'), prev_label=_('Participate'), next_url=url_for('shop.tickets'), next_label=_('Tickets') %}
+    {% include "partials/_hero_arrows.html" %}
+  {% endwith %}
+
+  <div class="container hero__content" data-reveal>
+    {# "Music is the most high" é a frase de marca -- fica sempre em inglês
+       nas 3 línguas (mesma regra do rodapé), por isso não passa por _(). #}
+    <img src="{{ url_for('static', filename='img/logo-music-is.png') }}" alt="Music is the most high — {{ _(config.FESTIVAL_DATES) }}, {{ config.FESTIVAL_LOCATION }}" class="hero__tagline-logo">
+  </div>
+
+  <div class="hero__meta">
+    <div class="hero__meta-edition"><b>{{ _('6ª Edição') }}</b>{{ _(config.FESTIVAL_DATES) }}</div>
+    <div class="hero__meta-coords">40.418799, -7.045625</div>
+    <div class="hero__meta-right">
+      <div class="lang-pills">
+        {% for code in languages %}
+          <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_labels[code] }}</a>
+        {% endfor %}
+      </div>
+      {% include "partials/_music_toggle.html" %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

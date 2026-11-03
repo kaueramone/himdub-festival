@@ -1,0 +1,1068 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-09-27 17:45+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: blueprints/main.py:36
+msgid ""
+"O palco noturno dos heavyweights, com curadoria do Nomad Embassy Sound "
+"System."
+msgstr ""
+
+#: blueprints/main.py:37
+msgid "Heavy pressure junto ao rio, o palco da praia."
+msgstr ""
+
+#: blueprints/main.py:38
+msgid "O canto rootikal, sessões madrugadoras."
+msgstr ""
+
+#: blueprints/main.py:39
+msgid "Conferências e palestras sobre temas importantes."
+msgstr ""
+
+#: blueprints/main.py:40
+msgid "Um espaço dedicado às famílias e aos mais pequenos."
+msgstr ""
+
+#: blueprints/main.py:41
+msgid "Artesanato, arte, DIY e muito mais."
+msgstr ""
+
+#: blueprints/main.py:42
+msgid "Terapias, massagens, yoga e bem-estar geral."
+msgstr ""
+
+#: blueprints/main.py:64
+msgid ""
+"Esta é a área principal do festival. Com curadoria do Nomad Embassy Sound"
+" System, é o espaço onde atuam os artistas principais. O Dub Temple está "
+"rodeado por vegetação natural e recebe um momento de celebração onde a "
+"música e a dança se encontram como o sol e a lua."
+msgstr ""
+
+#: blueprints/main.py:70
+msgid ""
+"Um dos lugares mais encantados do festival, situado à beira do Rio Côa, "
+"numa praia de areia, protegido pela sombra das árvores — uma viagem "
+"direta a Sião!"
+msgstr ""
+
+#: blueprints/main.py:75
+msgid ""
+"O Roots Garden, o espaço dedicado às Roots. Perto do campismo, acorda ao "
+"ar livre ao som doce do Mindel Reggae Sound System."
+msgstr ""
+
+#: blueprints/main.py:79
+msgid ""
+"Esta área é dedicada à aprendizagem e ao conhecimento através da prática "
+"de oficinas. De escultura em madeira a cerâmica, construções em adobe, "
+"produção do teu próprio bálsamo de óleos essenciais, entre outras."
+msgstr ""
+
+#: blueprints/main.py:85
+msgid ""
+"Facilitada por profissionais da área, é um espaço seguro onde podes "
+"deixar as tuas emoções fluir, libertar, expandir, abraçar, fortalecer-te…"
+" Descobre diferentes técnicas e métodos orientados para o "
+"autoconhecimento e a incorporação (embodiment)."
+msgstr ""
+
+#: blueprints/main.py:91
+msgid ""
+"Este é o espaço dedicado a palestras e debates. O objetivo deste espaço é"
+" promover a interação cultural, permitindo a expressão de todos os "
+"aspetos e componentes culturais envolvidos (Rastafari, Dub, Permacultura,"
+" Som, Terapia e Bem-Estar, Cultura Local)."
+msgstr ""
+
+#: blueprints/main.py:100
+msgid "A tua verdade encontra-se em tudo o que permanece escondido."
+msgstr ""
+
+#: blueprints/main.py:120 templates/venue_map.html:24
+msgid "Workshops"
+msgstr ""
+
+#: blueprints/main.py:120
+msgid ""
+"Tens skills, experiência e know-how? Partilha-os connosco em oficinas de "
+"produção musical, construção de instrumentos e artesanato."
+msgstr ""
+
+#: blueprints/main.py:121
+msgid "Healing"
+msgstr ""
+
+#: blueprints/main.py:121
+msgid ""
+"Procuramos terapeutas, dançarinos e bodyworkers para oferecer um caminho "
+"regenerativo de apoio aos participantes."
+msgstr ""
+
+#: blueprints/main.py:122
+msgid "Massagistas"
+msgstr ""
+
+#: blueprints/main.py:122
+msgid ""
+"Profissionais de toque terapêutico para proporcionar restauro profundo "
+"aos participantes."
+msgstr ""
+
+#: blueprints/main.py:123
+msgid "Mercado Artesanal"
+msgstr ""
+
+#: blueprints/main.py:123
+msgid "Criadores e artesãos com cerâmica, têxteis e cosméticos naturais."
+msgstr ""
+
+#: blueprints/main.py:124
+msgid "Voluntários"
+msgstr ""
+
+#: blueprints/main.py:124
+msgid ""
+"\"O primeiro sorriso que as pessoas veem quando chegam.\" Essenciais para"
+" o festival acontecer."
+msgstr ""
+
+#: blueprints/main.py:142
+msgid "Quando é o festival?"
+msgstr ""
+
+#: blueprints/main.py:142
+msgid ""
+"De 23 a 29 de agosto de 2027, com abertura ao público a 23 durante a "
+"manhã."
+msgstr ""
+
+#: blueprints/main.py:143
+msgid "Onde é o festival?"
+msgstr ""
+
+#: blueprints/main.py:143
+msgid ""
+"Praia Fluvial de Rapoula do Côa, Sabugal, distrito da Guarda, a cerca de "
+"20km da fronteira com Espanha."
+msgstr ""
+
+#: blueprints/main.py:144
+msgid "A que horas abrem as portas?"
+msgstr ""
+
+#: blueprints/main.py:144
+msgid "As portas abrem ao meio-dia (12h) no dia 23 de agosto."
+msgstr ""
+
+#: blueprints/main.py:145
+msgid "Há restrição de idade?"
+msgstr ""
+
+#: blueprints/main.py:145
+msgid "Não - o festival é para todas as idades e é family-friendly."
+msgstr ""
+
+#: blueprints/main.py:146
+msgid "Que tipos de bilhete existem?"
+msgstr ""
+
+#: blueprints/main.py:146
+msgid "General, Family, Weekend, Accessibility e Ambassador."
+msgstr ""
+
+#: blueprints/main.py:147
+msgid "Posso comprar bilhete à entrada?"
+msgstr ""
+
+#: blueprints/main.py:147
+msgid ""
+"Sim, mas o estacionamento de caravanas é limitado - recomendamos comprar "
+"com antecedência."
+msgstr ""
+
+#: blueprints/main.py:148
+msgid "Há reembolsos?"
+msgstr ""
+
+#: blueprints/main.py:148
+msgid ""
+"Não há reembolso de bilhetes, exceto em caso de cancelamento do festival,"
+" morte ou hospitalização."
+msgstr ""
+
+#: blueprints/main.py:149
+msgid "As crianças precisam de bilhete?"
+msgstr ""
+
+#: blueprints/main.py:149
+msgid "Não - entrada gratuita para menores de 16 anos."
+msgstr ""
+
+#: blueprints/main.py:150
+msgid "Posso revender o meu bilhete?"
+msgstr ""
+
+#: blueprints/main.py:150
+msgid ""
+"Sim, fica atento -- vamos partilhar mais informação sobre isso nas "
+"próximas semanas."
+msgstr ""
+
+#: blueprints/main.py:151
+msgid "O campismo está incluído?"
+msgstr ""
+
+#: blueprints/main.py:151
+msgid "Sim, o campismo é gratuito com o bilhete do festival."
+msgstr ""
+
+#: blueprints/main.py:152
+msgid "Posso levar caravana?"
+msgstr ""
+
+#: blueprints/main.py:152
+msgid "Sim, há um parque de caravanas dedicado, disponível para compra."
+msgstr ""
+
+#: blueprints/main.py:153
+msgid "Há duches e casas de banho?"
+msgstr ""
+
+#: blueprints/main.py:153
+msgid "Sim, tanto na zona de campismo como no parque de caravanas."
+msgstr ""
+
+#: blueprints/main.py:154
+msgid "Posso levar comida e bebida?"
+msgstr ""
+
+#: blueprints/main.py:154
+msgid ""
+"Bebidas alcoólicas apenas na zona de campismo/caravanas. Comida e bebidas"
+" não alcoólicas podem ser levadas para todo o recinto."
+msgstr ""
+
+#: blueprints/main.py:155
+msgid "Há água disponível?"
+msgstr ""
+
+#: blueprints/main.py:155
+msgid "Sim, no campismo, no parque de caravanas e no recinto do festival."
+msgstr ""
+
+#: blueprints/main.py:156
+msgid "Posso levar o meu cão?"
+msgstr ""
+
+#: blueprints/main.py:156
+msgid "Não, não são permitidos cães no festival."
+msgstr ""
+
+#: blueprints/main.py:157
+msgid "O evento é cashless?"
+msgstr ""
+
+#: blueprints/main.py:157
+msgid ""
+"Sim - usamos pulseiras para os pagamentos. Todos os carregamentos são "
+"finais e não reembolsáveis."
+msgstr ""
+
+#: blueprints/main.py:158
+msgid "Devo levar fato de banho?"
+msgstr ""
+
+#: blueprints/main.py:158
+msgid ""
+"Sem dúvida - o festival é construído à volta de um lugar de rio "
+"maravilhoso."
+msgstr ""
+
+#: blueprints/main.py:171
+msgid "Kit de Boas-vindas"
+msgstr ""
+
+#: blueprints/main.py:171
+msgid ""
+"Um kit de higiene ecológico é oferecido à entrada do festival, com um "
+"sabonete 100% natural e artesanal, pó dentífrico e um saquinho de "
+"sementes."
+msgstr ""
+
+#: blueprints/main.py:172
+msgid "Casas de Banho Secas"
+msgstr ""
+
+#: blueprints/main.py:172
+msgid ""
+"Sem água, sem químicos. Serrim substitui o autoclismo, poupando milhares "
+"de litros de água, e todos os resíduos são compostados de volta à terra."
+msgstr ""
+
+#: blueprints/main.py:173
+msgid "Restos de Comida"
+msgstr ""
+
+#: blueprints/main.py:173
+msgid ""
+"Os restos de comida dos nossos restaurantes e da cozinha da equipa são "
+"doados a pastores locais para alimentar os seus animais, fechando o ciclo"
+" do prato ao pasto."
+msgstr ""
+
+#: blueprints/main.py:174
+msgid "Produtos Locais"
+msgstr ""
+
+#: blueprints/main.py:174
+msgid ""
+"Priorizamos fornecedores e produtores da região em toda a cadeia de "
+"alimentação e artesanato."
+msgstr ""
+
+#: blueprints/main.py:175
+msgid "Respeito pelo Rio"
+msgstr ""
+
+#: blueprints/main.py:175
+msgid ""
+"O recinto é pensado para minimizar o impacto na praia fluvial e no "
+"ecossistema envolvente."
+msgstr ""
+
+#: blueprints/main.py:176
+msgid "Comunidade"
+msgstr ""
+
+#: blueprints/main.py:176
+msgid ""
+"Colaboração ativa com associações e produtores locais, como Uprising e "
+"Nomad."
+msgstr ""
+
+#: blueprints/main.py:191
+msgid "Obrigado! Vais receber novidades do HIM Dub Festival em breve."
+msgstr ""
+
+#: blueprints/main.py:193
+msgid "Introduz um email válido."
+msgstr ""
+
+#: blueprints/shop.py:405
+#, python-format
+msgid "\"%(name)s\" adicionado ao carrinho."
+msgstr ""
+
+#: blueprints/shop.py:528
+msgid "O teu carrinho está vazio."
+msgstr ""
+
+#: blueprints/shop.py:544
+msgid "Indica o teu nome."
+msgstr ""
+
+#: blueprints/shop.py:546
+msgid "Indica um email válido."
+msgstr ""
+
+#: blueprints/shop.py:548
+msgid "Indica o teu país de origem."
+msgstr ""
+
+#: blueprints/shop.py:550
+msgid ""
+"O NIF deve ter 9 dígitos (ou deixa em branco se não precisares de fatura "
+"com NIF)."
+msgstr ""
+
+#: blueprints/shop.py:560
+#, python-format
+msgid "Indica o nome de cada bilhete de %(product)s."
+msgstr ""
+
+#: blueprints/shop.py:672 templates/checkout.html:116
+msgid "Taxa de processamento"
+msgstr ""
+
+#: blueprints/shop.py:695
+msgid "NIF (opcional)"
+msgstr ""
+
+#: templates/ambassadors.html:2 templates/ambassadors.html:8
+msgid "Ambassadors"
+msgstr ""
+
+#: templates/ambassadors.html:9
+msgid "A voz do HIM Dub, um pouco por todo o mundo"
+msgstr ""
+
+#: templates/ambassadors.html:11
+msgid ""
+"Os nossos embaixadores levam o espírito do festival além-fronteiras, "
+"criando pontes entre Portugal e comunidades como o Japão, a Jamaica e São"
+" Tomé e Príncipe."
+msgstr ""
+
+#: templates/ambassadors.html:21
+msgid "Ásia"
+msgstr ""
+
+#: templates/ambassadors.html:22
+msgid "Ligação à comunidade sound system japonesa e asiática."
+msgstr ""
+
+#: templates/ambassadors.html:26
+msgid "Jamaica"
+msgstr ""
+
+#: templates/ambassadors.html:27
+msgid "Raízes da cultura reggae e dub, na origem do movimento."
+msgstr ""
+
+#: templates/ambassadors.html:31
+msgid "São Tomé e Príncipe"
+msgstr ""
+
+#: templates/ambassadors.html:32
+msgid "Comunidade lusófona que partilha o espírito do festival em África."
+msgstr ""
+
+#: templates/ambassadors.html:37
+msgid "Queres ser embaixador?"
+msgstr ""
+
+#: templates/ambassadors.html:38
+msgid ""
+"Se sentes que representas o espírito do HIM Dub na tua comunidade, "
+"escreve-nos."
+msgstr ""
+
+#: templates/ambassadors.html:39
+msgid "Contactar"
+msgstr ""
+
+#: templates/area_detail.html:8 templates/lineup.html:2 templates/lineup.html:9
+msgid "Line Up"
+msgstr ""
+
+#: templates/area_detail.html:32
+msgid "← Voltar às áreas"
+msgstr ""
+
+#: templates/base.html:7
+msgid ""
+"HIM Dub Festival — reggae, sound system e comunidade junto ao rio, em "
+"Sabugal, Portugal."
+msgstr ""
+
+#: templates/base.html:39 templates/base.html:78 templates/glamping.html:2
+#: templates/glamping.html:22
+msgid "The Experience"
+msgstr ""
+
+#: templates/base.html:40 templates/base.html:79 templates/glamping.html:16
+#: templates/home.html:19 templates/tickets.html:19
+msgid "Tickets"
+msgstr ""
+
+#: templates/base.html:41 templates/base.html:80 templates/glamping.html:16
+#: templates/home.html:19 templates/merchandise.html:10
+#: templates/participate.html:2 templates/participate.html:21
+#: templates/venue_map.html:10
+msgid "Participate"
+msgstr ""
+
+#: templates/base.html:43 templates/infos/contact.html:8
+#: templates/infos/faq.html:8 templates/infos/sustainability.html:9
+msgid "Infos"
+msgstr ""
+
+#: templates/base.html:45 templates/base.html:81
+msgid "FAQ"
+msgstr ""
+
+#: templates/base.html:46 templates/base.html:82
+#: templates/infos/partners.html:8 templates/infos/sustainability.html:2
+msgid "Sustainability"
+msgstr ""
+
+#: templates/base.html:47 templates/base.html:83 templates/base.html:112
+#: templates/infos/partners.html:2
+msgid "Partners"
+msgstr ""
+
+#: templates/base.html:48 templates/base.html:84 templates/base.html:111
+#: templates/infos/contact.html:2 templates/infos/contact.html:9
+#: templates/infos/partners.html:8
+msgid "Contact"
+msgstr ""
+
+#: templates/base.html:70
+msgid "Abrir menu"
+msgstr ""
+
+#: templates/base.html:113
+msgid "Support"
+msgstr ""
+
+#: templates/base.html:124
+msgid "Terms & help"
+msgstr ""
+
+#: templates/base.html:125 templates/cart.html:2
+msgid "Carrinho"
+msgstr ""
+
+#: templates/base.html:130
+msgid "Novidades do festival diretas ao teu email —"
+msgstr ""
+
+#: templates/base.html:132
+msgid "o-teu-email@exemplo.com"
+msgstr ""
+
+#: templates/base.html:133
+msgid "Subscrever"
+msgstr ""
+
+#: templates/base.html:143
+msgid "Todos os direitos reservados."
+msgstr ""
+
+#: templates/base.html:149 templates/cart.html:8
+msgid "O teu carrinho"
+msgstr ""
+
+#: templates/base.html:150
+msgid "Fechar carrinho"
+msgstr ""
+
+#: templates/base.html:157 templates/cart.html:51 templates/checkout.html:122
+msgid "Total"
+msgstr ""
+
+#: templates/base.html:160 templates/tickets.html:167
+msgid "Ver carrinho"
+msgstr ""
+
+#: templates/base.html:161 templates/checkout.html:2 templates/checkout.html:8
+msgid "Checkout"
+msgstr ""
+
+#: templates/cart.html:9
+msgid "Resumo da encomenda"
+msgstr ""
+
+#: templates/cart.html:14
+msgid "Produto"
+msgstr ""
+
+#: templates/cart.html:14
+msgid "Preço"
+msgstr ""
+
+#: templates/cart.html:14
+msgid "Qtd"
+msgstr ""
+
+#: templates/cart.html:14
+msgid "Subtotal"
+msgstr ""
+
+#: templates/cart.html:29 templates/partials/_cart_lines.html:14
+msgid "Tamanho:"
+msgstr ""
+
+#: templates/cart.html:42 templates/partials/_cart_lines.html:19
+msgid "Remover"
+msgstr ""
+
+#: templates/cart.html:56
+msgid "Continuar a explorar"
+msgstr ""
+
+#: templates/cart.html:57
+msgid "Avançar para checkout"
+msgstr ""
+
+#: templates/cart.html:60
+#, python-format
+msgid ""
+"O teu carrinho está vazio. Explora os <a "
+"href=\"%(tickets_url)s\">bilhetes</a>, o\n"
+"        <a href=\"%(glamping_url)s\">glamping</a> ou o <a "
+"href=\"%(merch_url)s\">merchandise</a>."
+msgstr ""
+
+#: templates/checkout.html:9
+msgid "Finaliza a tua encomenda"
+msgstr ""
+
+#: templates/checkout.html:13
+msgid ""
+"Modo demo: sem o Stripe configurado, esta encomenda vai ser marcada como "
+"paga\n"
+"        automaticamente, sem cobrança real. Configura o "
+"<code>STRIPE_SECRET_KEY</code> no\n"
+"        ficheiro <code>.env</code> para ligar pagamentos a sério."
+msgstr ""
+
+#: templates/checkout.html:22
+msgid "Nome"
+msgstr ""
+
+#: templates/checkout.html:26
+msgid "Email"
+msgstr ""
+
+#: templates/checkout.html:30
+msgid "País de origem"
+msgstr ""
+
+#: templates/checkout.html:32
+msgid "Seleciona o teu país"
+msgstr ""
+
+#: templates/checkout.html:39
+msgid "NIF (opcional, para fatura)"
+msgstr ""
+
+#: templates/checkout.html:40
+msgid "Só se precisares de fatura com contribuinte"
+msgstr ""
+
+#: templates/checkout.html:51
+msgid "Nome do acompanhante (opcional)"
+msgstr ""
+
+#: templates/checkout.html:54
+msgid "Fica registado para a entrada"
+msgstr ""
+
+#: templates/checkout.html:58
+msgid "Nomes das crianças (opcional, separados por vírgula)"
+msgstr ""
+
+#: templates/checkout.html:61
+msgid "Ex.: Chloé Bernal, João Cardoso"
+msgstr ""
+
+#: templates/checkout.html:79
+#, python-format
+msgid "Nome do bilhete %(n)s — %(product)s"
+msgstr ""
+
+#: templates/checkout.html:83
+msgid "Nome de quem vai usar este bilhete"
+msgstr ""
+
+#: templates/checkout.html:90
+msgid "Pagar com Stripe"
+msgstr ""
+
+#: templates/checkout.html:90
+msgid "Concluir encomenda (demo)"
+msgstr ""
+
+#: templates/checkout.html:100
+msgid ""
+"Depois de pagares, não feches nem atualizes a página -- espera até veres "
+"a confirmação da encomenda. Se fechares antes disso, o pagamento pode ser"
+" cobrado na mesma, mas o teu bilhete só é emitido depois de recebermos "
+"essa confirmação."
+msgstr ""
+
+#: templates/checkout.html:106
+msgid "Resumo"
+msgstr ""
+
+#: templates/checkout_cancel.html:2 templates/checkout_cancel.html:9
+msgid "Pagamento cancelado"
+msgstr ""
+
+#: templates/checkout_cancel.html:10
+msgid "Não te preocupes, o teu carrinho continua guardado."
+msgstr ""
+
+#: templates/checkout_cancel.html:11
+msgid "Voltar ao carrinho"
+msgstr ""
+
+#: templates/checkout_success.html:2
+msgid "Encomenda confirmada"
+msgstr ""
+
+#: templates/checkout_success.html:10
+#, python-format
+msgid "Obrigado, %(name)s!"
+msgstr ""
+
+#: templates/checkout_success.html:10
+msgid "Obrigado!"
+msgstr ""
+
+#: templates/checkout_success.html:11
+#, python-format
+msgid "A tua encomenda #%(id)s foi confirmada (modo demo)."
+msgstr ""
+
+#: templates/checkout_success.html:11
+#, python-format
+msgid "A tua encomenda #%(id)s foi confirmada."
+msgstr ""
+
+#: templates/checkout_success.html:14
+#, python-format
+msgid "Quase lá, %(name)s!"
+msgstr ""
+
+#: templates/checkout_success.html:14
+msgid "Quase lá!"
+msgstr ""
+
+#: templates/checkout_success.html:15
+#, python-format
+msgid ""
+"Estamos a confirmar o teu pagamento junto do Stripe — costuma demorar só "
+"alguns segundos. Vais receber a confirmação da encomenda #%(id)s assim "
+"que estiver concluído."
+msgstr ""
+
+#: templates/checkout_success.html:17
+msgid "Total:"
+msgstr ""
+
+#: templates/checkout_success.html:18
+msgid "Voltar ao início"
+msgstr ""
+
+#: templates/coming_soon.html:6 templates/coming_soon.html:48
+msgid "Brevemente"
+msgstr ""
+
+#: templates/coming_soon.html:49
+msgid ""
+"Estamos nos últimos preparativos. A venda de bilhetes abre hoje às 18h --"
+" volta a visitar-nos daqui a pouco."
+msgstr ""
+
+#: templates/coming_soon.html:50 templates/glamping.html:41
+#: templates/home.html:30 templates/infos/partners.html:52
+#: templates/merchandise.html:22 templates/participate.html:46
+#: templates/tickets.html:171 templates/venue_map.html:32
+msgid "6ª Edição"
+msgstr ""
+
+#: templates/festival.html:2 templates/glamping.html:26
+#: templates/glamping.html:27
+msgid "What is HIM Dub?"
+msgstr ""
+
+#: templates/festival.html:8
+msgid "The Festival"
+msgstr ""
+
+#: templates/festival.html:9
+msgid "What is HIM Dub"
+msgstr ""
+
+#: templates/festival.html:17
+msgid "Why the Name H.I.M Dub?"
+msgstr ""
+
+#: templates/festival.html:18
+msgid ""
+"H.I.M is the acronym used by HIS & HER IMPERIAL MAJESTIES, Emperor Haile "
+"Selassie I and Empress Menen Asfaw, respectively."
+msgstr ""
+
+#: templates/festival.html:19
+msgid ""
+"Emperor Haile Selassie and Empress Menen broke the tradition of a single "
+"monarch coronation and were crowned together on the 2nd of November 1930,"
+" a symbolic display of the divine union and balance of masculine and "
+"feminine energy. An event that was attended by dignitaries and "
+"representatives of 72 different nations, an unprecedented event for the "
+"coronation of African royalty in the 1930s."
+msgstr ""
+
+#: templates/festival.html:20
+msgid ""
+"In his 44 years on the throne, HIM Emperor Haile Selassie worked "
+"unceasingly with an unparalleled forward-thinking vision to modernise "
+"Ethiopia, and free Africa from colonial bondage. He voluntarily abolished"
+" slavery upon assuming the throne and voluntarily established a "
+"constitution of governance to redistribute power in a more democratic "
+"way."
+msgstr ""
+
+#: templates/festival.html:30
+msgid "The link between HIM Dub & Rastafari"
+msgstr ""
+
+#: templates/festival.html:31
+msgid ""
+"To the RasTafari brothers and sisters, he is the saviour, the redeemer, "
+"the divine, God in flesh as a black African King. To pan-Africanists, he "
+"is the godfather of African unity and the founder of the Organisation of "
+"African Unity (OAU). To those who opposed fascism, he was an icon of "
+"victorious triumph following his defeat of Mussolini in 1941, after five "
+"years of attempted occupation of Ethiopia by the Italian fascist army."
+msgstr ""
+
+#: templates/festival.html:32
+msgid ""
+"Haile Selassie relentlessly campaigned for nuclear disarmament and world "
+"peace. He was a pivotal figure in forming the United Nations and drafting"
+" the UN Declaration of Human Rights."
+msgstr ""
+
+#: templates/festival.html:33
+msgid ""
+"He was a firm advocate for women's rights and consequently a great friend"
+" to Sylvia Pankhurst so much that she spent the last part of her life "
+"living in Addis Ababa. Empress Menen too devoted much of her energy to "
+"charitable duties focused on women, children, the poor and the "
+"handicapped."
+msgstr ""
+
+#: templates/festival.html:43
+msgid "The Roots of Dub"
+msgstr ""
+
+#: templates/festival.html:44
+msgid ""
+"Dub was born in Kingston, Jamaica, in the late 1960s, when engineers and "
+"producers like King Tubby, Lee \"Scratch\" Perry, and Scientist began "
+"stripping songs down to their bones, pulling out vocals and instruments, "
+"then rebuilding the track with reverb, echo, and tape delay. What started"
+" as an experiment in the mixing booth became a genre in its own right, "
+"and eventually the blueprint for entire sound system cultures around the "
+"world."
+msgstr ""
+
+#: templates/festival.html:45
+msgid ""
+"At HIM DUB, that spirit is still very much alive. The sound systems carry"
+" forward the messages that have always run through reggae and dub, "
+"resistance, rebellion, and revolution, but also unity, healing, and a "
+"deep sense of connection to something greater than ourselves."
+msgstr ""
+
+#: templates/festival.html:60
+msgid "Garante já o teu lugar junto ao rio"
+msgstr ""
+
+#: templates/festival.html:61
+msgid ""
+"Bilhetes gerais, familiares, de fim de semana e passe de caravana "
+"disponíveis."
+msgstr ""
+
+#: templates/festival.html:62
+msgid "Ver Bilhetes"
+msgstr ""
+
+#: templates/glamping.html:21 templates/merchandise.html:10
+#: templates/participate.html:16 templates/tickets.html:14
+#: templates/venue_map.html:10 templates/venue_map.html:15
+msgid "Experience"
+msgstr ""
+
+#: templates/glamping.html:30 templates/glamping.html:31
+msgid "The areas"
+msgstr ""
+
+#: templates/glamping.html:34 templates/glamping.html:35
+#: templates/venue_map.html:2 templates/venue_map.html:16
+msgid "The map"
+msgstr ""
+
+#: templates/lineup.html:10
+msgid "As áreas do festival"
+msgstr ""
+
+#: templates/lineup.html:11
+msgid ""
+"A lista de artistas está a ser fechada — entretanto, conhece as áreas que"
+" vão dar vida ao recinto."
+msgstr ""
+
+#: templates/lineup.html:40
+msgid "Queres tocar no HIM Dub?"
+msgstr ""
+
+#: templates/lineup.html:41
+msgid ""
+"Envia a tua proposta artística para <a "
+"href=\"mailto:artists@himdubfestival.com\">artists@himdubfestival.com</a>"
+msgstr ""
+
+#: templates/merchandise.html:15
+msgid "Merchandise"
+msgstr ""
+
+#: templates/merchandise.html:16
+msgid "Produzido localmente em Portugal"
+msgstr ""
+
+#: templates/merchandise.html:17
+msgid "Handmade, handscreen, handcut — peças feitas por criadores locais."
+msgstr ""
+
+#: templates/participate.html:16 templates/tickets.html:14
+msgid "Home"
+msgstr ""
+
+#: templates/participate.html:22
+msgid "Faz parte do HIM Dub"
+msgstr ""
+
+#: templates/participate.html:23
+msgid ""
+"O festival vive da sua comunidade: as candidaturas ainda não estão "
+"abertas, fica atento para mais novidades."
+msgstr ""
+
+#: templates/participate.html:31
+msgid "Inscrições abertas"
+msgstr ""
+
+#: templates/participate.html:33
+msgid "Inscrições encerradas"
+msgstr ""
+
+#: templates/participate.html:38
+msgid "Candidatar-me →"
+msgstr ""
+
+#: templates/product_detail.html:21
+msgid "Tamanho"
+msgstr ""
+
+#: templates/product_detail.html:34
+msgid "Quantidade"
+msgstr ""
+
+#: templates/product_detail.html:38
+msgid "Adicionar ao carrinho"
+msgstr ""
+
+#: templates/product_detail.html:41
+msgid "← Voltar"
+msgstr ""
+
+#: templates/tickets.html:44 templates/tickets.html:91
+#: templates/tickets.html:109 templates/tickets.html:133
+#, python-format
+msgid "Adicionar %(name)s ao carrinho"
+msgstr ""
+
+#: templates/venue_map.html:20
+msgid "Mapa do recinto do festival"
+msgstr ""
+
+#: templates/venue_map.html:25
+msgid "Lectures"
+msgstr ""
+
+#: templates/venue_map.html:26
+msgid "Healing Area"
+msgstr ""
+
+#: templates/infos/contact.html:13
+msgid "Informações gerais"
+msgstr ""
+
+#: templates/infos/contact.html:17
+msgid "Bilhetes"
+msgstr ""
+
+#: templates/infos/contact.html:21
+msgid "Artistas & Música"
+msgstr ""
+
+#: templates/infos/faq.html:9
+msgid "Perguntas Frequentes"
+msgstr ""
+
+#: templates/infos/faq.html:16
+msgid "Para o regulamento completo do festival, consulta as"
+msgstr ""
+
+#: templates/infos/faq.html:17
+msgid "Regras e Normas de Funcionamento"
+msgstr ""
+
+#: templates/infos/partners.html:13
+msgid "Promotores, Parceiros e Apoios"
+msgstr ""
+
+#: templates/infos/partners.html:17
+msgid "Promotores"
+msgstr ""
+
+#: templates/infos/partners.html:29
+msgid "Parceiros"
+msgstr ""
+
+#: templates/infos/partners.html:41
+msgid "Apoio"
+msgstr ""
+
+#: templates/infos/sustainability.html:10
+msgid "Sustentabilidade"
+msgstr ""
+
+#: templates/infos/sustainability.html:11
+msgid ""
+"O festival é construído sobre ideologia ecológica e soberania alimentar "
+"com produtos locais."
+msgstr ""
+
+#: templates/partials/_cart_lines.html:27
+#, python-format
+msgid ""
+"O carrinho está vazio. Explora os <a "
+"href=\"%(tickets_url)s\">bilhetes</a> ou o <a "
+"href=\"%(merch_url)s\">merchandise</a>."
+msgstr ""
+
+#: templates/partials/_music_toggle.html:7
+#: templates/partials/_music_toggle.html:8
+msgid "Tocar música"
+msgstr ""
+
+#: templates/partials/_music_toggle.html:8
+msgid "Silenciar música"
+msgstr ""
+
+#: templates/partials/_product_grid.html:11
+msgid "Escolher"
+msgstr ""
+
+#: templates/partials/_product_grid.html:15
+msgid "Adicionar"
+msgstr ""
+
+#: templates/partials/_product_grid.html:22
+msgid "Ainda não há produtos disponíveis nesta categoria."
+msgstr ""
+

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Participate') }} — HIM Dub Festival{% endblock %}
+{% block body_class %}immersive-page{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero immersive-hero--participate">
+  <div class="immersive-hero__video-wrap">
+    <video class="immersive-hero__video" muted loop playsinline preload="auto"
+      poster="{{ url_for('static', filename='img/glamping-poster.jpg') }}">
+      <source src="{{ cdn_url('video/glamping-bg.mp4') }}" type="video/mp4">
+    </video>
+  </div>
+  <div class="immersive-hero__scrim"></div>
+
+  {% with prev_url=url_for('shop.glamping'), prev_label=_('Experience'), next_url=url_for('main.home'), next_label=_('Home') %}
+    {% include "partials/_hero_arrows.html" %}
+  {% endwith %}
+
+  <div class="immersive-hero__content" data-reveal>
+    <p class="eyebrow">{{ _('Participate') }}</p>
+    <h1 class="immersive-hero__title">{{ _('Faz parte do HIM Dub') }}</h1>
+    <p class="page-hero__lede">{{ _('O festival vive da sua comunidade: as candidaturas ainda não estão abertas, fica atento para mais novidades.') }}</p>
+
+    <div class="way-list">
+      {% for way in ways %}
+        <div class="way-card" data-reveal data-reveal-delay="{{ loop.index0 * 70 }}">
+          <div class="way-card__head">
+            <h3>{{ way.title }}</h3>
+            {% if way.status == "open" %}
+              <span class="badge badge--open">{{ _('Inscrições abertas') }}</span>
+            {% else %}
+              <span class="badge badge--closed">{{ _('Inscrições encerradas') }}</span>
+            {% endif %}
+          </div>
+          <p>{{ way.desc }}</p>
+          {% if way.status == "open" %}
+            <a href="mailto:contact@himdubfestival.com?subject=Participar - {{ way.title }}" class="link-arrow">{{ _('Candidatar-me →') }}</a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="hero__meta">
+    <div class="hero__meta-edition"><b>{{ _('6ª Edição') }}</b>{{ _(config.FESTIVAL_DATES) }}</div>
+    <div class="hero__meta-coords">40.418799, -7.045625</div>
+    <div class="hero__meta-right">
+      <div class="lang-pills">
+        {% for code in languages %}
+          <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_labels[code] }}</a>
+        {% endfor %}
+      </div>
+      {% include "partials/_music_toggle.html" %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

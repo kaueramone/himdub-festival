@@ -1,0 +1,13 @@
+{# Nome do artista/faixa da música de fundo (ver bgMusic em base.html) --
+   texto fixo porque só há uma faixa a tocar no site inteiro; se um dia
+   houver mais que uma, isto passa a vir de uma variável. Botão de
+   play/pause primeiro, nome a seguir (pedido do João) -- em ecrãs
+   pequenos (ver CSS) o nome só encolhe, nunca desaparece nem desce. #}
+<span class="music-toggle-group">
+  <button type="button" class="icon-btn music-toggle" id="musicToggle" aria-label="{{ _('Tocar música') }}" aria-pressed="false"
+    data-label-play="{{ _('Tocar música') }}" data-label-pause="{{ _('Silenciar música') }}">
+    <svg class="music-toggle__icon music-toggle__icon--play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    <svg class="music-toggle__icon music-toggle__icon--playing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16.5 8.2a5.2 5.2 0 0 1 0 7.6M19.3 5.5a9 9 0 0 1 0 13"/></svg>
+  </button>
+  <span class="music-toggle__track">V.I.V.E.K - Fally Ranking (Remix)</span>
+</span>

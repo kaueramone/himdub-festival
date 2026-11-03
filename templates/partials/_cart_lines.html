@@ -1,0 +1,29 @@
+{% if cart_lines %}
+  <ul class="cart-lines">
+    {% for line in cart_lines %}
+      <li class="cart-line">
+        {% if line.icon %}
+          <span class="cart-line__swatch cart-line__swatch--icon">
+            <img src="{{ url_for('static', filename='img/icons/' ~ line.icon ~ '.png') }}" alt="" loading="lazy">
+          </span>
+        {% else %}
+          <span class="cart-line__swatch {{ line.product.image_class }}"></span>
+        {% endif %}
+        <div class="cart-line__info">
+          <strong>{{ line.product.localized_name }}</strong>
+          {% if line.variant %}<small>{{ _('Tamanho:') }} {{ line.variant }}</small>{% endif %}
+          <small>{{ line.quantity }} × €{{ '%.2f'|format(line.product.price) }}</small>
+        </div>
+        <span class="cart-line__subtotal">€{{ '%.2f'|format(line.subtotal) }}</span>
+        <form action="{{ url_for('shop.cart_remove', key=line.key) }}" method="post" class="cart-line__remove-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="cart-line__remove" aria-label="{{ _('Remover') }}" title="{{ _('Remover') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="cart-empty">{% trans tickets_url=url_for('shop.tickets'), merch_url=url_for('shop.merchandise') %}O carrinho está vazio. Explora os <a href="{{ tickets_url }}">bilhetes</a> ou o <a href="{{ merch_url }}">merchandise</a>.{% endtrans %}</p>
+{% endif %}

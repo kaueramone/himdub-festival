@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Scanner de bilhetes — Admin{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container narrow">
+    <p class="eyebrow" data-reveal>Check-in</p>
+    <h1 data-reveal>Ler bilhete</h1>
+    <p data-reveal>Aponta a câmara ao QR code no telemóvel ou impresso do cliente.</p>
+
+    <div class="scanner-wrap" data-reveal>
+      <video id="scannerVideo" playsinline muted></video>
+      <canvas id="scannerCanvas" hidden></canvas>
+      <div class="scanner-frame"></div>
+    </div>
+
+    <p id="scannerStatus" class="scanner-status">A iniciar câmara…</p>
+
+    <div class="admin-filters" data-reveal style="margin-top:20px;">
+      {% if session.get('admin_role') == 'admin' %}
+        <a href="{{ url_for('admin.orders') }}">← Voltar às encomendas</a>
+      {% else %}
+        <a href="{{ url_for('admin.logout') }}">Sair</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/jsqr.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/checkin.js') }}"></script>
+
+{% endblock %}

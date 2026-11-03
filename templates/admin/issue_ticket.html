@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Emitir bilhete — Admin{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container narrow">
+    <p class="eyebrow" data-reveal>Área reservada</p>
+    <div class="admin-header" data-reveal>
+      <h1>Emitir bilhete</h1>
+      <div style="display:flex;gap:10px;">
+        <a href="{{ url_for('admin.orders') }}" class="btn btn--outline btn--small">← Encomendas</a>
+      </div>
+    </div>
+
+    <p style="color:var(--text-muted);margin-bottom:24px;">
+      Cria um bilhete sem passar pelo Stripe — para convidados VIP, embaixadores,
+      giveaways ou outras ofertas. O bilhete gerado é igual a um bilhete comprado
+      a sério: fica com o seu próprio QR/PDF, e o email é enviado normalmente.
+    </p>
+
+    <form method="post" class="checkout-form" data-reveal style="max-width:480px;">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="name">Nome de quem recebe</label>
+        <input type="text" id="name" name="name" value="{{ form_name }}" required autofocus>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ form_email }}" required>
+      </div>
+
+      <div class="field">
+        <label for="product_id">Tipo de bilhete</label>
+        <select id="product_id" name="product_id" required>
+          <option value="">— escolhe —</option>
+          {% for product in products %}
+            <option value="{{ product.id }}">{{ product.localized_name }}{% if not product.is_active %} (cortesia){% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="quantity">Quantidade</label>
+        <input type="number" id="quantity" name="quantity" value="{{ form_quantity }}" min="1" max="20" required>
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--lg">Emitir bilhete</button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

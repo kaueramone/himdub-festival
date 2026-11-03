@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="{{ lang_code }}" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ s.email_title }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
+<!--[if mso]>
+<style>
+  * { font-family: Arial, sans-serif !important; }
+</style>
+<![endif]-->
+<style>
+  body, table, td { font-family: 'Abel', Arial, Helvetica, sans-serif; }
+  body { margin:0; padding:0; background-color:#F4F3E9; -webkit-text-size-adjust:100%; }
+  img { border:0; display:block; }
+  a { color:#293440; }
+
+  @media only screen and (max-width:600px) {
+    .container { width:100% !important; }
+    .stack { display:block !important; width:100% !important; text-align:center !important; }
+    .px { padding-left:20px !important; padding-right:20px !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Preheader (hidden preview text) -->
+<div style="display:none; max-height:0; overflow:hidden; opacity:0; mso-hide:all;">
+  {{ s.preheader }}
+</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F4F3E9;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+
+      <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px;">
+
+        <!-- Header / brand bar -->
+        <tr>
+          <td class="px" style="background-color:#293440; padding:24px 32px;" align="center">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td class="stack" align="left" valign="middle" width="55%">
+                  <img src="{{ logo_lockup_image_url }}" width="170" alt="HIM Dub Festival" style="display:block; width:170px; max-width:100%; height:auto;">
+                </td>
+                <td class="stack" align="right" valign="middle" width="45%">
+                  <div style="font-family:'Abel', Arial, sans-serif; font-size:15px; color:#ffffff; line-height:1.4;">{{ festival_dates }}</div>
+                  <div style="font-family:Arial, sans-serif; font-size:11px; color:#9aa5ab; line-height:1.4; margin-top:2px;">{{ festival_venue }}</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td class="px" style="background-color:#ffffff; padding:40px;">
+
+            <h1 style="margin:0 0 12px; font-family:'Abel', Arial, sans-serif; font-size:26px; font-weight:700; color:#231f20;">
+              {{ s.greeting }}
+            </h1>
+
+            <p style="margin:0 0 8px; font-family:Arial, sans-serif; font-size:15px; line-height:1.6; color:#231f20;">
+              {{ s.confirmed }}
+            </p>
+
+            {% if tickets %}
+            <p style="margin:0 0 8px; font-family:Arial, sans-serif; font-size:15px; line-height:1.6; color:#231f20;">
+              {{ s.attachment_hint }}
+            </p>
+            {% endif %}
+
+            <p style="margin:0 0 28px; font-family:Arial, sans-serif; font-size:15px; line-height:1.6; color:#231f20;">
+              {{ s.see_you_soon }}
+            </p>
+
+            {% for ticket in tickets %}
+            <!-- Ticket card -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e4e0d3; border-radius:10px; overflow:hidden; margin-bottom:20px;">
+              <tr>
+                <td style="background-color:#293440; padding:18px 28px;">
+                  <span style="font-family:Arial, sans-serif; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:#f2d254;">{{ s.ticket_label }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" background="{{ ticket_bg_image_url }}" bgcolor="#293440" style="background-image:url('{{ ticket_bg_image_url }}'); background-size:cover; background-position:center; padding:0;">
+                  <!--[if mso]>
+                  <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;">
+                  <v:fill type="frame" src="{{ ticket_bg_image_url }}" color="#293440" />
+                  <v:textbox inset="0,0,0,0">
+                  <![endif]-->
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td align="center" style="background-color:rgba(35,31,32,0.55); padding:32px 28px 24px;">
+
+                        <div style="font-family:'Abel', Arial, sans-serif; font-size:24px; font-weight:700; color:#ffffff; margin-bottom:24px;">
+                          {{ ticket.type_name }}
+                        </div>
+
+                        <!-- QR code -->
+                        <table role="presentation" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td style="padding:12px; background-color:#F4F3E9; border-radius:8px;">
+                              <img src="{{ ticket.qr_code_url }}" width="180" height="180" alt="{{ s.qr_alt }}" style="display:block; width:180px; height:180px;">
+                            </td>
+                          </tr>
+                        </table>
+
+                        <div style="margin-top:20px; font-family:Arial, sans-serif; font-size:13px; letter-spacing:0.05em; color:#f4f3e9;">
+                          {{ s.code_label }} <strong style="color:#ffffff; letter-spacing:0.08em;">{{ ticket.code }}</strong>
+                        </div>
+
+                        <div style="margin-top:12px; padding:0 20px; font-family:Arial, sans-serif; font-size:12px; line-height:1.5; color:#e4e0d3;">
+                          {{ s.qr_hint }}
+                        </div>
+
+                      </td>
+                    </tr>
+                  </table>
+                  <!--[if mso]>
+                  </v:textbox>
+                  </v:rect>
+                  <![endif]-->
+                </td>
+              </tr>
+              <tr>
+                <td style="background-color:#fdf6e0; padding:14px 28px; border-top:1px solid #e4e0d3;">
+                  <div style="font-family:Arial, sans-serif; font-size:12px; line-height:1.5; color:#6b5d1f;">
+                    <strong>{{ s.personal_ticket_title }}</strong> {{ s.personal_ticket_body }}
+                  </div>
+                </td>
+              </tr>
+            </table>
+            {% endfor %}
+
+            <!-- Order summary -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
+              <tr>
+                <td style="font-family:'Abel', Arial, sans-serif; font-size:16px; font-weight:700; color:#231f20; padding-bottom:10px; border-bottom:2px solid #293440;">
+                  {{ s.summary }}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:14px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    {% for item in items %}
+                    <tr>
+                      <td style="font-family:Arial, sans-serif; font-size:14px; color:#231f20; padding:6px 0;">
+                        {{ item.quantity }}× {{ item.name }}{% if item.variant %} ({{ item.variant }}){% endif %}
+                      </td>
+                      <td align="right" style="font-family:Arial, sans-serif; font-size:14px; color:#231f20; padding:6px 0;">
+                        €{{ "%.2f"|format(item.subtotal) }}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    {% if processing_fee %}
+                    <tr>
+                      <td style="font-family:Arial, sans-serif; font-size:13px; font-style:italic; color:#6b5d1f; padding:6px 0;">
+                        {{ s.processing_fee }}
+                      </td>
+                      <td align="right" style="font-family:Arial, sans-serif; font-size:13px; font-style:italic; color:#6b5d1f; padding:6px 0;">
+                        €{{ "%.2f"|format(processing_fee) }}
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:10px; border-top:1px solid #e4e0d3;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="font-family:'Abel', Arial, sans-serif; font-size:16px; font-weight:700; color:#231f20; padding-top:8px;">
+                        {{ s.total }}
+                      </td>
+                      <td align="right" style="font-family:'Abel', Arial, sans-serif; font-size:16px; font-weight:700; color:#231f20; padding-top:8px;">
+                        €{{ "%.2f"|format(order_total) }}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Entry info -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:32px;">
+              <tr>
+                <td style="font-family:'Abel', Arial, sans-serif; font-size:16px; font-weight:700; color:#231f20; padding-bottom:10px; border-bottom:2px solid #293440;">
+                  {{ s.entry_info_title }}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:14px; font-family:Arial, sans-serif; font-size:14px; line-height:1.7; color:#231f20;">
+                  {% for line in s.entry_info_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:16px; font-family:Arial, sans-serif; font-size:13px; font-weight:bold; color:#231f20;">
+                  {{ s.not_allowed_title }}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:6px; font-family:Arial, sans-serif; font-size:13px; line-height:1.7; color:#696567;">
+                  {% for line in s.not_allowed_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:14px; font-family:Arial, sans-serif; font-size:12px; line-height:1.5; color:#8a8688;">
+                  {{ s.rules_link_label }} <a href="{{ terms_url }}" style="color:#293440;">{{ terms_url_label }}</a>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:24px 0 0; font-family:Arial, sans-serif; font-size:13px; line-height:1.6; color:#8a8688;">
+              {{ s.keep_ticket_note }}
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td class="px" style="background-color:#293440; padding:28px 40px; border-radius:0 0 8px 8px;" align="center">
+            <div style="font-family:'Abel', Arial, sans-serif; font-size:16px; color:#ffffff; margin-bottom:6px;">
+              {{ s.footer }}
+            </div>
+            <div style="font-family:Arial, sans-serif; font-size:11px; color:#9aa5ab; margin-top:10px;">
+              {{ festival_dates }} · {{ festival_venue }}
+            </div>
+            <div style="font-family:Arial, sans-serif; font-size:11px; color:#6f7a80; margin-top:14px;">
+              <a href="{{ contact_url }}" style="color:#9aa5ab; text-decoration:underline;">{{ s.contact_label }}</a>
+              &nbsp;·&nbsp;
+              <a href="{{ terms_url }}" style="color:#9aa5ab; text-decoration:underline;">{{ s.terms_label }}</a>
+            </div>
+            {% if company_legal_name %}
+            <div style="font-family:Arial, sans-serif; font-size:10px; color:#5a6367; margin-top:18px; padding-top:14px; border-top:1px solid #3a444c;">
+              {{ company_legal_name }} · NIF {{ company_nif }} · {{ company_address }}
+            </div>
+            {% endif %}
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

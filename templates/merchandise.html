@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Merchandise — HIM Dub Festival{% endblock %}
+{% block body_class %}immersive-page{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero immersive-hero--merch">
+  <div class="immersive-hero__scrim"></div>
+
+  {% with prev_url=url_for('shop.glamping'), prev_label=_('Experience'), next_url=url_for('main.participate'), next_label=_('Participate') %}
+    {% include "partials/_hero_arrows.html" %}
+  {% endwith %}
+
+  <div class="immersive-hero__content" data-reveal>
+    <p class="eyebrow">{{ _('Merchandise') }}</p>
+    <h1 class="immersive-hero__title">{{ _('Produzido localmente em Portugal') }}</h1>
+    <p class="page-hero__lede">{{ _('Handmade, handscreen, handcut — peças feitas por criadores locais.') }}</p>
+    {% include "partials/_product_grid.html" %}
+  </div>
+
+  <div class="hero__meta">
+    <div class="hero__meta-edition"><b>{{ _('6ª Edição') }}</b>{{ _(config.FESTIVAL_DATES) }}</div>
+    <div class="hero__meta-coords">40.418799, -7.045625</div>
+    <div class="hero__meta-right">
+      <div class="lang-pills">
+        {% for code in languages %}
+          <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_labels[code] }}</a>
+        {% endfor %}
+      </div>
+      {% include "partials/_music_toggle.html" %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

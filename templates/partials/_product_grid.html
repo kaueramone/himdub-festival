@@ -1,0 +1,25 @@
+<div class="product-grid">
+  {% for product in products %}
+    <div class="product-card" data-reveal data-reveal-delay="{{ loop.index0 * 60 }}">
+      <a href="{{ url_for('shop.product_detail', slug=product.slug) }}" class="product-card__visual {{ product.image_class }}"></a>
+      <div class="product-card__body">
+        <h3><a href="{{ url_for('shop.product_detail', slug=product.slug) }}">{{ product.localized_name }}</a></h3>
+        <p>{{ product.localized_short_description }}</p>
+        <div class="product-card__footer">
+          <span class="price">€{{ '%.2f'|format(product.price) }}</span>
+          {% if product.variant_list %}
+            <a href="{{ url_for('shop.product_detail', slug=product.slug) }}" class="btn btn--small btn--outline">{{ _('Escolher') }}</a>
+          {% else %}
+            <form action="{{ url_for('shop.cart_add') }}" method="post" class="quick-add-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <button type="submit" class="btn btn--small btn--primary">{{ _('Adicionar') }}</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p>{{ _('Ainda não há produtos disponíveis nesta categoria.') }}</p>
+  {% endfor %}
+</div>

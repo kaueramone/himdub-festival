@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Admin — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container narrow">
+    <p class="eyebrow" data-reveal>Área reservada</p>
+    <h1 data-reveal>Entrar como administrador</h1>
+
+    <form method="post" class="checkout-form" data-reveal style="max-width:360px;">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="field"><label for="staff-email">Email</label><input id="staff-email" type="email" name="email" autocomplete="username" {% if not config.ALLOW_LEGACY_LOGIN %}required{% endif %}></div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autofocus required>
+      </div>
+    <div class="field"><label for="staff-totp">Código da aplicação de autenticação (se configurada)</label><input id="staff-totp" name="totp" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" maxlength="6"></div>
+      <button type="submit" class="btn btn--primary btn--lg">Entrar</button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

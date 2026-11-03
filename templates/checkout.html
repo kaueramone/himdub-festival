@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Checkout') }} — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container narrow">
+    <p class="eyebrow" data-reveal>{{ _('Checkout') }}</p>
+    <h1 data-reveal>{{ _('Finaliza a tua encomenda') }}</h1>
+
+    {% if not config.PAYMENTS_LIVE %}
+      <div class="notice-box" data-reveal>
+        {% trans %}Modo demo: sem o Stripe configurado, esta encomenda vai ser marcada como paga
+        automaticamente, sem cobrança real. Configura o <code>STRIPE_SECRET_KEY</code> no
+        ficheiro <code>.env</code> para ligar pagamentos a sério.{% endtrans %}
+      </div>
+    {% endif %}
+
+    <div class="checkout-grid">
+      <form method="post" class="checkout-form" data-reveal>
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+          <label for="name">{{ _('Nome') }}</label>
+          <input type="text" id="name" name="name" value="{{ form_name or '' }}" required>
+        </div>
+        <div class="field">
+          <label for="email">{{ _('Email') }}</label>
+          <input type="email" id="email" name="email" value="{{ form_email or '' }}" required>
+        </div>
+        <div class="field">
+          <label for="country">{{ _('País de origem') }}</label>
+          <select id="country" name="country" required>
+            <option value="" disabled {{ 'selected' if not form_country }}>{{ _('Seleciona o teu país') }}</option>
+            {% for country in countries %}
+              <option value="{{ country }}" {{ 'selected' if form_country == country }}>{{ country }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="nif">{{ _('NIF (opcional, para fatura)') }}</label>
+          <input type="text" id="nif" name="nif" value="{{ form_nif or '' }}" inputmode="numeric" maxlength="9" placeholder="{{ _('Só se precisares de fatura com contribuinte') }}">
+        </div>
+
+        {# Campos extra para os bilhetes de Acessibilidade (nome do
+           acompanhante, que entra grátis) e Família (nomes das crianças,
+           que entram grátis) -- só aparecem quando o carrinho tem mesmo
+           esse tipo de bilhete (ver COMPANION_NAME_SLUG/KIDS_NAMES_SLUG em
+           blueprints/shop.py). #}
+        {% for line in lines %}
+          {% if line.product.slug == 'bilhete-acessibilidade' %}
+            <div class="field">
+              <label for="companion_name__{{ line.key }}">{{ _('Nome do acompanhante (opcional)') }}</label>
+              <input type="text" id="companion_name__{{ line.key }}" name="companion_name__{{ line.key }}"
+                value="{{ (form_special_fields or {}).get(line.key, '') }}" maxlength="120"
+                placeholder="{{ _('Fica registado para a entrada') }}">
+            </div>
+          {% elif line.product.slug == 'bilhete-familia' %}
+            <div class="field">
+              <label for="kids_names__{{ line.key }}">{{ _('Nomes das crianças (opcional, separados por vírgula)') }}</label>
+              <input type="text" id="kids_names__{{ line.key }}" name="kids_names__{{ line.key }}"
+                value="{{ (form_special_fields or {}).get(line.key, '') }}" maxlength="300"
+                placeholder="{{ _('Ex.: Chloé Bernal, João Cardoso') }}">
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {# Nome de cada bilhete individual, para todos os outros tipos de
+           bilhete (Geral, Fim de Semana, Caravana, Full Pass + Caravan,
+           etc.) -- pedido explícito do João: se a linha tem quantidade > 1,
+           cada bilhete gerado tem de poder ter o seu próprio nome, em vez
+           de saírem todos com o nome de quem comprou (ver
+           _needs_ticket_names em blueprints/shop.py). Obrigatório para
+           cada bilhete. #}
+        {% for line in lines %}
+          {% if line.product.category == 'ticket' and line.product.slug not in ('bilhete-acessibilidade', 'bilhete-familia') %}
+            {% set names_for_line = (form_ticket_names or {}).get(line.key, []) %}
+            {% for i in range(line.quantity) %}
+              <div class="field">
+                <label for="ticket_name__{{ line.key }}__{{ i }}">
+                  {{ _('Nome do bilhete %(n)s — %(product)s', n=i + 1, product=line.product.localized_name) }}
+                </label>
+                <input type="text" id="ticket_name__{{ line.key }}__{{ i }}" name="ticket_name__{{ line.key }}__{{ i }}"
+                  value="{{ names_for_line[i] if i < names_for_line|length else '' }}" maxlength="120" required
+                  placeholder="{{ _('Nome de quem vai usar este bilhete') }}">
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+
+        <button type="submit" class="btn btn--primary btn--lg">
+          {% if config.PAYMENTS_LIVE %}{{ _('Pagar com Stripe') }}{% else %}{{ _('Concluir encomenda (demo)') }}{% endif %}
+        </button>
+
+        {% if config.PAYMENTS_LIVE %}
+          {# Pedido explicito do Joao: alguns metodos de pagamento (ex: MB WAY)
+             confirmam de forma assincrona -- se a pessoa fechar/atualizar a
+             pagina demasiado cedo, o pagamento pode ainda ser cobrado mas o
+             bilhete so e emitido quando a confirmacao chega (ver
+             checkout_success/webhook em blueprints/shop.py). #}
+          <p class="checkout-form__warning">
+            {{ _('Depois de pagares, não feches nem atualizes a página -- espera até veres a confirmação da encomenda. Se fechares antes disso, o pagamento pode ser cobrado na mesma, mas o teu bilhete só é emitido depois de recebermos essa confirmação.') }}
+          </p>
+        {% endif %}
+      </form>
+
+      <div class="checkout-summary" data-reveal>
+        <h3>{{ _('Resumo') }}</h3>
+        <ul>
+          {% for line in lines %}
+            <li>
+              <span>{{ line.quantity }}× {{ line.product.localized_name }}{% if line.variant %} ({{ line.variant }}){% endif %}</span>
+              <span>€{{ '%.2f'|format(line.subtotal) }}</span>
+            </li>
+          {% endfor %}
+          {% if processing_fee %}
+            <li class="checkout-summary__fee">
+              <span>{{ _('Taxa de processamento') }}</span>
+              <span>€{{ '%.2f'|format(processing_fee) }}</span>
+            </li>
+          {% endif %}
+        </ul>
+        <div class="checkout-summary__total">
+          <span>{{ _('Total') }}</span>
+          <strong>€{{ '%.2f'|format(lines|sum(attribute='subtotal') + (processing_fee or 0)) }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

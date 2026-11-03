@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Ambassadors') }} — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<section class="page-hero page-hero--ambassadors">
+  <div class="container" data-reveal>
+    <p class="eyebrow">{{ _('Ambassadors') }}</p>
+    <h1>{{ _('A voz do HIM Dub, um pouco por todo o mundo') }}</h1>
+    <p class="page-hero__lede">
+      {{ _('Os nossos embaixadores levam o espírito do festival além-fronteiras, criando pontes entre Portugal e comunidades como o Japão, a Jamaica e São Tomé e Príncipe.') }}
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="ambassador-grid">
+      <div class="ambassador-card" data-reveal>
+        <span class="ambassador-card__flag">🇯🇵</span>
+        <h3>{{ _('Ásia') }}</h3>
+        <p>{{ _('Ligação à comunidade sound system japonesa e asiática.') }}</p>
+      </div>
+      <div class="ambassador-card" data-reveal data-reveal-delay="80">
+        <span class="ambassador-card__flag">🇯🇲</span>
+        <h3>{{ _('Jamaica') }}</h3>
+        <p>{{ _('Raízes da cultura reggae e dub, na origem do movimento.') }}</p>
+      </div>
+      <div class="ambassador-card" data-reveal data-reveal-delay="160">
+        <span class="ambassador-card__flag">🇸🇹</span>
+        <h3>{{ _('São Tomé e Príncipe') }}</h3>
+        <p>{{ _('Comunidade lusófona que partilha o espírito do festival em África.') }}</p>
+      </div>
+    </div>
+
+    <div class="highlight-box" data-reveal>
+      <h2>{{ _('Queres ser embaixador?') }}</h2>
+      <p>{{ _('Se sentes que representas o espírito do HIM Dub na tua comunidade, escreve-nos.') }}</p>
+      <a href="mailto:contact@himdubfestival.com?subject=Ambassador Program" class="btn btn--primary">{{ _('Contactar') }}</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

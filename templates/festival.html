@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ _('What is HIM Dub?') }} — HIM Dub Festival{% endblock %}
+
+{% block content %}
+
+<section class="page-hero page-hero--festival" style="background-image: linear-gradient(180deg, rgba(16,21,23,.5) 0%, rgba(16,21,23,.6) 55%, rgba(16,21,23,.88) 100%), url('{{ url_for('static', filename='img/story/festival-hero-bg.jpg') }}'); background-size: cover; background-position: center 30%;">
+  <div class="container" data-reveal>
+    <p class="eyebrow">{{ _('The Festival') }}</p>
+    <h1>{{ _('What is HIM Dub') }}</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <div class="highlight-box highlight-box--story" data-reveal>
+      <h2>{{ _('Why the Name H.I.M Dub?') }}</h2>
+      <p>{{ _("H.I.M is the acronym used by HIS & HER IMPERIAL MAJESTIES, Emperor Haile Selassie I and Empress Menen Asfaw, respectively.") }}</p>
+      <p>{{ _("Emperor Haile Selassie and Empress Menen broke the tradition of a single monarch coronation and were crowned together on the 2nd of November 1930, a symbolic display of the divine union and balance of masculine and feminine energy. An event that was attended by dignitaries and representatives of 72 different nations, an unprecedented event for the coronation of African royalty in the 1930s.") }}</p>
+      <p>{{ _("In his 44 years on the throne, HIM Emperor Haile Selassie worked unceasingly with an unparalleled forward-thinking vision to modernise Ethiopia, and free Africa from colonial bondage. He voluntarily abolished slavery upon assuming the throne and voluntarily established a constitution of governance to redistribute power in a more democratic way.") }}</p>
+    </div>
+
+    <div class="story-gallery story-gallery--3" data-reveal>
+      <img src="{{ url_for('static', filename='img/story/story-06.jpg') }}" alt="">
+      <img src="{{ url_for('static', filename='img/story/story-10.jpg') }}" alt="">
+      <img src="{{ url_for('static', filename='img/story/story-03.jpg') }}" alt="">
+    </div>
+
+    <div class="highlight-box highlight-box--story" data-reveal>
+      <h2>{{ _('The link between HIM Dub & Rastafari') }}</h2>
+      <p>{{ _("To the RasTafari brothers and sisters, he is the saviour, the redeemer, the divine, God in flesh as a black African King. To pan-Africanists, he is the godfather of African unity and the founder of the Organisation of African Unity (OAU). To those who opposed fascism, he was an icon of victorious triumph following his defeat of Mussolini in 1941, after five years of attempted occupation of Ethiopia by the Italian fascist army.") }}</p>
+      <p>{{ _("Haile Selassie relentlessly campaigned for nuclear disarmament and world peace. He was a pivotal figure in forming the United Nations and drafting the UN Declaration of Human Rights.") }}</p>
+      <p>{{ _("He was a firm advocate for women's rights and consequently a great friend to Sylvia Pankhurst so much that she spent the last part of her life living in Addis Ababa. Empress Menen too devoted much of her energy to charitable duties focused on women, children, the poor and the handicapped.") }}</p>
+    </div>
+
+    <div class="story-gallery story-gallery--3" data-reveal>
+      <img src="{{ url_for('static', filename='img/story/story-07.jpg') }}" alt="">
+      <img src="{{ url_for('static', filename='img/story/story-05.jpg') }}" alt="">
+      <img src="{{ url_for('static', filename='img/story/story-04.jpg') }}" alt="">
+    </div>
+
+    <div class="highlight-box highlight-box--story" data-reveal>
+      <h2>{{ _('The Roots of Dub') }}</h2>
+      <p>{{ _('Dub was born in Kingston, Jamaica, in the late 1960s, when engineers and producers like King Tubby, Lee "Scratch" Perry, and Scientist began stripping songs down to their bones, pulling out vocals and instruments, then rebuilding the track with reverb, echo, and tape delay. What started as an experiment in the mixing booth became a genre in its own right, and eventually the blueprint for entire sound system cultures around the world.') }}</p>
+      <p>{{ _('At HIM DUB, that spirit is still very much alive. The sound systems carry forward the messages that have always run through reggae and dub, resistance, rebellion, and revolution, but also unity, healing, and a deep sense of connection to something greater than ourselves.') }}</p>
+    </div>
+
+    <div class="story-gallery story-gallery--4" data-reveal>
+      <img src="{{ url_for('static', filename='img/story/story-08.jpg') }}" alt="">
+      <img src="{{ url_for('static', filename='img/story/story-09.jpg') }}" alt="">
+      <img src="{{ url_for('static', filename='img/story/story-01.jpg') }}" alt="">
+      <img src="{{ url_for('static', filename='img/story/story-02.jpg') }}" alt="">
+    </div>
+
+  </div>
+</section>
+
+<section class="section section--cta section--dark">
+  <div class="container cta-banner" data-reveal>
+    <h2>{{ _('Garante já o teu lugar junto ao rio') }}</h2>
+    <p>{{ _('Bilhetes gerais, familiares, de fim de semana e passe de caravana disponíveis.') }}</p>
+    <a href="{{ url_for('shop.tickets') }}" class="btn btn--primary btn--lg">{{ _('Ver Bilhetes') }}</a>
+  </div>
+</section>
+
+{% endblock %}
