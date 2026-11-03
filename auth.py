@@ -100,6 +100,20 @@ def init_auth(app):
     @app.cli.command("staff-bootstrap")
     def staff_bootstrap():
         """Provision the first staff account from temporary, private deployment variables."""
+        if os.environ.get("STAFF_BOOTSTRAP_ROTATE_MFA", "").lower() == "true":
+            email = os.environ.get("STAFF_BOOTSTRAP_EMAIL", "").strip().lower()
+            secret = os.environ.get("STAFF_BOOTSTRAP_TOTP_SECRET", "")
+            user = AdminUser.query.filter_by(email=email, role="admin", active=True).first()
+            if not user or len(secret) != 32 or any(c not in "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" for c in secret):
+                raise click.ClickException("Conta ou segredo de recuperação MFA inválido.")
+            if not hmac.compare_digest(user.totp_secret or "", secret):
+                user.totp_secret = secret
+                user.totp_last_counter = -1
+                user.session_version += 1
+                db.session.add(AuditEvent(actor="deployment", action="mfa_reset", target=str(user.id)))
+                db.session.commit()
+            click.echo("MFA da conta indicada atualizado; as sessões anteriores foram revogadas.")
+            return
         if AdminUser.query.count():
             click.echo("Já existem contas; não foi alterado nenhum acesso.")
             return

@@ -282,6 +282,34 @@ class PurchaseSecurityTests(unittest.TestCase):
         self.assertNotIn(environment["STAFF_BOOTSTRAP_TOTP_SECRET"], first.output)
         self.assertNotIn(environment["STAFF_BOOTSTRAP_PASSWORD_HASH"], first.output)
 
+    def test_explicit_mfa_recovery_revokes_sessions_without_changing_password(self):
+        from models import AdminUser, AuditEvent
+        from werkzeug.security import generate_password_hash
+        user = AdminUser(email="staff@example.invalid", role="admin",
+                         password_hash=generate_password_hash("synthetic-password"),
+                         totp_secret="GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", totp_last_counter=100)
+        db.session.add(user)
+        db.session.commit()
+        old_version, old_hash = user.session_version, user.password_hash
+        environment = {"STAFF_BOOTSTRAP_EMAIL": user.email, "STAFF_BOOTSTRAP_ROTATE_MFA": "true",
+                       "STAFF_BOOTSTRAP_TOTP_SECRET": "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP"}
+        with patch.dict(os.environ, environment):
+            first = self.app.test_cli_runner().invoke(args=["staff-bootstrap"])
+            second = self.app.test_cli_runner().invoke(args=["staff-bootstrap"])
+        self.assertEqual(first.exit_code, 0, first.output)
+        self.assertEqual(second.exit_code, 0, second.output)
+        self.assertEqual(user.session_version, old_version + 1)
+        self.assertEqual(user.password_hash, old_hash)
+        self.assertEqual(user.totp_last_counter, -1)
+        self.assertEqual(user.totp_secret, environment["STAFF_BOOTSTRAP_TOTP_SECRET"])
+        self.assertEqual(AuditEvent.query.filter_by(action="mfa_reset").count(), 1)
+        self.assertNotIn(user.totp_secret, first.output)
+        environment["STAFF_BOOTSTRAP_TOTP_SECRET"] = "invalid"
+        with patch.dict(os.environ, environment):
+            rejected = self.app.test_cli_runner().invoke(args=["staff-bootstrap"])
+        self.assertNotEqual(rejected.exit_code, 0)
+        self.assertEqual(user.session_version, old_version + 1)
+
     def test_concurrent_webhooks_issue_each_ticket_once(self):
         if db.engine.dialect.name != "postgresql":
             self.skipTest("Row-lock concurrency runs in the PostgreSQL CI job")
