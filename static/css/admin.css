@@ -17,3 +17,5 @@
 .app-row-actions{justify-content:flex-end}.app-row-actions form{margin:0}
 .content-list-title{display:flex;align-items:center;gap:16px;flex:1;min-width:180px}
 .content-list-image{width:76px;height:58px;object-fit:contain;background:var(--bg-alt);border-radius:6px;flex-shrink:0}
+
+.ticket-tier{display:grid;gap:18px;max-width:900px}.ticket-tier legend{padding:0 10px;font-size:20px}

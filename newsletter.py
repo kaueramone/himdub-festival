@@ -125,7 +125,24 @@ def init_newsletter(main, bp, admin_required):
             db.session.commit()
             done = True
         return render_template(
-            "newsletter_result.html", done=done, action="confirm", token=token
+            "newsletter_result.html",
+            done=done,
+            action="confirm",
+            token=token,
+            unsubscribe_url=(
+                url_for(
+                    "main.newsletter_unsubscribe",
+                    token=serializer().dumps(
+                        {
+                            "id": subscriber.id,
+                            "nonce": subscriber.nonce,
+                            "action": "unsubscribe",
+                        }
+                    ),
+                )
+                if done
+                else None
+            ),
         )
 
     @main.route("/newsletter/unsubscribe", methods=["GET", "POST"])
@@ -135,6 +152,8 @@ def init_newsletter(main, bp, admin_required):
         done = False
         if request.method == "POST":
             subscriber.unsubscribed_at = datetime.utcnow()
+            # An old confirmation email must not undo a later opt-out.
+            subscriber.nonce = secrets.token_hex(24)
             enqueue(
                 "newsletter_sync",
                 {"subscriber_id": subscriber.id},

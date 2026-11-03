@@ -479,6 +479,10 @@ class AdminAutonomyTests(unittest.TestCase):
         )
         self.assertIsNotNone(subscriber.unsubscribed_at)
         self.assertEqual(
+            self.post("/newsletter/confirm", {"token": token}).status_code, 410
+        )
+        self.assertIsNotNone(subscriber.unsubscribed_at)
+        self.assertEqual(
             self.client.get("/newsletter/confirm?token=invalid").status_code, 410
         )
 
