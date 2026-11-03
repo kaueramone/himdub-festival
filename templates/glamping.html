@@ -22,18 +22,13 @@
     <h1 class="immersive-hero__title">{{ _('The Experience') }}</h1>
 
     <div class="experience-cards">
-      <a href="{{ url_for('main.festival') }}" class="experience-card" data-reveal data-reveal-delay="0">
-        <h3 class="experience-card__title">{{ _('What is HIM Dub?') }}</h3>
-        <img src="{{ url_for('static', filename='img/experience-what-is.jpg') }}" alt="{{ _('What is HIM Dub?') }}" class="experience-card__image">
+      {% for item in native_content %}
+      <a href="{{ item.link_url or '#' }}" class="experience-card" data-reveal data-reveal-delay="{{ loop.index0 * 70 }}">
+        <h3 class="experience-card__title">{{ item.title }}</h3>
+        {% if item.image_url %}<img src="{{ item.image_url }}" alt="{{ item.title }}" class="experience-card__image {{ 'experience-card__image--map' if item.key=='experience:map' else '' }}">{% endif %}
+        {% if item.text %}<p>{{ item.text }}</p>{% endif %}
       </a>
-      <a href="{{ url_for('main.lineup') }}" class="experience-card" data-reveal data-reveal-delay="70">
-        <h3 class="experience-card__title">{{ _('The areas') }}</h3>
-        <img src="{{ url_for('static', filename='img/experience-areas.jpg') }}" alt="{{ _('The areas') }}" class="experience-card__image">
-      </a>
-      <a href="{{ url_for('main.venue_map') }}" class="experience-card" data-reveal data-reveal-delay="140">
-        <h3 class="experience-card__title">{{ _('The map') }}</h3>
-        <img src="{{ url_for('static', filename='img/experience-map.png') }}" alt="{{ _('The map') }}" class="experience-card__image experience-card__image--map">
-      </a>
+      {% endfor %}
     </div>
   </div>
 

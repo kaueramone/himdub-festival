@@ -17,10 +17,10 @@
       <a href="https://himdubfestival.com/index.php/regras-e-normas-de-funcionamento/" target="_blank" rel="noopener">{{ _('Regras e Normas de Funcionamento') }}</a>.
     </p>
     <div class="accordion" data-reveal>
-      {% for question, answer in faqs %}
+      {% for item in native_content %}
         <details class="accordion__item">
-          <summary>{{ question }}</summary>
-          <div class="accordion__content"><p>{{ answer }}</p></div>
+          <summary>{{ item.title }}</summary>
+          <div class="accordion__content"><p>{{ item.text }}</p></div>
         </details>
       {% endfor %}
     </div>

@@ -1,0 +1,24 @@
+{% extends 'admin/base.html' %}
+{% block title %}Editar conteúdo · HIM Dub{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="app-overline">{{ pages[page_key][0] }}</p><h1>Editar conteúdo</h1><p>Este conteúdo aparece na própria página, no formato original.</p></div><a href="{{ url_for('admin.content', page=page_key) }}">← Conteúdos</a></div>
+<section class="app-card"><form method="post" enctype="multipart/form-data" class="app-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="key" value="{{ item.key }}">
+<label>{{ 'Pergunta' if item.kind=='faq' else 'Título' }}<input name="title" value="{{ item.title }}" maxlength="180" required></label>
+{% if item.kind not in ['contact','partner'] %}<label>{{ 'Resposta' if item.kind=='faq' else 'Texto' }}<textarea name="text" rows="6" maxlength="10000">{{ item.text }}</textarea></label>{% endif %}
+{% if item.kind in ['card','partner','way'] %}
+<label>{{ 'Logótipo' if item.kind=='partner' else 'Fotografia' }}<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
+{% if item.image_url %}<img class="admin-preview" src="{{ item.image_url }}" alt="Imagem atual">{% endif %}<input type="hidden" name="image_url" value="{{ item.image_url }}">
+<p class="app-hint">A imagem atual é mantida se não carregares outra. JPEG, PNG ou WebP, até 10 MB.</p>
+<label>Endereço de destino<input name="link_url" value="{{ item.link_url }}" maxlength="500" placeholder="/the-map ou https://..."></label>
+<label>Texto do botão (opcional)<input name="link_label" value="{{ item.link_label }}" maxlength="80"></label>
+{% endif %}
+{% if item.kind=='way' %}<label>Candidaturas<select name="status"><option value="closed" {% if item.status=='closed' %}selected{% endif %}>Inscrições encerradas</option><option value="open" {% if item.status=='open' %}selected{% endif %}>Inscrições abertas</option></select></label><p class="app-hint">Quando estão abertas, o botão usa o endereço de destino indicado. Sem endereço, abre um email para a organização.</p>{% endif %}
+{% if item.kind=='eco' %}<label>Cor do marcador<input name="color" type="color" value="{{ item.color }}"></label>{% endif %}
+{% if item.kind=='partner' %}<label>Grupo<select name="group">{% for key,label in groups.items() %}<option value="{{ key }}" {% if item.group==key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>{% endif %}
+{% if item.kind=='contact' %}<label>Email de contacto<input name="email" type="email" value="{{ item.email }}" maxlength="180" required></label>{% endif %}
+<details><summary>Traduções em inglês e francês</summary>{% for language,label in [('en','Inglês'),('fr','Francês')] %}<label>Título · {{ label }}<input name="title_{{ language }}" value="{{ item['title_'+language] }}" maxlength="180"></label>{% if item.kind not in ['contact','partner'] %}<label>Texto · {{ label }}<textarea name="text_{{ language }}" rows="4" maxlength="10000">{{ item['text_'+language] }}</textarea></label>{% endif %}{% endfor %}<p class="app-hint">As traduções existentes estão preenchidas. Revê-as quando alterares o português; se apagares uma tradução, será usado o português.</p></details>
+<label>Ordem<input name="sort_order" type="number" min="-10000" max="10000" value="{{ item.sort_order }}"></label>
+<label class="app-checkbox"><input type="checkbox" name="published" {% if item.published %}checked{% endif %}> Publicar no website</label><p class="app-hint">Se retirares esta opção, o conteúdo deixa de aparecer na página pública e fica guardado como rascunho.</p>
+<button class="btn btn--primary">Guardar conteúdo</button></form></section>
+{% endblock %}

@@ -23,7 +23,7 @@
     <p class="page-hero__lede">{{ _('O festival vive da sua comunidade: as candidaturas ainda não estão abertas, fica atento para mais novidades.') }}</p>
 
     <div class="way-list">
-      {% for way in ways %}
+      {% for way in native_content %}
         <div class="way-card" data-reveal data-reveal-delay="{{ loop.index0 * 70 }}">
           <div class="way-card__head">
             <h3>{{ way.title }}</h3>
@@ -33,9 +33,9 @@
               <span class="badge badge--closed">{{ _('Inscrições encerradas') }}</span>
             {% endif %}
           </div>
-          <p>{{ way.desc }}</p>
+          {% if way.image_url %}<img class="way-card__image" src="{{ way.image_url }}" alt="" loading="lazy">{% endif %}<p>{{ way.text }}</p>
           {% if way.status == "open" %}
-            <a href="mailto:contact@himdubfestival.com?subject=Participar - {{ way.title }}" class="link-arrow">{{ _('Candidatar-me →') }}</a>
+            <a href="{{ way.link_url or ('mailto:contact@himdubfestival.com?subject=Participar%20-%20' + (way.title|urlencode)) }}" class="link-arrow">{{ way.link_label or _('Candidatar-me →') }}</a>
           {% endif %}
         </div>
       {% endfor %}

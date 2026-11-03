@@ -130,14 +130,7 @@ def area_detail(slug):
 
 @main_bp.route("/participate")
 def participate():
-    ways = [
-        {"title": _("Workshops"), "desc": _("Tens skills, experiência e know-how? Partilha-os connosco em oficinas de produção musical, construção de instrumentos e artesanato."), "status": "closed"},
-        {"title": _("Healing"), "desc": _("Procuramos terapeutas, dançarinos e bodyworkers para oferecer um caminho regenerativo de apoio aos participantes."), "status": "closed"},
-        {"title": _("Massagistas"), "desc": _("Profissionais de toque terapêutico para proporcionar restauro profundo aos participantes."), "status": "closed"},
-        {"title": _("Mercado Artesanal"), "desc": _("Criadores e artesãos com cerâmica, têxteis e cosméticos naturais."), "status": "closed"},
-        {"title": _("Voluntários"), "desc": _("\"O primeiro sorriso que as pessoas veem quando chegam.\" Essenciais para o festival acontecer."), "status": "closed"},
-    ]
-    return render_template("participate.html", ways=ways)
+    return render_template('participate.html')
 
 
 @main_bp.route("/ambassadors")
@@ -152,26 +145,7 @@ def venue_map():
 
 @main_bp.route("/infos/faq")
 def faq():
-    faqs = [
-        (_("Quando é o festival?"), _("De 23 a 29 de agosto de 2027, com abertura ao público a 23 durante a manhã.")),
-        (_("Onde é o festival?"), _("Praia Fluvial de Rapoula do Côa, Sabugal, distrito da Guarda, a cerca de 20km da fronteira com Espanha.")),
-        (_("A que horas abrem as portas?"), _("As portas abrem ao meio-dia (12h) no dia 23 de agosto.")),
-        (_("Há restrição de idade?"), _("Não - o festival é para todas as idades e é family-friendly.")),
-        (_("Que tipos de bilhete existem?"), _("General, Family, Weekend, Accessibility e Ambassador.")),
-        (_("Posso comprar bilhete à entrada?"), _("Sim, mas o estacionamento de caravanas é limitado - recomendamos comprar com antecedência.")),
-        (_("Há reembolsos?"), _("Não há reembolso de bilhetes, exceto em caso de cancelamento do festival, morte ou hospitalização.")),
-        (_("As crianças precisam de bilhete?"), _("Não - entrada gratuita para menores de 16 anos.")),
-        (_("Posso revender o meu bilhete?"), _("Sim, fica atento -- vamos partilhar mais informação sobre isso nas próximas semanas.")),
-        (_("O campismo está incluído?"), _("Sim, o campismo é gratuito com o bilhete do festival.")),
-        (_("Posso levar caravana?"), _("Sim, há um parque de caravanas dedicado, disponível para compra.")),
-        (_("Há duches e casas de banho?"), _("Sim, tanto na zona de campismo como no parque de caravanas.")),
-        (_("Posso levar comida e bebida?"), _("Bebidas alcoólicas apenas na zona de campismo/caravanas. Comida e bebidas não alcoólicas podem ser levadas para todo o recinto.")),
-        (_("Há água disponível?"), _("Sim, no campismo, no parque de caravanas e no recinto do festival.")),
-        (_("Posso levar o meu cão?"), _("Não, não são permitidos cães no festival.")),
-        (_("O evento é cashless?"), _("Sim - usamos pulseiras para os pagamentos. Todos os carregamentos são finais e não reembolsáveis.")),
-        (_("Devo levar fato de banho?"), _("Sem dúvida - o festival é construído à volta de um lugar de rio maravilhoso.")),
-    ]
-    return render_template("infos/faq.html", faqs=faqs)
+    return render_template('infos/faq.html')
 
 
 @main_bp.route("/infos/partners")
@@ -181,15 +155,7 @@ def partners():
 
 @main_bp.route("/infos/sustainability")
 def sustainability():
-    eco_cards = [
-        {"color": "#d97757", "title": _("Kit de Boas-vindas"), "desc": _("Um kit de higiene ecológico é oferecido à entrada do festival, com um sabonete 100% natural e artesanal, pó dentífrico e um saquinho de sementes.")},
-        {"color": "#c9b93a", "title": _("Casas de Banho Secas"), "desc": _("Sem água, sem químicos. Serrim substitui o autoclismo, poupando milhares de litros de água, e todos os resíduos são compostados de volta à terra.")},
-        {"color": "#5aa8c9", "title": _("Restos de Comida"), "desc": _("Os restos de comida dos nossos restaurantes e da cozinha da equipa são doados a pastores locais para alimentar os seus animais, fechando o ciclo do prato ao pasto.")},
-        {"color": "#3f6b3f", "title": _("Produtos Locais"), "desc": _("Priorizamos fornecedores e produtores da região em toda a cadeia de alimentação e artesanato.")},
-        {"color": "#3a6ea8", "title": _("Respeito pelo Rio"), "desc": _("O recinto é pensado para minimizar o impacto na praia fluvial e no ecossistema envolvente.")},
-        {"color": "#6b5a44", "title": _("Comunidade"), "desc": _("Colaboração ativa com associações e produtores locais, como Uprising e Nomad.")},
-    ]
-    return render_template("infos/sustainability.html", eco_cards=eco_cards)
+    return render_template('infos/sustainability.html')
 
 
 @main_bp.route("/infos/contact")

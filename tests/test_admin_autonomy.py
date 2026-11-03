@@ -255,6 +255,144 @@ class AdminAutonomyTests(unittest.TestCase):
             db.session.get(PageAppearance, "experience").color_start, "#123456"
         )
 
+    def test_original_content_is_listed_and_edited_in_place(self):
+        from models import NativeContent
+        from content_catalog import DEFAULT_CONTENT
+
+        self.login()
+        for page, originals in DEFAULT_CONTENT.items():
+            listing = self.client.get("/admin/content?page=" + page)
+            self.assertEqual(listing.status_code, 200)
+            self.assertIn(originals[0]["title"].encode(), listing.data)
+            for item in originals:
+                self.assertEqual(
+                    self.client.get(
+                        "/admin/content/original/edit?key=" + item["key"]
+                    ).status_code,
+                    200,
+                )
+        self.assertEqual(
+            NativeContent.query.count(), 0
+        )  # Reading does not seed or publish data.
+        response = self.post(
+            "/admin/content/original/edit",
+            {
+                "key": "experience:festival",
+                "title": "Discover the festival",
+                "text": "<script>synthetic</script>",
+                "image_url": "/static/img/experience-what-is.jpg",
+                "link_url": "/the-festival",
+                "published": "on",
+                "sort_order": "0",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        public = self.client.get("/the-experience").data
+        self.assertIn(b"Discover the festival", public)
+        self.assertNotIn(b"What is HIM Dub?", public)
+        self.assertIn(b"&lt;script&gt;synthetic&lt;/script&gt;", public)
+        self.assertEqual(public.count(b'class="experience-card"'), 3)
+        self.assertEqual(PageBlock.query.count(), 0)
+        self.assertIn(
+            b"Discover the festival", self.client.get("/en/the-experience").data
+        )
+
+    def test_original_duplication_stays_draft_and_retains_page_format(self):
+        from models import NativeContent
+
+        self.login()
+        duplicate = self.post("/admin/content/original/duplicate", {"key": "faq:0"})
+        self.assertEqual(duplicate.status_code, 302)
+        row = NativeContent.query.one()
+        before = self.client.get("/infos/faq").data
+        self.assertNotIn(b"Synthetic new question", before)
+        self.assertEqual(
+            self.post(
+                "/admin/content/original/edit",
+                {
+                    "key": row.key,
+                    "title": "Synthetic new question",
+                    "text": "Synthetic answer",
+                    "sort_order": "1",
+                    "published": "on",
+                },
+            ).status_code,
+            302,
+        )
+        after = self.client.get("/infos/faq").data
+        self.assertIn(b"<summary>Synthetic new question</summary>", after)
+        self.assertIn(b"Synthetic answer", after)
+        self.assertEqual(
+            after.count(b'class="accordion__item"'),
+            before.count(b'class="accordion__item"') + 1,
+        )
+        self.assertEqual(
+            self.post(
+                "/admin/content/original/edit",
+                {
+                    "key": row.key,
+                    "title": "Synthetic new question",
+                    "text": "Synthetic answer",
+                },
+            ).status_code,
+            302,
+        )
+        self.assertNotIn(b"Synthetic new question", self.client.get("/infos/faq").data)
+        self.assertEqual(
+            self.client.post(
+                "/admin/content/original/duplicate", data={"key": "faq:0"}
+            ).status_code,
+            400,
+        )
+
+    def test_original_editor_validates_links_and_contact_destinations(self):
+        self.login()
+        self.assertEqual(
+            self.post(
+                "/admin/content/original/edit",
+                {
+                    "key": "experience:festival",
+                    "title": "Unsafe link",
+                    "link_url": "javascript:alert(1)",
+                },
+            ).status_code,
+            400,
+        )
+        self.assertEqual(
+            self.post(
+                "/admin/content/original/edit",
+                {
+                    "key": "contact:0",
+                    "title": "Contact",
+                    "email": "bad@example.invalid?bcc=other@example.invalid",
+                },
+            ).status_code,
+            400,
+        )
+        self.assertIn(
+            b"contact@himdubfestival.com", self.client.get("/infos/contact").data
+        )
+
+    def test_additional_block_can_be_duplicated_without_publishing(self):
+        self.login()
+        self.post(
+            "/admin/content/edit",
+            {
+                "page": "experience",
+                "title": "Original extra",
+                "text": "Extra text",
+                "published": "on",
+            },
+        )
+        original = PageBlock.query.one()
+        response = self.post("/admin/content/duplicate", {"id": str(original.id)})
+        self.assertEqual(response.status_code, 302)
+        copy = PageBlock.query.filter(PageBlock.id != original.id).one()
+        self.assertFalse(copy.published)
+        self.assertEqual(copy.text, original.text)
+        self.assertEqual(copy.page_key, original.page_key)
+        self.assertNotIn(copy.title.encode(), self.client.get("/the-experience").data)
+
     def test_gallery_draft_is_private_and_published_album_has_polaroids(self):
         self.login()
         album = GalleryAlbum(
@@ -444,6 +582,29 @@ class AdminAutonomyTests(unittest.TestCase):
         self.assertEqual(TicketTransfer.query.count(), 0)
         self.assertEqual(WebsiteJob.query.count(), 0)
 
+    def test_family_and_accessibility_tickets_require_organisation_review(self):
+        from ticketing import generate_tickets_for_order
+        from transfers import ticket_eligible
+
+        db.session.add(Setting(key="transfer_enabled", value="true"))
+        order = self.order("paid")
+        generate_tickets_for_order(order)
+        db.session.commit()
+        ticket = Ticket.query.one()
+        original = ticket.code
+        for slug in ("bilhete-familia", "bilhete-acessibilidade"):
+            with self.subTest(slug=slug):
+                ticket.product_slug = slug
+                db.session.commit()
+                self.assertFalse(ticket_eligible(ticket))
+                response = self.post(
+                    "/ticket-transfer", {"code": original, "email": order.email}
+                )
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(TicketTransfer.query.count(), 0)
+                self.assertEqual(WebsiteJob.query.count(), 0)
+                self.assertEqual(ticket.code, original)
+
     def test_transfer_rejects_mismatched_amount_and_preserves_original_qr(self):
         ticket, transfer, token, old_code = self.prepare_transfer()
         self.assertEqual(self.pay_transfer(transfer, amount_total=1).status_code, 400)
@@ -586,6 +747,21 @@ class AdminAutonomyTests(unittest.TestCase):
             )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(upload.call_count, 1)
+            # The original-content editor supports the same upload limit as new blocks.
+            response = self.post(
+                "/admin/content/original/edit",
+                {
+                    "key": "experience:festival",
+                    "title": "Photo replacement",
+                    "image": (
+                        io.BytesIO(image.getvalue() + b"\0" * (3 * 1024 * 1024)),
+                        "large.png",
+                    ),
+                    "published": "on",
+                },
+            )
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(upload.call_count, 2)
 
     def test_concurrent_invite_acceptance_creates_only_one_account(self):
         if db.engine.dialect.name != "postgresql":

@@ -157,3 +157,18 @@ Os eventos de reembolso integral invalidam a entrada associada. Reembolsos parci
 exigem uma política funcional própria; o código não presume que anulam todos os
 bilhetes. O estado de email `sent` significa aceite pelo fornecedor. Confirmação
 `delivered`/`bounced` por webhook permanece uma evolução da monitorização.
+
+## Edição dos conteúdos atuais
+
+Em Conteúdos, The Experience, Participate e as páginas FAQ, Sustentabilidade,
+Parceiros e Contactos incluem os itens originais, com Editar e Duplicar.
+O catálogo inicial em `content_catalog.py` preserva os textos, imagens e destinos
+existentes. As alterações e cópias ficam na tabela aditiva `native_contents`,
+criada pelo mesmo `db-upgrade`; consultar a listagem não modifica a base.
+Não existe uma importação que possa voltar a escrever por cima de edições.
+
+Os itens são apresentados no local e formato originais. Uma cópia começa como
+rascunho; desmarcar Publicar retira o item da página pública. As traduções
+existentes são preenchidas no editor e devem ser revistas quando o português
+muda. Os blocos adicionais continuam disponíveis e também podem ser duplicados.
+Os conteúdos da loja e os álbuns mantêm as suas ferramentas próprias.

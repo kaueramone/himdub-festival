@@ -230,6 +230,14 @@ class PageBlock(db.Model):
     published = db.Column(db.Boolean, default=False, nullable=False)
 
 
+class NativeContent(db.Model):
+    """Overrides and copies of the original editorial items; no executable markup."""
+    __tablename__ = "native_contents"
+    key = db.Column(db.String(100), primary_key=True)
+    page_key = db.Column(db.String(40), nullable=False, index=True)
+    payload = db.Column(db.Text, nullable=False)
+
+
 class GalleryAlbum(db.Model):
     __tablename__ = "gallery_albums"
     id = db.Column(db.Integer, primary_key=True)

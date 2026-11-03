@@ -13,38 +13,13 @@
     <h1 class="sr-only">{{ _('Promotores, Parceiros e Apoios') }}</h1>
 
     <div class="partners-groups">
-      <div class="partners-group partners-group--promoters" data-reveal>
-        <h2>{{ _('Promotores') }}</h2>
-        <div class="partners-group__logos">
-          <span class="partner-item">
-            <img src="{{ url_for('static', filename='img/logo-uprising.png') }}" alt="Uprising — Projects for a better good">
-          </span>
-          <span class="partner-item">
-            <img src="{{ url_for('static', filename='img/logo-nomad-embassy.png') }}" alt="Nomad Embassy Sound System">
-          </span>
-        </div>
-      </div>
-
-      <div class="partners-group partners-group--partners" data-reveal data-reveal-delay="80">
-        <h2>{{ _('Parceiros') }}</h2>
-        <div class="partners-group__logos">
-          <span class="partner-item">
-            <img src="{{ url_for('static', filename='img/logo-ashabon.png') }}" alt="Ashabon — Pure Castile Soap">
-          </span>
-          <span class="partner-item">
-            <img src="{{ url_for('static', filename='img/logo-sementes-vivas.png') }}" alt="Sementes Vivas">
-          </span>
-        </div>
-      </div>
-
-      <div class="partners-group partners-group--support" data-reveal data-reveal-delay="160">
-        <h2>{{ _('Apoio') }}</h2>
-        <div class="partners-group__logos">
-          <span class="partner-item partner-item--wide">
-            <img src="{{ url_for('static', filename='img/logo-visit-portugal.png') }}" alt="Visit Portugal">
-          </span>
-        </div>
-      </div>
+      {% for group,label in [('promoters','Promotores'),('partners','Parceiros'),('support','Apoio')] %}
+      {% set members=native_content|selectattr('group','equalto',group)|list %}
+      {% if members %}<div class="partners-group partners-group--{{ group }}" data-reveal><h2>{{ _(label) }}</h2><div class="partners-group__logos">
+        {% for item in members %}{% if item.link_url %}<a class="partner-item {{ 'partner-item--wide' if group=='support' else '' }}" href="{{ item.link_url }}">{% else %}<span class="partner-item {{ 'partner-item--wide' if group=='support' else '' }}">{% endif %}
+          <img src="{{ item.image_url }}" alt="{{ item.title }}" loading="lazy">
+        {% if item.link_url %}</a>{% else %}</span>{% endif %}{% endfor %}
+      </div></div>{% endif %}{% endfor %}
     </div>
   </div>
 

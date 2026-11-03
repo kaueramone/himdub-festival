@@ -138,8 +138,11 @@ def page_context():
     if not key:
         return {}
     appearance = db.session.get(PageAppearance, key)
+    from native_content import page_items
+
     return {
         "page_settings": appearance,
+        "native_content": page_items(key),
         "page_blocks": PageBlock.query.filter_by(page_key=key, published=True)
         .order_by(PageBlock.sort_order, PageBlock.id)
         .all(),
@@ -147,6 +150,10 @@ def page_context():
 
 
 def init_cms(bp, admin_required):
+    from native_content import init_native_content, page_items
+
+    init_native_content(bp, admin_required)
+
     @bp.route("/content")
     @admin_required
     def content():
@@ -157,10 +164,40 @@ def init_cms(bp, admin_required):
             "admin/content.html",
             pages=PAGES,
             page_key=page,
+            original_items=page_items(page, admin=True),
+            content_pages=PAGES,
             blocks=PageBlock.query.filter_by(page_key=page)
             .order_by(PageBlock.sort_order, PageBlock.id)
             .all(),
         )
+
+    @bp.post("/content/duplicate")
+    @admin_required
+    def duplicate_block():
+        original = db.get_or_404(PageBlock, request.form.get("id", type=int))
+        fields = (
+            "page_key",
+            "title",
+            "text",
+            "image_url",
+            "link_url",
+            "link_label",
+            "title_en",
+            "title_fr",
+            "text_en",
+            "text_fr",
+            "sort_order",
+        )
+        copy = PageBlock(**{field: getattr(original, field) for field in fields})
+        copy.title = original.title[:172] + " (cópia)"
+        copy.published = False
+        copy.sort_order = min(10000, (original.sort_order or 0) + 1)
+        db.session.add(copy)
+        db.session.flush()
+        audit("content_duplicated", copy.id)
+        db.session.commit()
+        flash("Cópia criada como rascunho.", "success")
+        return redirect(url_for("admin.edit_block", id=copy.id))
 
     @bp.route("/content/edit", methods=["GET", "POST"])
     @admin_required

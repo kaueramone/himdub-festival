@@ -9,18 +9,7 @@
     <h1>{{ _('Contact') }}</h1>
 
     <div class="contact-grid">
-      <div>
-        <h4>{{ _('Informações gerais') }}</h4>
-        <a href="mailto:contact@himdubfestival.com">contact@himdubfestival.com</a>
-      </div>
-      <div>
-        <h4>{{ _('Bilhetes') }}</h4>
-        <a href="mailto:tickets@himdubfestival.com">tickets@himdubfestival.com</a>
-      </div>
-      <div>
-        <h4>{{ _('Artistas & Música') }}</h4>
-        <a href="mailto:artists@himdubfestival.com">artists@himdubfestival.com</a>
-      </div>
+      {% for item in native_content %}<div><h4>{{ item.title }}</h4><a href="mailto:{{ item.email }}">{{ item.email }}</a></div>{% endfor %}
     </div>
   </div>
 </section>

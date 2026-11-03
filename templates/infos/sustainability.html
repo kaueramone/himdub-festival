@@ -15,13 +15,13 @@
   <section class="section">
     <div class="container">
       <div class="eco-grid">
-        {% for card in eco_cards %}
+        {% for card in native_content %}
           <div class="eco-card" data-reveal data-reveal-delay="{{ loop.index0 * 60 }}">
             <div class="eco-card__head">
               <span class="eco-card__dot" style="background: {{ card.color }};"></span>
               <h3>{{ card.title }}</h3>
             </div>
-            <p>{{ card.desc }}</p>
+            <p>{{ card.text }}</p>
           </div>
         {% endfor %}
       </div>
