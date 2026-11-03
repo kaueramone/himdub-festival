@@ -95,8 +95,11 @@ def _finalize_paid_order(order):
         if order.status not in ("paid", "demo-paid", "comp"):
             raise ValueError("Order has no admission entitlement")
         db.session.expire(order, ["tickets"])
-        generate_tickets_for_order(order)
-        if current_app.config.get("EMAILS_LIVE") and order.status in ("paid", "comp"):
+        created = generate_tickets_for_order(order)
+        if created:
+            order.email_sent = False
+        if (not order.email_sent and current_app.config.get("EMAILS_LIVE")
+                and order.status in ("paid", "comp")):
             from outbox import enqueue_order_emails
             enqueue_order_emails(order)
         db.session.commit()
@@ -758,6 +761,10 @@ def _start_stripe_checkout(order):
 
 @shop_bp.route("/checkout/success/<int:order_id>")
 def checkout_success(order_id):
+    if not request.args.get("token"):
+        # Sessions opened before the migration have an unsigned return URL.
+        # Keep a useful receipt page without revealing any order-specific data.
+        return render_template("checkout_received.html")
     try:
         token_order = URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt="order-confirmation").loads(
             request.args.get("token", ""), max_age=7 * 24 * 3600)

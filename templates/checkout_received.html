@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Confirmação da compra') }} — HIM Dub Festival{% endblock %}
+{% block content %}
+<section class="section section--result"><div class="container narrow center-cta">
+  <h1>{{ _('Confirmação da compra') }}</h1>
+  <p>{{ _('Se concluíste o pagamento, receberás a confirmação e os bilhetes por email. Se não os receberes, contacta a organização.') }}</p>
+  <a href="{{ url_for('main.contact') }}" class="btn btn--primary">{{ _('Contactar a organização') }}</a>
+</div></section>
+{% endblock %}

@@ -113,7 +113,9 @@ class PurchaseSecurityTests(unittest.TestCase):
 
     def test_success_requires_scoped_signed_token(self):
         order = self.order(status="paid")
-        self.assertEqual(self.client.get(f"/checkout/success/{order.id}").status_code, 404)
+        legacy = self.client.get(f"/checkout/success/{order.id}")
+        self.assertEqual(legacy.status_code, 200)
+        self.assertNotIn(order.name, legacy.get_data(as_text=True))
         with self.app.test_request_context():
             token = shop._order_token(order.id)
         response = self.client.get(f"/checkout/success/{order.id}?token={token}")
@@ -164,6 +166,16 @@ class PurchaseSecurityTests(unittest.TestCase):
         self.assertEqual(self.webhook().status_code, 200)
         self.assertEqual(EmailDelivery.query.count(), 1)
         self.assertEqual(EmailDelivery.query.one().status, "pending")
+
+    def test_legacy_paid_and_emailed_order_is_not_resent_on_webhook_retry(self):
+        from ticketing import generate_tickets_for_order
+        order = self.order(status="paid")
+        generate_tickets_for_order(order)
+        order.email_sent = True
+        db.session.commit()
+        self.app.config["EMAILS_LIVE"] = True
+        self.assertEqual(self.webhook().status_code, 200)
+        self.assertEqual(EmailDelivery.query.count(), 0)
 
     def test_email_job_creation_failure_rolls_back_payment_and_tickets(self):
         order = self.order()
