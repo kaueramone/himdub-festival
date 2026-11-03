@@ -750,3 +750,6 @@ init_newsletter(main_bp, admin_bp, admin_required)
 
 from transfers import init_transfers
 init_transfers(main_bp, admin_bp, admin_required)
+
+from ticket_sales import init_ticket_sales
+init_ticket_sales(admin_bp, admin_required)

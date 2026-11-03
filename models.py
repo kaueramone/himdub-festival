@@ -230,6 +230,14 @@ class PageBlock(db.Model):
     published = db.Column(db.Boolean, default=False, nullable=False)
 
 
+class TicketConfiguration(db.Model):
+    __tablename__ = "ticket_configurations"
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), primary_key=True)
+    payload = db.Column(db.Text, nullable=False)
+    revision = db.Column(db.Integer, nullable=False, default=1)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
 class NativeContent(db.Model):
     """Overrides and copies of the original editorial items; no executable markup."""
     __tablename__ = "native_contents"

@@ -8,3 +8,5 @@
 .custom-page-bg .gallery-page,.custom-page-bg main>.section{background:transparent!important}
 
 .way-card__image{width:100%;max-height:220px;object-fit:cover;margin:12px 0;border-radius:8px}
+
+.ticket-sale-art{display:block;width:100%;max-height:240px;object-fit:contain;margin:12px 0;border-radius:8px}.ticket-pill:disabled{opacity:.5;cursor:not-allowed;transform:none}

@@ -225,7 +225,7 @@ def _tier_rows(slug):
             **t,
             "icon": TICKET_ICONS_BY_TIER.get((slug, t["idx"]), TICKET_ICONS.get(slug, "akoma")),
             "symbol_name": TIER_SYMBOL_NAMES.get((slug, t["idx"]), ""),
-            "label": labels.get(t["idx"], ""),
+            "label": t.get("label") or labels.get(t["idx"], ""),
             "price": t["price_cents"] / 100,
         })
     return rows
@@ -341,6 +341,13 @@ def _validate_cart_line(product, variant, quantity):
         abort(400, description="Quantidade inválida (máximo 20 unidades).")
     if (product.variant_list and variant not in product.variant_list) or (not product.variant_list and variant):
         abort(400, description="Variante inválida.")
+    from ticket_sales import sale_available, remaining_capacity
+    if product.category == "ticket" and not sale_available(product.slug):
+        abort(409, description="Este bilhete não está à venda neste período.")
+    for slug in [product.slug] + BUNDLES.get(product.slug, []):
+        capacity = remaining_capacity(slug)
+        if capacity is not None and quantity > capacity:
+            abort(409, description="Não há bilhetes suficientes disponíveis.")
     components = BUNDLES.get(product.slug, [product.slug])
     from batches import current_tier
     for slug in components:
@@ -356,9 +363,13 @@ def _validate_cart_totals(lines):
     from batches import current_tier
     counts = {}
     for line in lines:
-        for slug in BUNDLES.get(line["product"].slug, [line["product"].slug]):
+        for slug in [line["product"].slug] + BUNDLES.get(line["product"].slug, []):
             counts[slug] = counts.get(slug, 0) + line["quantity"]
+    from ticket_sales import remaining_capacity
     for slug, quantity in counts.items():
+        capacity = remaining_capacity(slug)
+        if capacity is not None and quantity > capacity:
+            abort(409, description="O conjunto do carrinho excede os lugares disponíveis.")
         if slug in TICKET_BATCHES:
             tier = current_tier(slug)
             if tier is None or (tier[2] is not None and quantity > tier[2]):

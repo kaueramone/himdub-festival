@@ -72,6 +72,7 @@ Como funciona:
 """
 
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from extensions import db
 
@@ -80,10 +81,23 @@ TICKET_BATCHES = {
         # "limit": 200 fica só para o número mostrado ao público em
         # "Limited to 200" -- quem decide mesmo quando este lote fecha e o
         # 2nd batch abre é o "real_limit": 150 (ver comentário acima).
-        {"limit": 200, "real_limit": 150, "until": None, "price_cents": 14000},  # 1º lote -- Early Bird (Akoma)
+        {
+            "limit": 200,
+            "real_limit": 150,
+            "until": None,
+            "price_cents": 14000,
+        },  # 1º lote -- Early Bird (Akoma)
         {"limit": None, "until": None, "price_cents": 18000},  # 2º lote (Duage)
-        {"limit": None, "until": None, "price_cents": 22000},  # 3º lote (Ananse Ntontan)
-        {"limit": None, "until": None, "price_cents": 28000},  # 4º lote -- último (Djwennimmen)
+        {
+            "limit": None,
+            "until": None,
+            "price_cents": 22000,
+        },  # 3º lote (Ananse Ntontan)
+        {
+            "limit": None,
+            "until": None,
+            "price_cents": 28000,
+        },  # 4º lote -- último (Djwennimmen)
     ],
     # Bilhete Fim de Semana e Bilhete Família também passam a ter lotes,
     # tal como o Bilhete Geral -- pedido explícito do João, para o preço
@@ -95,10 +109,18 @@ TICKET_BATCHES = {
     # aqui uma entrada nova (preço + arte em ticket_image.py), como se fez
     # para o Bilhete Geral.
     "bilhete-fim-de-semana": [
-        {"limit": None, "until": None, "price_cents": 17000},  # 1º lote -- Early Bird (Bi Nka Bi)
+        {
+            "limit": None,
+            "until": None,
+            "price_cents": 17000,
+        },  # 1º lote -- Early Bird (Bi Nka Bi)
     ],
     "bilhete-familia": [
-        {"limit": None, "until": None, "price_cents": 34000},  # 1º lote -- Early Bird (Sankofa)
+        {
+            "limit": None,
+            "until": None,
+            "price_cents": 34000,
+        },  # 1º lote -- Early Bird (Sankofa)
     ],
 }
 
@@ -136,6 +158,7 @@ def sold_count(product_slug):
     inclua (ex: vendas de "Full Pass + Caravan" contam para o limite do
     Full Pass)."""
     from models import Ticket, Order
+
     return (
         db.session.query(Ticket)
         .join(Order, Ticket.order_id == Order.id)
@@ -152,6 +175,7 @@ def real_sales_launch_at():
     é assim que garantimos que os testes feitos no domínio provisório
     (himdub-festival.onrender.com) nunca contam para o 2nd batch."""
     from models import Setting
+
     row = Setting.query.get(REAL_SALES_LAUNCH_SETTING_KEY)
     if not row or not row.value:
         return None
@@ -169,10 +193,13 @@ def activate_real_sales_launch():
     fica de fora da contagem do "real_limit" -- são só testes. Devolve o
     datetime UTC gravado."""
     from models import Setting
+
     now = datetime.utcnow()
     row = Setting.query.get(REAL_SALES_LAUNCH_SETTING_KEY)
     if row is None:
-        db.session.add(Setting(key=REAL_SALES_LAUNCH_SETTING_KEY, value=now.isoformat()))
+        db.session.add(
+            Setting(key=REAL_SALES_LAUNCH_SETTING_KEY, value=now.isoformat())
+        )
     else:
         row.value = now.isoformat()
     db.session.commit()
@@ -189,6 +216,7 @@ def real_sold_count(product_slug):
         return 0
 
     from models import Ticket, Order
+
     return (
         db.session.query(Ticket)
         .join(Order, Ticket.order_id == Order.id)
@@ -202,12 +230,22 @@ def real_sold_count(product_slug):
 def _reserved_count(product_slug, real_only=False):
     from models import Order, OrderItem, Product
     from sqlalchemy import func, or_, and_
-    query = (db.session.query(func.coalesce(func.sum(OrderItem.quantity), 0))
-             .join(Order, OrderItem.order_id == Order.id)
-             .join(Product, OrderItem.product_id == Product.id)
-             .filter(Product.slug.in_(_slugs_counting_towards(product_slug)),
-                     or_(and_(Order.status == "pending", Order.reservation_expires_at > datetime.utcnow()),
-                         Order.status == "processing")))
+
+    query = (
+        db.session.query(func.coalesce(func.sum(OrderItem.quantity), 0))
+        .join(Order, OrderItem.order_id == Order.id)
+        .join(Product, OrderItem.product_id == Product.id)
+        .filter(
+            Product.slug.in_(_slugs_counting_towards(product_slug)),
+            or_(
+                and_(
+                    Order.status == "pending",
+                    Order.reservation_expires_at > datetime.utcnow(),
+                ),
+                Order.status == "processing",
+            ),
+        )
+    )
     if real_only:
         launch_at = real_sales_launch_at()
         if launch_at is None:
@@ -225,11 +263,18 @@ def current_tier(product_slug):
     Um lote fecha quando QUALQUER UM dos dois critérios se verifica
     primeiro -- esgotar o limite de unidades (ou "real_limit", ver
     comentário no topo do ficheiro) OU passar a data marcada em "until"."""
-    tiers = TICKET_BATCHES.get(product_slug)
+    from ticket_sales import configured_tiers
+
+    tiers = configured_tiers(product_slug)
     if not tiers:
         return None
 
-    today = date.today()
+    from ticket_sales import configuration, within_period, tier_units
+
+    saved = configuration(product_slug)
+    if saved and not within_period(saved):
+        return None
+    today = datetime.now(ZoneInfo("Europe/Lisbon")).date()
     cumulative = 0
     real_cumulative = 0
     real_sold = None  # só calculado (1 query) se algum lote tiver "real_limit"
@@ -246,7 +291,9 @@ def current_tier(product_slug):
 
         if real_limit is not None:
             if real_sold is None:
-                real_sold = real_sold_count(product_slug) + _reserved_count(product_slug, real_only=True)
+                real_sold = real_sold_count(product_slug) + _reserved_count(
+                    product_slug, real_only=True
+                )
             has_stock = real_sold < real_cumulative
         elif limit is not None:
             if sold is None:
@@ -255,13 +302,24 @@ def current_tier(product_slug):
         else:
             has_stock = True
 
-        still_open = until is None or today <= until
+        if saved and real_limit is None and limit is not None:
+            # Every saved tier has its own quota; unused units from an expired tier
+            # must not increase the next tier's quota.
+            used = tier_units(product_slug, idx)
+            has_stock = used < limit
+        still_open = (until is None or today <= until) and within_period(tier)
+        if tier.get("starts_at") and datetime.utcnow() < datetime.fromisoformat(
+            tier["starts_at"]
+        ):
+            return None
 
         if has_stock and still_open:
             if limit is not None and real_limit is None:
                 if sold is None:
                     sold = sold_count(product_slug) + _reserved_count(product_slug)
-                remaining = cumulative - sold
+                remaining = (limit - used) if saved else cumulative - sold
+            elif real_limit is not None:
+                remaining = real_cumulative - real_sold
             else:
                 remaining = None
             return (idx, tier["price_cents"], remaining)
@@ -279,7 +337,9 @@ def real_remaining_in_current_tier(product_slug):
 
     Usado para o aviso de stock baixo no admin e por email -- ver
     check_and_flag_low_stock_alert, abaixo, e blueprints/admin.py."""
-    tiers = TICKET_BATCHES.get(product_slug)
+    from ticket_sales import configured_tiers
+
+    tiers = configured_tiers(product_slug)
     if not tiers:
         return None
     cur = current_tier(product_slug)
@@ -305,6 +365,7 @@ def check_and_flag_low_stock_alert(product_slug):
     (indice_do_lote, restantes) para quem chamou despachar o email.
     Devolve None quando não há nada de novo para avisar."""
     from models import Setting
+
     remaining = real_remaining_in_current_tier(product_slug)
     if remaining is None or remaining < 0 or remaining > LOW_STOCK_ALERT_THRESHOLD:
         return None
@@ -341,7 +402,9 @@ def all_tiers_with_status(product_slug):
     Usado para mostrar o lote atual em destaque e a lista dos restantes
     lotes por baixo (ver templates/tickets.html). Devolve [] para produtos
     sem lotes (preço fixo)."""
-    tiers = TICKET_BATCHES.get(product_slug)
+    from ticket_sales import configured_tiers
+
+    tiers = configured_tiers(product_slug)
     if not tiers:
         return []
 
@@ -349,20 +412,34 @@ def all_tiers_with_status(product_slug):
     cur_idx = cur[0] if cur else None
 
     result = []
+    from ticket_sales import configuration
+
+    settings = configuration(product_slug) or {}
+    now = datetime.utcnow()
     for idx, tier in enumerate(tiers, start=1):
-        if cur_idx is None or idx < cur_idx:
+        future_start = tier.get("starts_at") or settings.get("starts_at")
+        if (
+            cur_idx is None
+            and future_start
+            and now < datetime.fromisoformat(future_start)
+        ):
+            status = "upcoming"
+        elif cur_idx is None or idx < cur_idx:
             status = "sold_out"
         elif idx == cur_idx:
             status = "active"
         else:
             status = "upcoming"
-        result.append({
-            "idx": idx,
-            "price_cents": tier["price_cents"],
-            "limit": tier.get("limit"),
-            "remaining": cur[2] if (status == "active" and cur) else None,
-            "status": status,
-        })
+        result.append(
+            {
+                **tier,
+                "idx": idx,
+                "price_cents": tier["price_cents"],
+                "limit": tier.get("limit"),
+                "remaining": cur[2] if (status == "active" and cur) else None,
+                "status": status,
+            }
+        )
     return result
 
 
@@ -384,6 +461,7 @@ def effective_price_cents(product_slug):
             comp_price = effective_price_cents(comp_slug)
             if comp_price is None:
                 from models import Product
+
                 comp_product = Product.query.filter_by(slug=comp_slug).first()
                 comp_price = comp_product.price_cents if comp_product else 0
             total += comp_price
@@ -408,5 +486,3 @@ def resolve_batch_tier_for_order_item(product_slug):
                 return tier_idx
         return None
     return batch_tier_index(product_slug)
-
-

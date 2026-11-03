@@ -172,3 +172,32 @@ rascunho; desmarcar Publicar retira o item da página pública. As traduções
 existentes são preenchidas no editor e devem ser revistas quando o português
 muda. Os blocos adicionais continuam disponíveis e também podem ser duplicados.
 Os conteúdos da loja e os álbuns mantêm as suas ferramentas próprias.
+
+## Bilheteira e newsletter
+
+`/admin/ticket-sales` gere os seis tipos de bilhete existentes na página pública.
+O editor guarda configurações versionadas em `ticket_configurations`; o preço
+fixo e os textos continuam no produto. O primeiro acesso não altera preços.
+As regras antigas são usadas enquanto não existir configuração guardada.
+
+As alterações bloqueiam a linha do produto, tal como o checkout, e rejeitam
+uma versão desatualizada do formulário. Preços, lotes e quantidades já registados
+numa encomenda não são recalculados por uma edição posterior. Os packs somam
+os preços dos componentes e consomem as suas quotas, incluindo reservas válidas.
+Os novos limites por lote usam o lote registado na compra, sem transferir para
+o lote seguinte unidades não vendidas de um lote encerrado por data. A regra
+histórica `real_limit` e o instante de lançamento são preservados no primeiro
+lote enquanto configurados; o editor identifica a diferença para o limite anunciado.
+
+Datas são introduzidas em Portugal continental e guardadas em UTC; horas
+ambíguas ou inexistentes nas mudanças de hora são recusadas. As imagens
+configuradas são de apresentação no website. Não substituem a arte nem a
+posição do QR dos PDFs enviados anteriormente. O limite de upload é de 10 MB
+por imagem e 16 MB no pedido completo. Acrescentar lotes mantém a numeração;
+não se apagam nem reordenam lotes com histórico.
+
+A newsletter usa `RESEND_NEWSLETTER_SEGMENT_ID` e uma chave separada
+`RESEND_MARKETING_API_KEY` com gestão de contactos. A chave transacional
+existente não precisa de ser substituída. Depois de configurar, validar
+consentimento, confirmação explícita, sincronização e cancelamento com um
+endereço de teste autorizado. Nunca importar compradores automaticamente.

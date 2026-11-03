@@ -36,4 +36,4 @@ jobs:
           HIMDUB_TEST_DATABASE_URL: postgresql://test:test@localhost:5432/himdub_test
         run: python -m unittest discover -s tests -v
       - name: JavaScript syntax
-        run: node --check static/js/main.js && node --check static/js/checkin.js
+        run: node --check static/js/main.js && node --check static/js/checkin.js && node --check static/js/admin_tickets.js && node --check static/js/admin.js && node --check static/js/gallery.js

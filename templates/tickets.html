@@ -41,8 +41,9 @@
               <form action="{{ url_for('shop.cart_add') }}" method="post" class="product-form">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="product_id" value="{{ full_pass.id }}">
+            {% set sale_image=ticket_sale_image(full_pass.slug, t.idx if t is defined and t else none) %}{% if sale_image %}<img class="ticket-sale-art" src="{{ sale_image }}" alt="{{ full_pass.localized_name }}" loading="lazy">{% endif %}
                 <button type="submit" class="ticket-pill ticket-pill--hero"
-                  aria-label="{{ _('Adicionar %(name)s ao carrinho', name=full_pass.localized_name) }}">
+                  {% if not ticket_sale_available(full_pass.slug) %}disabled title="Bilhete indisponível neste período"{% endif %} aria-label="{{ _('Adicionar %(name)s ao carrinho', name=full_pass.localized_name) }}">
                   <span class="ticket-pill__icon">
                     <img src="{{ url_for('static', filename='img/icons/' ~ t.icon ~ '.png') }}" alt="" loading="lazy">
                   </span>
@@ -54,7 +55,7 @@
                       <small>Limited to {{ t.limit }}</small>
                     {% endif %}
                   </span>
-                  <span class="ticket-pill__price">€{{ '%.0f'|format(t.price) }}</span>
+                  <span class="ticket-pill__price">€{{ '%.2f'|format(t.price) }}</span>
                 </button>
               </form>
             {% else %}
@@ -73,7 +74,7 @@
                 {% if t.status == 'sold_out' %}
                   <span class="ticket-pill__price ticket-pill__price--soldout">Sold out</span>
                 {% else %}
-                  <span class="ticket-pill__price">€{{ '%.0f'|format(t.price) }}</span>
+                  <span class="ticket-pill__price">€{{ '%.2f'|format(t.price) }}</span>
                 {% endif %}
               </div>
             {% endif %}
@@ -89,8 +90,9 @@
           <form action="{{ url_for('shop.cart_add') }}" method="post" class="product-form">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="product_id" value="{{ caravan.product.id }}">
+            {% set sale_image=ticket_sale_image(caravan.product.slug, t.idx if t is defined and t else none) %}{% if sale_image %}<img class="ticket-sale-art" src="{{ sale_image }}" alt="{{ caravan.product.localized_name }}" loading="lazy">{% endif %}
             <button type="submit" class="ticket-pill"
-              aria-label="{{ _('Adicionar %(name)s ao carrinho', name=caravan.product.localized_name) }}">
+              {% if not ticket_sale_available(caravan.product.slug) %}disabled title="Bilhete indisponível neste período"{% endif %} aria-label="{{ _('Adicionar %(name)s ao carrinho', name=caravan.product.localized_name) }}">
               <span class="ticket-pill__icon">
                 <img src="{{ url_for('static', filename='img/icons/' ~ caravan.icon ~ '.png') }}" alt="" loading="lazy">
               </span>
@@ -99,7 +101,7 @@
                 <strong>{{ caravan.symbol_name }}</strong>
                 <small>{{ caravan.product.localized_short_description }}</small>
               </span>
-              <span class="ticket-pill__price">€{{ '%.0f'|format(caravan.product.price) }}</span>
+              <span class="ticket-pill__price">€{{ '%.2f'|format(caravan.product.price) }}</span>
             </button>
           </form>
         {% endif %}
@@ -108,8 +110,9 @@
           <form action="{{ url_for('shop.cart_add') }}" method="post" class="product-form">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="product_id" value="{{ bundle.product.id }}">
+            {% set sale_image=ticket_sale_image(bundle.product.slug, t.idx if t is defined and t else none) %}{% if sale_image %}<img class="ticket-sale-art" src="{{ sale_image }}" alt="{{ bundle.product.localized_name }}" loading="lazy">{% endif %}
             <button type="submit" class="ticket-pill ticket-pill--hero"
-              aria-label="{{ _('Adicionar %(name)s ao carrinho', name=bundle.product.localized_name) }}">
+              {% if not ticket_sale_available(bundle.product.slug) %}disabled title="Bilhete indisponível neste período"{% endif %} aria-label="{{ _('Adicionar %(name)s ao carrinho', name=bundle.product.localized_name) }}">
               <span class="ticket-pill__icon">
                 <img src="{{ url_for('static', filename='img/icons/' ~ bundle.icon ~ '.png') }}" alt="" loading="lazy">
               </span>
@@ -118,7 +121,7 @@
                 <strong>{{ bundle.symbol_name }}</strong>
                 <small>{{ bundle.product.localized_short_description }}</small>
               </span>
-              <span class="ticket-pill__price">€{{ '%.0f'|format(bundle.product.price) }}</span>
+              <span class="ticket-pill__price">€{{ '%.2f'|format(bundle.product.price) }}</span>
             </button>
           </form>
         {% endif %}
@@ -133,8 +136,9 @@
             <form action="{{ url_for('shop.cart_add') }}" method="post" class="product-form">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <input type="hidden" name="product_id" value="{{ card.product.id }}">
+            {% set sale_image=ticket_sale_image(card.product.slug, t.idx if t is defined and t else none) %}{% if sale_image %}<img class="ticket-sale-art" src="{{ sale_image }}" alt="{{ card.product.localized_name }}" loading="lazy">{% endif %}
               <button type="submit" class="ticket-pill"
-                aria-label="{{ _('Adicionar %(name)s ao carrinho', name=card.product.localized_name) }}">
+                {% if not ticket_sale_available(card.product.slug) %}disabled title="Bilhete indisponível neste período"{% endif %} aria-label="{{ _('Adicionar %(name)s ao carrinho', name=card.product.localized_name) }}">
                 <span class="ticket-pill__icon">
                   <img src="{{ url_for('static', filename='img/icons/' ~ card.icon ~ '.png') }}" alt="" loading="lazy">
                 </span>
@@ -143,7 +147,7 @@
                   <strong>{{ card.symbol_name }}</strong>
                   <small>{{ card.product.localized_description }}</small>
                 </span>
-                <span class="ticket-pill__price">€{{ '%.0f'|format(card.product.price) }}</span>
+                <span class="ticket-pill__price">€{{ '%.2f'|format(card.product.price) }}</span>
               </button>
             </form>
           {% endif %}

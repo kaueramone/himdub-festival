@@ -31,7 +31,7 @@ from i18n import (
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    asset_files=['js/main.js','js/admin.js','js/gallery.js','css/admin.css','css/managed.css']
+    asset_files=['js/main.js','js/admin.js','js/gallery.js','js/admin_tickets.js','css/admin.css','css/managed.css']
     app.jinja_env.globals['asset_version']=hashlib.sha256(b''.join(
         (Path(app.static_folder)/name).read_bytes() for name in asset_files)).hexdigest()[:12]
     from security import init_security
@@ -156,6 +156,8 @@ def create_app():
     app.jinja_env.globals["cdn_url"] = cdn_url
 
     # Blueprints = grupos de rotas, para nao ter tudo num ficheiro gigante.
+    from ticket_sales import website_image, sale_available
+    app.jinja_env.globals.update(ticket_sale_image=website_image, ticket_sale_available=sale_available)
     from blueprints.main import main_bp
     from blueprints.shop import shop_bp
     from blueprints.admin import admin_bp
