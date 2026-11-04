@@ -7,7 +7,7 @@ from gunicorn.glogging import Logger
 class PrivatePathLogger(Logger):
     def atoms(self, response, request, environ, request_time):
         atoms = super().atoms(response, request, environ, request_time)
-        atoms['U'] = re.sub(r'(/admin/join/|/account/access/)[^/]+', r'\1[private]', atoms.get('U', ''))
+        atoms['U'] = re.sub(r'(/admin/join/|/admin/reset-password/|/account/access/)[^/]+', r'\1[private]', atoms.get('U', ''))
         return atoms
 
 

@@ -104,6 +104,7 @@ def downloadable(ticket):
     return ticket.order.status == "paid" and not ticket.checked_in_at
 
 
+@customer_bp.route("/recover", methods=["GET", "POST"], endpoint="recover")
 @customer_bp.route("/login", methods=["GET", "POST"])
 def login():
     sent = False
@@ -142,7 +143,7 @@ def login():
             )
             db.session.commit()
         sent = True
-    return render_template("customer/login.html", sent=sent)
+    return render_template("customer/login.html", sent=sent, recovering=request.path.endswith('/recover'))
 
 
 @customer_bp.route("/access/<token>", methods=["GET", "POST"])

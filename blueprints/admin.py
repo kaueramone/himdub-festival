@@ -756,3 +756,6 @@ init_ticket_sales(admin_bp, admin_required)
 
 from customer_portal import init_customer_admin
 init_customer_admin(admin_bp, admin_required)
+
+from password_recovery import init_password_recovery
+init_password_recovery(admin_bp)

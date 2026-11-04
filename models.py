@@ -174,6 +174,16 @@ class AdminUser(db.Model):
     totp_last_counter = db.Column(db.Integer, default=-1, nullable=False)
 
 
+class AdminPasswordReset(db.Model):
+    __tablename__ = "admin_password_resets"
+    token_hash = db.Column(db.String(64), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("admin_users.id"), nullable=False, index=True)
+    session_version = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used_at = db.Column(db.DateTime)
+
+
 class LoginThrottle(db.Model):
     __tablename__ = "login_throttles"
     key = db.Column(db.String(64), primary_key=True)

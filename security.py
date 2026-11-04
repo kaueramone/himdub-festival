@@ -57,6 +57,6 @@ def init_security(app):
         if request.path.startswith(('/newsletter/', '/ticket-transfer', '/account')):
             response.headers['Cache-Control']='private, no-store'
             response.headers['Referrer-Policy']='no-referrer'
-        if '/admin/join/' in request.path or request.endpoint == 'admin.team':
+        if request.path.startswith(('/admin/join/', '/admin/reset-password/', '/admin/forgot-password')) or request.endpoint == 'admin.team':
             response.headers['Referrer-Policy'] = 'no-referrer'
         return response

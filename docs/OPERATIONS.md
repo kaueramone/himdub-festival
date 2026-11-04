@@ -235,3 +235,25 @@ modelo `emails/brand_base.html`, com cores e logótipo do festival. A área de
 cliente desta primeira versão está em português; os textos dos bilhetes e as
 encomendas mantêm os dados e idiomas registados. Validar conteúdos e traduções
 adicionais antes de alargar a interface a outros idiomas.
+
+## Recuperação de acesso
+
+`/admin/forgot-password` envia um link apenas para uma conta de equipa activa,
+com a mesma resposta pública para emails existentes ou desconhecidos. Há limites
+por email/IP e um intervalo mínimo de um minuto entre envios. A tabela aditiva
+`admin_password_resets` guarda apenas o hash do token aleatório, a versão da sessão
+e a validade de 20 minutos; é criada pelo `db-upgrade` existente.
+
+Abrir o link não altera a conta. O POST com CSRF exige uma palavra-passe de
+14 a 256 caracteres, confirmação e um código novo do autenticador configurado.
+O sucesso consome o link, invalida todos os outros links e sessões de equipa
+através de `session_version`, regista auditoria e coloca uma notificação na fila
+de email. Não inicia sessão automaticamente, não altera o email, o perfil de
+permissões nem o autenticador. Perda do autenticador exige recuperação assistida;
+o formulário não remove MFA nem reactiva contas desactivadas. Os caminhos com
+tokens são ocultados nos logs, e as páginas usam no-store e no-referrer.
+
+Os clientes continuam sem palavra-passe. `/account/recover` usa o mesmo fluxo
+verificado de `/account/login` para enviar um novo link de entrada, com a mesma
+validade, limites e utilização única. Não cria contas de equipa nem altera a
+titularidade de bilhetes. Perder o acesso ao email exige verificação assistida.

@@ -18,6 +18,7 @@
     <div class="field"><label for="staff-totp">Código da aplicação de autenticação (se configurada)</label><input id="staff-totp" name="totp" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" maxlength="6"></div>
       <button type="submit" class="btn btn--primary btn--lg">Entrar</button>
     </form>
+    <p><a href="{{ url_for('admin.forgot_password') }}">Esqueci-me da palavra-passe</a></p>
   </div>
 </section>
 
