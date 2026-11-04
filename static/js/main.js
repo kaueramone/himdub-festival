@@ -215,16 +215,32 @@ function initImmersiveVideos() {
     const hero = video.closest(".immersive-hero");
     if (!hero) return;
 
-    if (!reduceMotion) {
-      const playPromise = video.play();
-      if (playPromise && playPromise.catch) playPromise.catch(() => {});
+    // Set the properties as well as the HTML attributes: pages inserted by
+    // Turbo must also start muted and inline on mobile browsers.
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.autoplay = !reduceMotion;
+    if (reduceMotion) {
+      video.pause();
+      return;
     }
+    const playVisibleVideo = () => {
+      const bounds = hero.getBoundingClientRect();
+      if (document.hidden || bounds.bottom <= 0 || bounds.top >= window.innerHeight || !video.paused || video.error) return;
+      video.play().catch(() => {});
+    };
+    playVisibleVideo();
+    // If autoplay was blocked, the next genuine user interaction can start
+    // the background without affecting the separate music player.
+    document.addEventListener('pointerdown', playVisibleVideo, {passive:true, signal:pageEvents.signal});
+    document.addEventListener('keydown', playVisibleVideo, {signal:pageEvents.signal});
 
     if ("IntersectionObserver" in window) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (reduceMotion) return;
-          if (entry.isIntersecting) video.play().catch(() => {});
+          if (entry.isIntersecting) playVisibleVideo();
           else video.pause();
         });
       }, { threshold: 0.05 });
@@ -235,7 +251,7 @@ function initImmersiveVideos() {
     document.addEventListener("visibilitychange", () => {
       if (reduceMotion) return;
       if (document.hidden) video.pause();
-      else video.play().catch(() => {});
+      else playVisibleVideo();
     }, {signal:pageEvents.signal});
   });
 }

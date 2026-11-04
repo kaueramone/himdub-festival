@@ -6,7 +6,7 @@
 
 <section class="immersive-hero immersive-hero--participate">
   <div class="immersive-hero__video-wrap">
-    {% if not page_settings or page_settings.mode=='original' %}<video class="immersive-hero__video" muted loop playsinline preload="auto"
+    {% if not page_settings or page_settings.mode=='original' %}<video class="immersive-hero__video" autoplay muted loop playsinline preload="auto"
       poster="{{ url_for('static', filename='img/glamping-poster.jpg') }}">
       <source src="{{ cdn_url('video/glamping-bg.mp4') }}" type="video/mp4">
     </video>{% endif %}
