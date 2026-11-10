@@ -1827,8 +1827,8 @@ msgstr "Aucun produit disponible dans cette catégorie pour le moment."
 
 
 
-msgid "Pagar com Teya"
-msgstr "Payer avec Teya"
+msgid "Pagar"
+msgstr "Payer"
 
 
 #, python-format

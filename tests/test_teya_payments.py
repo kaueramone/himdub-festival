@@ -196,12 +196,16 @@ class TeyaPaymentTests(unittest.TestCase):
         db.session.add(PaymentGatewayConfiguration(id=1,provider='teya',revision=1));db.session.commit()
         self.assertEqual(self.post('/cart/add',{'product_id':1}).status_code,302)
         response=self.client.get('/checkout')
-        self.assertIn('Pagar com Teya',response.text)
+        self.assertRegex(response.text,r'>\s*Pagar\s*</button>')
+        self.assertNotIn('Pagar com Teya',response.text)
+        self.assertIn('€0.21',response.text)
+        self.assertIn('€10.21',response.text)
         with patch.object(teya,'start_checkout',return_value=('synthetic-teya',200)) as start:
             with patch.object(base.shop,'_start_stripe_checkout') as stripe:
                 response=self.post('/checkout',{'name':'Test','email':'buyer@example.invalid','country':'Portugal','ticket_name__1__0':'Test'})
                 self.assertEqual(response.status_code,200)
                 self.assertEqual(start.call_count,1)
+                self.assertEqual(start.call_args.args[0].total_cents,1021)
                 stripe.assert_not_called()
         self.assertEqual(Ticket.query.count(),0)
 

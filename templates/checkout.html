@@ -88,7 +88,7 @@
         {% endfor %}
 
         <button type="submit" class="btn btn--primary btn--lg">
-          {% if checkout_provider()=='teya' %}{{ _('Pagar com Teya') }}{% elif config.PAYMENTS_LIVE %}{{ _('Pagar com Stripe') }}{% else %}{{ _('Concluir encomenda (demo)') }}{% endif %}
+          {% if checkout_provider()=='teya' or config.PAYMENTS_LIVE %}{{ _('Pagar') }}{% else %}{{ _('Concluir encomenda (demo)') }}{% endif %}
         </button>
 
         {% if config.PAYMENTS_LIVE or checkout_provider()=='teya' %}

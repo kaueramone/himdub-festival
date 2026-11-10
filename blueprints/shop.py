@@ -24,7 +24,7 @@ from batches import (
     resolve_batch_tier_for_order_item, remaining_in_current_tier, batch_tier_index,
     BUNDLES, TICKET_BATCHES, all_tiers_with_status, check_and_flag_low_stock_alert,
 )
-from fees import cart_processing_fee_cents, order_processing_fee_cents
+from fees import cart_processing_fee_cents, order_processing_fee_cents, stored_processing_fee_cents
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from security import local_redirect
 
@@ -579,6 +579,8 @@ def _collect_special_fields(lines):
 
 @shop_bp.route("/checkout", methods=["GET", "POST"])
 def checkout():
+    from teya_gateway import provider, ready, start_checkout
+    checkout_gateway = provider()
     lines = _cart_lines()
     if not lines:
         flash(_("O teu carrinho está vazio."), "error")
@@ -630,11 +632,9 @@ def checkout():
                 "checkout.html", lines=lines, countries=COUNTRIES,
                 form_name=name, form_email=email, form_country=country, form_nif=nif,
                 form_special_fields=special_fields, form_ticket_names=ticket_names,
-                processing_fee=cart_processing_fee_cents(lines) / 100,
+                processing_fee=cart_processing_fee_cents(lines, checkout_gateway) / 100,
             )
 
-        from teya_gateway import provider, ready, start_checkout
-        checkout_gateway = provider()
         if checkout_gateway == 'teya' and not ready():
             abort(503, description='O pagamento está temporariamente indisponível.')
         if checkout_gateway == 'stripe' and current_app.config.get('PRODUCTION') and not current_app.config.get('STRIPE_SECRET_KEY'):
@@ -672,9 +672,9 @@ def checkout():
         # uns segundos antes) -- assim o total cobrado bate sempre certo
         # com a soma das linhas gravadas. Depois soma-se a taxa de
         # processamento (ver fees.py) -- o total gravado fica já a ser o
-        # valor a sério cobrado no Stripe (produtos + taxa).
+        # valor a cobrar pelo fornecedor seleccionado (produtos + taxa).
         order.total_cents = sum(i.price_cents * i.quantity for i in order.items)
-        order.total_cents += order_processing_fee_cents(order.items)
+        order.total_cents += order_processing_fee_cents(order.items, checkout_gateway)
         db.session.add(order)
         db.session.commit()
 
@@ -693,7 +693,7 @@ def checkout():
 
     return render_template(
         "checkout.html", lines=lines, countries=COUNTRIES,
-        processing_fee=cart_processing_fee_cents(lines) / 100,
+        processing_fee=cart_processing_fee_cents(lines, checkout_gateway) / 100,
     )
 
 
@@ -736,7 +736,7 @@ def _start_stripe_checkout(order):
     # que é a comissão. Já está incluída em order.total_cents (ver
     # checkout() acima), por isso soma-se aqui aos line_items em vez de
     # ser recalculada -- os dois têm de bater sempre certo.
-    fee_cents = order_processing_fee_cents(order.items)
+    fee_cents = stored_processing_fee_cents(order)
     if fee_cents:
         line_items.append({
             "price_data": {

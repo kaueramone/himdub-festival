@@ -1,16 +1,8 @@
-"""Taxa de processamento (para cobrir a comissão da Stripe).
+"""Customer processing fees, applied to every product category.
 
-A Stripe cobra ao festival, por cada pagamento com cartão/MB WAY europeu,
-qualquer coisa como 1,5% do valor + 0,25€ fixos. Para o festival não
-absorver esse custo sozinho, esta taxa é passada para quem compra --
-pedido explícito do João -- calculada por unidade/bilhete comprado (não
-uma única vez por encomenda) e aplicada a QUALQUER produto vendido no
-site (bilhetes, glamping, merchandise), não só bilhetes.
-
-Tudo em cêntimos (int), tal como o resto do dinheiro no projeto
-(`Product.price_cents`, `OrderItem.price_cents`, `Order.total_cents`) --
-evita problemas de arredondamento com floats. Quem precisar do valor em
-euros (para mostrar num template) converte no fim, com `/100`.
+Teya: 2.09% of the basket subtotal, rounded once to the nearest cent
+(half up), with no fixed charge. Stripe retains its existing per-unit
+calculation. Receipts use the stored order total, never today's provider.
 """
 
 STRIPE_FEE_PERCENT = 0.015  # 1,5%
@@ -25,20 +17,25 @@ def processing_fee_cents(price_cents, quantity=1):
     return per_unit * quantity
 
 
-def cart_processing_fee_cents(lines):
-    """Soma a taxa de processamento de uma lista de linhas do carrinho/
-    checkout (dicts com 'product' e 'quantity', como devolve
-    `_cart_lines()` em blueprints/shop.py) -- usa sempre o preço efetivo
-    do produto (`effective_price_cents`, já com o lote/batch em conta)."""
+def cart_processing_fee_cents(lines, provider="stripe"):
+    """Calculate the selected provider's fee using current catalog prices."""
+    if provider == "teya":
+        subtotal = sum(line["product"].effective_price_cents * line["quantity"] for line in lines)
+        return (subtotal * 209 + 5000) // 10000
     return sum(
         processing_fee_cents(line["product"].effective_price_cents, line["quantity"])
         for line in lines
     )
 
 
-def order_processing_fee_cents(order_items):
-    """O mesmo, mas para os `OrderItem` já gravados de uma encomenda --
-    usa o `price_cents` gravado em cada linha, que é o preço mesmo
-    cobrado (ver `checkout()` em blueprints/shop.py), para a taxa nunca
-    poder desviar-se do que foi realmente cobrado."""
+def order_processing_fee_cents(order_items, provider="stripe"):
+    """Calculate the new order fee using its captured item prices."""
+    if provider == "teya":
+        subtotal = sum(item.price_cents * item.quantity for item in order_items)
+        return (subtotal * 209 + 5000) // 10000
     return sum(processing_fee_cents(item.price_cents, item.quantity) for item in order_items)
+
+
+def stored_processing_fee_cents(order):
+    """Use the amount originally charged, even after prices/provider change."""
+    return max(0, order.total_cents - sum(item.price_cents * item.quantity for item in order.items))

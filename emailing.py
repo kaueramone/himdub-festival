@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 from models import Product
 from ticket_image import generate_ticket_image_bytes
 from ticketing import ticket_qr_png_bytes
-from fees import order_processing_fee_cents
+from fees import stored_processing_fee_cents
 
 # Textos fixos do email, no idioma em que o cliente fez o checkout
 # (order.lang_code) -- guardado nesse idioma precisamente para isto. Não usa
@@ -349,7 +349,7 @@ def build_ticket_email_html(order, domain, tickets=None, recipient_name=None):
         festival_venue=FESTIVAL_VENUE_BY_LANG.get(lang_code, FESTIVAL_VENUE_BY_LANG["pt"]),
         tickets=_tickets_context(ticket_list, lang_code),
         items=_order_items_context(order),
-        processing_fee=order_processing_fee_cents(order.items) / 100,
+        processing_fee=stored_processing_fee_cents(order) / 100,
         order_total=order.total,
         terms_url=f"{domain}{_localized_path('/infos/faq', lang_code)}",
         terms_url_label=s["terms_link_text"],
