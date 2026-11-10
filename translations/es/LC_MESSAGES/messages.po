@@ -222,3 +222,12 @@ msgstr "¿Qué es HIM Dub?"
 
 msgid "O que é o HIM Dub"
 msgstr "Qué es HIM Dub"
+
+msgid "Devo levar fato de banho?"
+msgstr "¿Debo llevar bañador?"
+
+msgid "Casas de Banho Secas"
+msgstr "Baños secos"
+
+msgid "Regras e Normas de Funcionamento"
+msgstr "Reglamento y normas de funcionamiento"
