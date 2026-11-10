@@ -120,6 +120,18 @@ class TeyaPaymentTests(unittest.TestCase):
         self.assertEqual(Ticket.query.count(),0)
         self.assertEqual(order.status,'processing')
 
+    def test_recovered_lookup_clears_warning_without_confirming_unpaid_order(self):
+        order,payment=self.payment()
+        payment.last_error='Pagamento por reconciliar; reserva mantida'
+        db.session.commit()
+        with patch.object(teya,'api',return_value=self.success(payment,session_status='ACTIVE',payment_status='NONE')):
+            teya.reconcile(payment.id)
+        self.assertEqual(payment.last_error,'')
+        self.assertEqual(payment.status,'active')
+        self.assertEqual(order.status,'processing')
+        self.assertIsNone(order.reservation_expires_at)
+        self.assertEqual(Ticket.query.count(),0)
+
     def test_unavailable_lookup_is_retriable_and_cannot_issue(self):
         order,payment=self.payment()
         with patch.object(teya,'api',side_effect=teya.TeyaUnavailable('temporary')):

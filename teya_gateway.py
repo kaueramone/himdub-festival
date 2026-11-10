@@ -219,6 +219,7 @@ def reconcile(payment_id, webhook=None):
             payment.last_error=''
             db.session.commit()
     else:
+        payment.last_error=''
         payment.next_check_at=datetime.utcnow()+timedelta(minutes=2)
         db.session.commit()
 
