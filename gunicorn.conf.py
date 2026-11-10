@@ -3,6 +3,15 @@ import os
 import re
 from gunicorn.glogging import Logger
 
+# Register the language refresher in each worker, including --preload supplied
+# through GUNICORN_CMD_ARGS. Never leave it running only in master memory.
+os.environ['HIMDUB_GUNICORN_WORKER_HOOKS'] = 'true'
+
+
+def post_worker_init(worker):
+    from auto_translation import start_translation_worker
+    start_translation_worker(worker.wsgi)
+
 
 class PrivatePathLogger(Logger):
     def atoms(self, response, request, environ, request_time):

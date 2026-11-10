@@ -4,6 +4,7 @@ GitHub Actions builds this website's translated editorial assets with the
 open-source LibreTranslate engine. No visitor data enters the translation task.
 """
 import json
+import os
 from pathlib import Path
 import threading
 import requests
@@ -147,8 +148,20 @@ def init_translations(app):
         import click
         click.echo(f'{refresh_translations(app)} translations loaded.')
 
+    # Gunicorn can preload the app in its master. Threads do not survive a
+    # fork, and updates to master memory never reach request-serving workers.
+    if not os.environ.get('HIMDUB_GUNICORN_WORKER_HOOKS'):
+        start_translation_worker(app)
+
+
+def start_translation_worker(app):
     if app.testing or not app.config.get('TRANSLATION_WORKER_ENABLED'):
         return
+    state = app.extensions['public_translations']
+    process_id = os.getpid()
+    if state.get('worker_pid') == process_id:
+        return
+    state['worker_pid'] = process_id
 
     def consume():
         stop = threading.Event()

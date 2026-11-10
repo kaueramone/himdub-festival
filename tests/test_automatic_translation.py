@@ -7,7 +7,7 @@ import test_purchase_security as base
 import test_admin_autonomy as autonomy
 from extensions import db
 from models import NativeContent, PageBlock, Product
-from auto_translation import refresh_translations, translate_public
+from auto_translation import refresh_translations, translate_public, start_translation_worker
 from translation_codec import cache_key, glossary_version, segments, validate_translation
 from translation_terms import FIXED_TERMS
 
@@ -142,3 +142,16 @@ class AutomaticTranslationTests(unittest.TestCase):
         with self.app.test_request_context('/fr/'):
             self.assertEqual(translate_public('Pagar', 'fr'), 'Payer')
             self.assertEqual(translate_public('Subscrever', 'es'), 'Suscribirse')
+
+    def test_refresher_starts_in_each_process_once_even_after_preload_fork(self):
+        self.app.config.update(TESTING=False, TRANSLATION_WORKER_ENABLED=True)
+        self.app.extensions['public_translations'].pop('worker_pid', None)
+        with patch('auto_translation.threading.Thread') as thread:
+            with patch('auto_translation.os.getpid', return_value=111):
+                start_translation_worker(self.app)
+                start_translation_worker(self.app)
+                self.assertEqual(thread.return_value.start.call_count, 1)
+            # The forked worker inherits the state, but not the master thread.
+            with patch('auto_translation.os.getpid', return_value=222):
+                start_translation_worker(self.app)
+                self.assertEqual(thread.return_value.start.call_count, 2)
