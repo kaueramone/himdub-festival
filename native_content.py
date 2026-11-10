@@ -6,6 +6,7 @@ import secrets
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_babel import gettext, force_locale
 from content_catalog import DEFAULT_CONTENT
+from legal_content import LEGAL_DEFAULT_CONTENT
 from extensions import db
 from models import NativeContent
 
@@ -13,7 +14,7 @@ GROUPS = {"promoters": "Promotores", "partners": "Parceiros", "support": "Apoio"
 
 
 def page_items(page, *, admin=False):
-    defaults = DEFAULT_CONTENT.get(page, [])
+    defaults = LEGAL_DEFAULT_CONTENT.get(page, DEFAULT_CONTENT.get(page, []))
     overrides = {
         row.key: json.loads(row.payload)
         for row in NativeContent.query.filter_by(page_key=page)

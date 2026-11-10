@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}{{ _(document_title) }} — HIM Dub Festival{% endblock %}
+{% block content %}
+<section class="page-hero legal-hero"><div class="container"><p class="eyebrow">HIM DUB FESTIVAL</p><h1>{{ _(document_title) }}</h1></div></section>
+<section class="section legal-page"><div class="container narrow">
+{% if native_content %}
+<nav class="legal-index" aria-label="{{ _('Nesta página') }}">{% for item in native_content %}<a href="#legal-{{ loop.index }}">{{ item.title }}</a>{% endfor %}</nav>
+{% for item in native_content %}<article id="legal-{{ loop.index }}" class="legal-section"><h2>{{ item.title }}</h2><p>{{ item.text }}</p></article>{% endfor %}
+{% else %}
+<p>{{ _('Estamos a actualizar esta informação para a próxima edição do festival.') }}</p><p>{{ _('Para esclarecimentos, contacta a organização.') }} <a href="mailto:decibelcostume@gmail.com">decibelcostume@gmail.com</a></p>
+{% endif %}
+<a class="link-arrow" href="{{ url_for('main.contact') }}">{{ _('Contact') }} ↗</a>
+</div></section>
+{% endblock %}

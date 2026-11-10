@@ -1,0 +1,32 @@
+<footer class="site-footer">
+  <div class="container footer-connect">
+    <section class="footer-newsletter" aria-labelledby="newsletter-title">
+      <h2 id="newsletter-title">{{ _('Novidades do festival') }}</h2>
+      <form action="{{ url_for('main.newsletter') }}" method="post" class="newsletter-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label class="sr-only" for="footer-newsletter-email">Email</label>
+        <input id="footer-newsletter-email" type="email" name="email" autocomplete="email" placeholder="{{ _('O teu email') }}" required>
+        <button type="submit">{{ _('Subscrever') }} <span aria-hidden="true">↗</span></button>
+        <label class="newsletter-consent"><input type="checkbox" name="consent" value="yes" required><span>{{ _('Quero receber novidades por email. Posso cancelar a qualquer momento.') }} <a href="{{ url_for('main.legal_page',document='privacy') }}">{{ _('Privacidade') }}</a></span></label>
+      </form>
+    </section>
+    <nav class="social-row" aria-label="{{ _('Redes sociais') }}">
+      {% for network,href in [('facebook','https://www.facebook.com/himdubfestivalofficial'),('instagram','https://www.instagram.com/himdubfestival/'),('youtube','https://www.youtube.com/@himdubfestival')] %}
+      <a href="{{ href }}" aria-label="{{ {'facebook':'Facebook','instagram':'Instagram','youtube':'YouTube'}[network] }}" target="_blank" rel="noopener noreferrer">{% include 'partials/icons/' ~ network ~ '.svg' %}</a>
+      {% endfor %}
+    </nav>
+  </div>
+  <div class="container footer-details">
+    <p>Music is the most high <span>© 2027 HIM Dub Festival</span></p>
+    <nav aria-label="{{ _('Informações e apoio') }}">
+      <a href="{{ url_for('main.contact') }}">{{ _('Contact') }}</a>
+      <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
+      <a href="{{ url_for('main.legal_page',document='rules') }}">{{ _('Regras') }}</a>
+      <a href="{{ url_for('main.legal_page',document='terms') }}">{{ _('Termos') }}</a>
+      <a href="{{ url_for('main.legal_page',document='privacy') }}">{{ _('Privacidade') }}</a>
+      <a href="{{ url_for('main.legal_page',document='cookies') }}">Cookies</a>
+      <a href="{{ url_for('customer.dashboard') }}">{{ _('Área de cliente') }}</a>
+      <button type="button" id="cartToggle" class="site-footer__cart-btn">{{ _('Carrinho') }}</button>
+    </nav>
+  </div>
+</footer>

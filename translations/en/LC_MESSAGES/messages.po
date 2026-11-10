@@ -1800,3 +1800,57 @@ msgstr "Pay"
 #, python-format
 msgid "Estamos a confirmar o teu pagamento junto do fornecedor de pagamentos — costuma demorar só alguns segundos. Vais receber a confirmação da encomenda #%(id)s assim que estiver concluído."
 msgstr "We are confirming your payment with the payment provider — this usually takes just a few seconds. You will receive confirmation of order #%(id)s as soon as it is completed."
+
+msgid "Novidades do festival"
+msgstr "Festival news"
+
+msgid "O teu email"
+msgstr "Your email"
+
+msgid "Quero receber novidades por email. Posso cancelar a qualquer momento."
+msgstr "I want to receive news by email. I can unsubscribe at any time."
+
+msgid "Privacidade"
+msgstr "Privacy"
+
+msgid "Redes sociais"
+msgstr "Social media"
+
+msgid "Informações e apoio"
+msgstr "Information and support"
+
+msgid "Regras"
+msgstr "Rules"
+
+msgid "Termos"
+msgstr "Terms"
+
+msgid "Área de cliente"
+msgstr "Customer account"
+
+msgid "A minha conta"
+msgstr "My account"
+
+msgid "Galeria"
+msgstr "Gallery"
+
+msgid "Regras e normas de funcionamento"
+msgstr "Festival rules"
+
+msgid "Política de privacidade"
+msgstr "Privacy policy"
+
+msgid "Termos e condições"
+msgstr "Terms and conditions"
+
+msgid "Política de cookies"
+msgstr "Cookie policy"
+
+msgid "Nesta página"
+msgstr "On this page"
+
+msgid "Estamos a actualizar esta informação para a próxima edição do festival."
+msgstr "We are updating this information for the next festival edition."
+
+msgid "Para esclarecimentos, contacta a organização."
+msgstr "For more information, contact the organisers."

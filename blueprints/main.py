@@ -7,6 +7,20 @@ from i18n import localized_url_for as url_for
 main_bp = Blueprint("main", __name__)
 
 
+@main_bp.route('/infos/<document>')
+def legal_page(document):
+    from legal_content import LEGAL_PAGES
+    if document not in LEGAL_PAGES:
+        abort(404)
+    return render_template('infos/legal.html', document=document,
+                           document_title=LEGAL_PAGES[document][0])
+
+
+@main_bp.route('/index.php/regras-e-normas-de-funcionamento/')
+def legacy_rules():
+    return redirect(url_for('main.legal_page', document='rules'), code=301)
+
+
 @main_bp.route('/gallery')
 def gallery():
     from models import GalleryAlbum

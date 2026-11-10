@@ -2,6 +2,7 @@
 {% block title %}Editar conteúdo · HIM Dub{% endblock %}
 {% block content %}
 <div class="page-heading"><div><p class="app-overline">{{ pages[page_key][0] }}</p><h1>Editar conteúdo</h1><p>Este conteúdo aparece na própria página, no formato original.</p></div><a href="{{ url_for('admin.content', page=page_key) }}">← Conteúdos</a></div>
+{% if item.kind=='legal' %}<div class="app-notice"><strong>Minuta para revisão da organização</strong><p>Confirma os factos e as regras aplicáveis, completa os prazos e contactos e retira as notas de preparação antes de publicar. Esta estrutura não representa uma certificação de conformidade com o RGPD. Cada secção começa como rascunho. Revê também as traduções.</p></div>{% endif %}
 <section class="app-card"><form method="post" enctype="multipart/form-data" class="app-form">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="key" value="{{ item.key }}">
 <label>{{ 'Pergunta' if item.kind=='faq' else 'Título' }}<input name="title" value="{{ item.title }}" maxlength="180" required></label>

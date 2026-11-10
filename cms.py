@@ -31,6 +31,8 @@ PAGES = {
     "tickets": ("Bilhetes", "/tickets"),
     "gallery": ("Galeria", "/gallery"),
 }
+from legal_content import LEGAL_PAGES
+PAGES.update(LEGAL_PAGES)
 
 
 def safe_url(value, image=False):

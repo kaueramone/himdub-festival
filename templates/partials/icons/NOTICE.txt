@@ -1,0 +1,5 @@
+Facebook, Instagram and YouTube SVG paths: Simple Icons contributors.
+Source: https://github.com/simple-icons/simple-icons/tree/develop/icons
+Licence: CC0-1.0 (https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md).
+Brand names and marks remain the property of their respective owners.
+Icons are served inline, with no requests to the social networks until clicked.

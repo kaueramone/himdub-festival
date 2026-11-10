@@ -8,9 +8,6 @@
   <meta name="turbo-cache-control" content="no-cache"><meta name="turbo-prefetch" content="false">
   <script src="{{ url_for('static',filename='vendor/turbo.js') }}" defer data-turbo-track="reload"></script>
   <script src="{{ url_for('static',filename='js/main.js',v=asset_version) }}" defer data-turbo-track="reload"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/managed.css',v=asset_version) }}" data-turbo-track="reload">
   {% if page_settings and page_settings.mode!='original' %}<style data-turbo-track="dynamic">
@@ -46,8 +43,8 @@
         <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
         <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
         <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
-        <a href="{{ url_for('main.gallery') }}">Gallery</a>
-        <a href="{{ url_for('customer.dashboard') }}">A minha conta</a>
+        <a href="{{ url_for('main.gallery') }}">{{ _('Galeria') }}</a>
+        <a href="{{ url_for('customer.dashboard') }}">{{ _('A minha conta') }}</a>
         <div class="main-nav__dropdown">
           <button type="button" class="main-nav__dropdown-btn">{{ _('Infos') }} <span aria-hidden="true">▾</span></button>
           <div class="main-nav__dropdown-menu">
@@ -87,8 +84,8 @@
     <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
     <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
     <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
-    <a href="{{ url_for('main.gallery') }}">Gallery</a>
-    <a href="{{ url_for('customer.dashboard') }}">A minha conta</a>
+    <a href="{{ url_for('main.gallery') }}">{{ _('Galeria') }}</a>
+    <a href="{{ url_for('customer.dashboard') }}">{{ _('A minha conta') }}</a>
     <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
     <a href="{{ url_for('main.sustainability') }}">{{ _('Sustainability') }}</a>
     <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
@@ -117,48 +114,7 @@
     {% include 'partials/_page_blocks.html' %}
   </main>
 
-  <footer class="site-footer">
-    <div class="container site-footer__grid">
-      <div class="site-footer__links">
-        <a href="{{ url_for('main.contact') }}">{{ _('Contact') }}</a>
-        <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
-        <a href="{{ url_for('main.faq') }}">{{ _('Support') }}</a>
-      </div>
-
-      <div class="site-footer__tagline">
-        {# Frase de marca -- fica sempre em inglês nas 3 línguas do site
-           (mesma regra dos nomes dos bilhetes), por isso não passa por
-           _(), que traduziria a partir do português. #}
-        <p class="site-footer__tagline-text">Music is<br>the most high</p>
-      </div>
-
-      <div class="site-footer__links">
-        <a href="{{ url_for('main.faq') }}">{{ _('Terms & help') }}</a>
-        <a href="{{ url_for('customer.dashboard') }}">Área de cliente</a>
-        <a href="{{ url_for('main.ticket_transfer') }}">Trocar titular de um bilhete</a>
-        <button type="button" id="cartToggle" class="site-footer__cart-btn">{{ _('Carrinho') }}</button>
-      </div>
-    </div>
-
-    <div class="site-footer__newsletter">
-      <p>{{ _('Novidades do festival diretas ao teu email —') }}</p>
-      <form action="{{ url_for('main.newsletter') }}" method="post" class="newsletter-form">
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="email" name="email" placeholder="{{ _('o-teu-email@exemplo.com') }}" required>
-        <label class="newsletter-consent"><input type="checkbox" name="consent" value="yes" required> Quero receber novidades do HIM Dub Festival por email. Posso cancelar a qualquer momento.</label>
-        <button type="submit">{{ _('Subscrever') }}</button>
-      </form>
-      <div class="social-row">
-        <a href="https://www.facebook.com/himdubfestivalofficial" aria-label="Facebook" target="_blank" rel="noopener">FB</a>
-        <a href="https://www.instagram.com/himdubfestival/" aria-label="Instagram" target="_blank" rel="noopener">IG</a>
-        <a href="https://www.youtube.com/@himdubfestival" aria-label="YouTube" target="_blank" rel="noopener">YT</a>
-      </div>
-    </div>
-
-    <div class="container site-footer__bottom">
-      <p>&copy; 2027 HIM Dub Festival. {{ _('Todos os direitos reservados.') }}</p>
-    </div>
-  </footer>
+  {% include 'partials/_site_footer.html' %}
 
   <aside class="cart-drawer" id="cartDrawer">
     <div class="cart-drawer__header">

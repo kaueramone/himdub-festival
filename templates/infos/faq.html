@@ -14,7 +14,7 @@
   <div class="container narrow">
     <p class="faq-rules-link" data-reveal>
       {{ _('Para o regulamento completo do festival, consulta as') }}
-      <a href="https://himdubfestival.com/index.php/regras-e-normas-de-funcionamento/" target="_blank" rel="noopener">{{ _('Regras e Normas de Funcionamento') }}</a>.
+      <a href="{{ url_for('main.legal_page',document='rules') }}">{{ _('Regras e Normas de Funcionamento') }}</a>.
     </p>
     <div class="accordion" data-reveal>
       {% for item in native_content %}
