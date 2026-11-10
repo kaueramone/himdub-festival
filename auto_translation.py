@@ -31,12 +31,14 @@ def translate_public(source, language=None, *, legacy=''):
         return source
     if language not in TARGETS:
         language = 'en'
-    translated = cached_text(source, language)
-    if translated:
-        return translated
+    # Keep reviewed interface wording. Machine translation of isolated buttons
+    # can be ambiguous; editable content still translates by its current source.
     with force_locale(language):
         translated = babel_gettext(source)
     if translated != source:
+        return translated
+    translated = cached_text(source, language)
+    if translated:
         return translated
     if legacy:
         return legacy
@@ -85,17 +87,8 @@ def public_sources():
     return sorted(text for text in sources if text and not is_fixed(text))
 
 
-def refresh_translations(app):
-    with requests.get(TRANSLATIONS_URL, timeout=(3, 15), stream=True,
-                      allow_redirects=False) as response:
-        response.raise_for_status()
-        chunks, size = [], 0
-        for chunk in response.iter_content(65536):
-            size += len(chunk)
-            if size > MAX_TRANSLATIONS_BYTES:
-                raise ValueError('Translation asset too large')
-            chunks.append(chunk)
-    document = json.loads(b''.join(chunks))
+def load_translations(app, document, *, origin='automatic'):
+    """Validate every entry before replacing the current immutable snapshot."""
     if document.get('version') != 1 or document.get('glossary') != glossary_version():
         raise ValueError('Translation glossary mismatch')
     values = {}
@@ -109,11 +102,29 @@ def refresh_translations(app):
             validate_translation(source, text)
             values[cache_key(source, language)] = text
     app.extensions['public_translations']['values'] = values
+    app.extensions['public_translations']['origin'] = origin
     return len(values)
+
+
+def refresh_translations(app):
+    with requests.get(TRANSLATIONS_URL, timeout=(3, 15), stream=True,
+                      allow_redirects=False) as response:
+        response.raise_for_status()
+        chunks, size = [], 0
+        for chunk in response.iter_content(65536):
+            size += len(chunk)
+            if size > MAX_TRANSLATIONS_BYTES:
+                raise ValueError('Translation asset too large')
+            chunks.append(chunk)
+    document = json.loads(b''.join(chunks))
+    return load_translations(app, document)
 
 
 def init_translations(app):
     app.extensions['public_translations'] = {'values': {}}
+    bundled = Path(app.root_path) / 'translations/generated.json'
+    if bundled.is_file():
+        load_translations(app, json.loads(bundled.read_text(encoding='utf-8')), origin='bundled')
     app.jinja_env.install_gettext_callables(gettext, babel_ngettext, newstyle=True)
     app.jinja_env.globals['translate_public'] = translate_public
 
@@ -123,22 +134,30 @@ def init_translations(app):
         return {'version': 1, 'glossary': glossary_version(), 'sources': public_sources()}, 200, {
             'Cache-Control': 'public, max-age=60', 'X-Robots-Tag': 'noindex'}
 
+    @app.get('/i18n/status.json')
+    def translation_status():
+        state = app.extensions['public_translations']
+        return {'ready': bool(state['values']), 'count': len(state['values']),
+                'origin': state.get('origin', 'pending'), 'glossary': glossary_version()}, 200, {
+                    'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex'}
+
     @app.cli.command('translations-refresh')
     def refresh():
         """Fetch and validate this website's generated language assets."""
         import click
         click.echo(f'{refresh_translations(app)} translations loaded.')
 
-    if app.testing or not app.config.get('EMAIL_WORKER_ENABLED'):
+    if app.testing or not app.config.get('TRANSLATION_WORKER_ENABLED'):
         return
 
     def consume():
         stop = threading.Event()
         while not stop.wait(5):
             try:
-                refresh_translations(app)
-            except Exception:
-                app.logger.warning('Language assets temporarily unavailable; keeping previous translations')
+                with app.app_context():
+                    refresh_translations(app)
+            except Exception as error:
+                app.logger.warning('Language assets temporarily unavailable (%s); keeping previous translations', type(error).__name__)
             if stop.wait(295):
                 break
     threading.Thread(target=consume, name='public-translations', daemon=True).start()

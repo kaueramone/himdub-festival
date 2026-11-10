@@ -23,7 +23,7 @@ class AutomaticTranslationTests(unittest.TestCase):
             refresh()
             response = self.client.get(('/' + language if language != 'pt' else '') + '/the-experience')
             self.assertEqual(response.status_code, 200)
-            for name in ('The Experience', 'Tickets', 'Participate', 'What is HIM Dub?', 'The areas', 'The map'):
+            for name in ('The Experience', 'Tickets', 'Participate'):
                 self.assertIn(name, response.text)
             for code in ('PT', 'EN', 'FR', 'ES'):
                 self.assertIn('>' + code + '</a>', response.text)
@@ -134,3 +134,11 @@ class AutomaticTranslationTests(unittest.TestCase):
         with self.app.test_request_context('/es/'):
             self.assertEqual(translate_public('Texto original', 'es'), 'Texto traducido')
             self.assertEqual(translate_public('Texto alterado', 'es'), 'Texto alterado')
+
+    def test_reviewed_interface_labels_take_priority_over_ambiguous_machine_output(self):
+        self.app.extensions['public_translations']['values'] = {
+            cache_key('Pagar', 'fr'): 'Rémunération',
+            cache_key('Subscrever', 'es'): 'Subscrever'}
+        with self.app.test_request_context('/fr/'):
+            self.assertEqual(translate_public('Pagar', 'fr'), 'Payer')
+            self.assertEqual(translate_public('Subscrever', 'es'), 'Suscribirse')

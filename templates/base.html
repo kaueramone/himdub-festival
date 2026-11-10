@@ -43,15 +43,15 @@
         <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
         <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
         <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
-        <a href="{{ url_for('main.gallery') }}">{{ _('Gallery') }}</a>
+        <a href="{{ url_for('main.gallery') }}">{{ _('Galeria') }}</a>
         <a href="{{ url_for('customer.dashboard') }}">{{ _('A minha conta') }}</a>
         <div class="main-nav__dropdown">
-          <button type="button" class="main-nav__dropdown-btn">{{ _('Infos') }} <span aria-hidden="true">▾</span></button>
+          <button type="button" class="main-nav__dropdown-btn">{{ _('Informações') }} <span aria-hidden="true">▾</span></button>
           <div class="main-nav__dropdown-menu">
             <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
-            <a href="{{ url_for('main.sustainability') }}">{{ _('Sustainability') }}</a>
-            <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
-            <a href="{{ url_for('main.contact') }}">{{ _('Contact') }}</a>
+            <a href="{{ url_for('main.sustainability') }}">{{ _('Sustentabilidade') }}</a>
+            <a href="{{ url_for('main.partners') }}">{{ _('Parceiros') }}</a>
+            <a href="{{ url_for('main.contact') }}">{{ _('Contactos') }}</a>
           </div>
         </div>
       </nav>
@@ -84,12 +84,12 @@
     <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
     <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
     <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
-    <a href="{{ url_for('main.gallery') }}">{{ _('Gallery') }}</a>
+    <a href="{{ url_for('main.gallery') }}">{{ _('Galeria') }}</a>
     <a href="{{ url_for('customer.dashboard') }}">{{ _('A minha conta') }}</a>
     <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
-    <a href="{{ url_for('main.sustainability') }}">{{ _('Sustainability') }}</a>
-    <a href="{{ url_for('main.partners') }}">{{ _('Partners') }}</a>
-    <a href="{{ url_for('main.contact') }}">{{ _('Contact') }}</a>
+    <a href="{{ url_for('main.sustainability') }}">{{ _('Sustentabilidade') }}</a>
+    <a href="{{ url_for('main.partners') }}">{{ _('Parceiros') }}</a>
+    <a href="{{ url_for('main.contact') }}">{{ _('Contactos') }}</a>
     {% if request.blueprint in ('main', 'shop') %}
       <div class="lang-switch lang-switch--mobile">
         {% for code in languages %}

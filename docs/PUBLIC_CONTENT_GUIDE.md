@@ -37,7 +37,7 @@ Português usa o URL sem prefixo; inglês, francês e espanhol usam `/en/`,
 num cookie de preferência durante um ano e tem prioridade na próxima entrada.
 
 Na página inicial, sem preferência guardada, o país aproximado do IP é
-consultado localmente na base DB-IP Lite. Não é pedido GPS e o IP não é enviado
+consultado localmente na base user-country (PDDL). Não é pedido GPS e o IP não é enviado
 para uma API de localização. Países sem idioma suportado usam inglês. Sem país
 disponível, usa-se o primeiro idioma do navegador se suportado, ou inglês.
 Localização por IP é aproximada e pode corresponder à localização de uma VPN.
@@ -54,6 +54,10 @@ Os nomes de navegação e áreas de identidade inglesa estão protegidos em
 `translation_terms.py`: The Experience, Tickets, Participate, Dub Temple,
 River Station e os restantes termos dessa lista. São reconstruídos exactamente,
 sem passarem pelo motor. Textos explicativos são traduzidos normalmente.
+
+Os rótulos fixos da interface usam os catálogos revistos quando disponíveis,
+para evitar traduções ambíguas de botões isolados. Os conteúdos editáveis
+continuam a ser traduzidos automaticamente a partir do texto actual.
 
 As traduções são guardadas na branch `site-translations`, que não activa deploys
 do website. O site actualiza a cópia em memória de cinco em cinco minutos.
@@ -90,4 +94,4 @@ mantêm o seu mecanismo separado. Não é apresentada uma certificação RGPD.
 
 - LibreTranslate: https://docs.libretranslate.com/
 - GitHub Actions gratuito: https://docs.github.com/en/billing/concepts/product-billing/github-actions
-- DB-IP Lite: https://db-ip.com/db/download/ip-to-country-lite
+- Base de países em domínio público: https://github.com/sapics/ip-location-db/tree/main/user-country

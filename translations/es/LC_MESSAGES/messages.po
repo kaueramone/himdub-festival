@@ -1,0 +1,212 @@
+# Spanish translations for HIM Dub Festival.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the HIM Dub Festival
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: HIM Dub Festival 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-11-10 12:45+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+msgid "Pagar"
+msgstr "Pagar"
+
+msgid "Subscrever"
+msgstr "Suscribirse"
+
+msgid "Novidades do festival"
+msgstr "Novedades del festival"
+
+msgid "O teu email"
+msgstr "Tu correo electrónico"
+
+msgid "Quero receber novidades por email. Posso cancelar a qualquer momento."
+msgstr ""
+"Quiero recibir novedades por correo electrónico. Puedo darme de baja en "
+"cualquier momento."
+
+msgid "Privacidade"
+msgstr "Privacidad"
+
+msgid "Redes sociais"
+msgstr "Redes sociales"
+
+msgid "Informações e apoio"
+msgstr "Información y ayuda"
+
+msgid "Regras"
+msgstr "Normas"
+
+msgid "Termos"
+msgstr "Términos"
+
+msgid "Área de cliente"
+msgstr "Área de cliente"
+
+msgid "A minha conta"
+msgstr "Mi cuenta"
+
+msgid "Carrinho"
+msgstr "Carrito"
+
+msgid "O teu carrinho"
+msgstr "Tu carrito"
+
+msgid "Ver carrinho"
+msgstr "Ver carrito"
+
+msgid "Fechar carrinho"
+msgstr "Cerrar carrito"
+
+msgid "Abrir menu"
+msgstr "Abrir menú"
+
+msgid "Checkout"
+msgstr "Finalizar compra"
+
+msgid "Finaliza a tua encomenda"
+msgstr "Finaliza tu pedido"
+
+msgid "Taxa de processamento"
+msgstr "Gastos de gestión"
+
+msgid "Resumo"
+msgstr "Resumen"
+
+msgid "Resumo da encomenda"
+msgstr "Resumen del pedido"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Nome"
+msgstr "Nombre"
+
+msgid "Email"
+msgstr "Correo electrónico"
+
+msgid "Produto"
+msgstr "Producto"
+
+msgid "Preço"
+msgstr "Precio"
+
+msgid "Qtd"
+msgstr "Cant."
+
+msgid "Subtotal"
+msgstr "Subtotal"
+
+msgid "Quantidade"
+msgstr "Cantidad"
+
+msgid "Adicionar ao carrinho"
+msgstr "Añadir al carrito"
+
+msgid "Remover"
+msgstr "Eliminar"
+
+msgid "Continuar a explorar"
+msgstr "Seguir explorando"
+
+msgid "Saber mais"
+msgstr "Saber más"
+
+msgid "Inscrições abertas"
+msgstr "Inscripciones abiertas"
+
+msgid "Inscrições encerradas"
+msgstr "Inscripciones cerradas"
+
+msgid "Todos os álbuns"
+msgstr "Todos los álbumes"
+
+msgid "Fotografia ampliada"
+msgstr "Fotografía ampliada"
+
+msgid "Fechar fotografia"
+msgstr "Cerrar fotografía"
+
+msgid "Fotografia anterior"
+msgstr "Fotografía anterior"
+
+msgid "Fotografia seguinte"
+msgstr "Fotografía siguiente"
+
+msgid "Ver Bilhetes"
+msgstr "Ver entradas"
+
+msgid "Perguntas Frequentes"
+msgstr "Preguntas frecuentes"
+
+msgid "Tamanho"
+msgstr "Talla"
+
+msgid "Pagamento cancelado"
+msgstr "Pago cancelado"
+
+msgid "Voltar ao carrinho"
+msgstr "Volver al carrito"
+
+msgid "Encomenda confirmada"
+msgstr "Pedido confirmado"
+
+msgid "Brevemente"
+msgstr "Próximamente"
+
+msgid "Fica registado para a entrada"
+msgstr "Quedará registrado para la entrada"
+
+msgid "Nome de quem vai usar este bilhete"
+msgstr "Nombre de quien utilizará esta entrada"
+
+msgid "Tocar música"
+msgstr "Reproducir música"
+
+msgid "Pausar música"
+msgstr "Pausar música"
+
+msgid "Contactos"
+msgstr "Contacto"
+
+msgid "Sustentabilidade"
+msgstr "Sostenibilidad"
+
+msgid "Parceiros"
+msgstr "Colaboradores"
+
+msgid "Informações"
+msgstr "Información"
+
+msgid "Início"
+msgstr "Inicio"
+
+msgid "Galeria"
+msgstr "Galería"
+
+msgid "Loja"
+msgstr "Tienda"
+
+msgid "Programa"
+msgstr "Programa"
+
+msgid "O festival"
+msgstr "El festival"
+
+msgid "Embaixadores"
+msgstr "Embajadores"
+
+msgid "6ª Edição"
+msgstr "6.ª edición"

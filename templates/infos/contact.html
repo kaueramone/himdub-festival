@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}{{ _('Contact') }} — HIM Dub Festival{% endblock %}
+{% block title %}{{ _('Contactos') }} — HIM Dub Festival{% endblock %}
 
 {% block content %}
 
 <section class="page-hero page-hero--contact">
   <div class="container" data-reveal>
-    <p class="eyebrow">{{ _('Infos') }}</p>
-    <h1>{{ _('Contact') }}</h1>
+    <p class="eyebrow">{{ _('Informações') }}</p>
+    <h1>{{ _('Contactos') }}</h1>
 
     <div class="contact-grid">
       {% for item in native_content %}<div><h4>{{ item.title }}</h4><a href="mailto:{{ item.email }}">{{ item.email }}</a></div>{% endfor %}

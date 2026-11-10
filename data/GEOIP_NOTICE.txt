@@ -1,11 +1,13 @@
-IP Geolocation by DB-IP: https://db-ip.com
-DB-IP IP to Country Lite, November 2026 release.
-Source: https://db-ip.com/db/download/ip-to-country-lite
-Licence: Creative Commons Attribution 4.0 International
-https://creativecommons.org/licenses/by/4.0/
+Country database: user-country, sapics/ip-location-db.
+Source: https://github.com/sapics/ip-location-db
+Dataset release downloaded 2026-11-10, SHA-256:
+5eb05025ee0e5c308f5e97feeef6715a7eff3c2a11f2b5fe5503fd86c0a22b72
+Licence: Public Domain Dedication and License (PDDL v1.0)
+https://opendatacommons.org/licenses/pddl/1-0/
+The publisher explicitly allows free use without attribution:
+https://github.com/sapics/ip-location-db/blob/main/user-country/SOURCES.md
 
 Country-level approximate inference only; not a visitor's precise location.
-Queries are local; visitor IP addresses are not transmitted to DB-IP.
-The required credit and link are displayed in the public site footer.
-The Lite database has reduced coverage and accuracy. Refresh the bundled
-database during maintenance; preserve the licence and attribution.
+Queries are local; visitor IP addresses are not transmitted to a third party.
+The dataset uses routing records and public geofeeds; approximate accuracy
+varies. Refresh the bundled database during maintenance.

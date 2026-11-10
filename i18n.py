@@ -85,7 +85,7 @@ def init_language_selection(app):
     from flask import redirect
     reader = None
     path = Path(app.config.get('GEOIP_COUNTRY_DATABASE') or
-                Path(app.root_path) / 'data/dbip-country-lite.mmdb')
+                Path(app.root_path) / 'data/user-country.mmdb')
     if path.is_file():
         import maxminddb
         reader = maxminddb.open_database(str(path))

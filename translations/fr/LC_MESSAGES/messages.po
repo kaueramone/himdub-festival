@@ -1209,6 +1209,96 @@ msgstr "Ajouter"
 msgid "Ainda não há produtos disponíveis nesta categoria."
 msgstr "Aucun produit disponible dans cette catégorie pour le moment."
 
+msgid "Pagar"
+msgstr "Payer"
+
+#, python-format
+msgid ""
+"Estamos a confirmar o teu pagamento junto do fornecedor de pagamentos — "
+"costuma demorar só alguns segundos. Vais receber a confirmação da "
+"encomenda #%(id)s assim que estiver concluído."
+msgstr ""
+"Nous confirmons votre paiement auprès du prestataire de paiement — cela "
+"ne prend généralement que quelques secondes. Vous recevrez la "
+"confirmation de la commande #%(id)s dès que le paiement sera confirmé."
+
+msgid "Novidades do festival"
+msgstr "Les nouvelles du festival"
+
+msgid "O teu email"
+msgstr "Ton adresse email"
+
+msgid "Quero receber novidades por email. Posso cancelar a qualquer momento."
+msgstr ""
+"Je souhaite recevoir les nouvelles par email. Je peux me désinscrire à "
+"tout moment."
+
+msgid "Privacidade"
+msgstr "Confidentialité"
+
+msgid "Redes sociais"
+msgstr "Réseaux sociaux"
+
+msgid "Informações e apoio"
+msgstr "Informations et assistance"
+
+msgid "Regras"
+msgstr "Règlement"
+
+msgid "Termos"
+msgstr "Conditions"
+
+msgid "Área de cliente"
+msgstr "Espace client"
+
+msgid "A minha conta"
+msgstr "Mon compte"
+
+msgid "Galeria"
+msgstr "Galerie"
+
+msgid "Regras e normas de funcionamento"
+msgstr "Règlement du festival"
+
+msgid "Política de privacidade"
+msgstr "Politique de confidentialité"
+
+msgid "Termos e condições"
+msgstr "Conditions générales"
+
+msgid "Política de cookies"
+msgstr "Politique relative aux cookies"
+
+msgid "Nesta página"
+msgstr "Sur cette page"
+
+msgid "Estamos a actualizar esta informação para a próxima edição do festival."
+msgstr "Nous actualisons ces informations pour la prochaine édition du festival."
+
+msgid "Para esclarecimentos, contacta a organização."
+msgstr "Pour toute question, contacte l’organisation."
+
+msgid "Contactos"
+msgstr "Contact"
+
+msgid "Informações"
+msgstr "Informations"
+
+msgid "Início"
+msgstr "Accueil"
+
+msgid "Loja"
+msgstr "Boutique"
+
+msgid "Programa"
+msgstr "Programmation"
+
+msgid "O festival"
+msgstr "Le festival"
+
+msgid "Embaixadores"
+msgstr "Ambassadeurs"
+
 #~ msgid "Um festival que se sente em familia, do primeiro ao ultimo dia."
 #~ msgstr "Un festival qui se vit en famille, du premier au dernier jour."
 
@@ -1824,67 +1914,3 @@ msgstr "Aucun produit disponible dans cette catégorie pour le moment."
 
 #~ msgid "A venda de bilhetes estará disponível a partir das %(hora)s."
 #~ msgstr "La vente de billets sera disponible à partir de %(hora)s."
-
-
-
-msgid "Pagar"
-msgstr "Payer"
-
-
-#, python-format
-msgid "Estamos a confirmar o teu pagamento junto do fornecedor de pagamentos — costuma demorar só alguns segundos. Vais receber a confirmação da encomenda #%(id)s assim que estiver concluído."
-msgstr "Nous confirmons votre paiement auprès du prestataire de paiement — cela ne prend généralement que quelques secondes. Vous recevrez la confirmation de la commande #%(id)s dès que le paiement sera confirmé."
-
-msgid "Novidades do festival"
-msgstr "Les nouvelles du festival"
-
-msgid "O teu email"
-msgstr "Ton adresse email"
-
-msgid "Quero receber novidades por email. Posso cancelar a qualquer momento."
-msgstr "Je souhaite recevoir les nouvelles par email. Je peux me désinscrire à tout moment."
-
-msgid "Privacidade"
-msgstr "Confidentialité"
-
-msgid "Redes sociais"
-msgstr "Réseaux sociaux"
-
-msgid "Informações e apoio"
-msgstr "Informations et assistance"
-
-msgid "Regras"
-msgstr "Règlement"
-
-msgid "Termos"
-msgstr "Conditions"
-
-msgid "Área de cliente"
-msgstr "Espace client"
-
-msgid "A minha conta"
-msgstr "Mon compte"
-
-msgid "Galeria"
-msgstr "Galerie"
-
-msgid "Regras e normas de funcionamento"
-msgstr "Règlement du festival"
-
-msgid "Política de privacidade"
-msgstr "Politique de confidentialité"
-
-msgid "Termos e condições"
-msgstr "Conditions générales"
-
-msgid "Política de cookies"
-msgstr "Politique relative aux cookies"
-
-msgid "Nesta página"
-msgstr "Sur cette page"
-
-msgid "Estamos a actualizar esta informação para a próxima edição do festival."
-msgstr "Nous actualisons ces informations pour la prochaine édition du festival."
-
-msgid "Para esclarecimentos, contacta a organização."
-msgstr "Pour toute question, contacte l’organisation."

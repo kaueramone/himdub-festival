@@ -16,10 +16,15 @@
       {% endfor %}
     </nav>
   </div>
+  <div class="container footer-music-signature">
+    <span class="footer-equalizer" aria-hidden="true">{% for bar in range(7) %}<span></span>{% endfor %}</span>
+    <p>Music is the most high</p>
+    <span class="footer-equalizer footer-equalizer--right" aria-hidden="true">{% for bar in range(7) %}<span></span>{% endfor %}</span>
+  </div>
   <div class="container footer-details">
-    <p><a href="https://db-ip.com" rel="noopener noreferrer">IP Geolocation by DB-IP</a><br>Music is the most high <span>© 2027 HIM Dub Festival</span></p>
+    <p>© 2027 HIM Dub Festival</p>
     <nav aria-label="{{ _('Informações e apoio') }}">
-      <a href="{{ url_for('main.contact') }}">{{ _('Contact') }}</a>
+      <a href="{{ url_for('main.contact') }}">{{ _('Contactos') }}</a>
       <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
       <a href="{{ url_for('main.legal_page',document='rules') }}">{{ _('Regras') }}</a>
       <a href="{{ url_for('main.legal_page',document='terms') }}">{{ _('Termos') }}</a>

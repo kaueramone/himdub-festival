@@ -7,14 +7,10 @@ import re
 
 FIXED_TERMS = frozenset({
     'HIM Dub Festival', 'HIM Dub', 'The Experience', 'Experience',
-    'Tickets', 'Participate', 'Infos', 'FAQ', 'Sustainability', 'Partners',
-    'Contact', 'Home', 'Gallery', 'Merchandise', 'Line Up', 'The Festival',
-    'Ambassadors', 'What is HIM Dub?', 'What is HIM Dub', 'The areas',
-    'The map', 'Dub Temple', 'River Station', 'Roots Garden', 'Lectures',
-    'Kids Area', 'Workshops', 'Healing Area', 'Healing',
+    'Tickets', 'Participate', 'Dub Temple', 'River Station', 'Roots Garden',
     'Nomad Embassy Sound System', 'Mindel Reggae Sound System',
     'Music is the most high', 'HIM DUB MEMORIES',
-    'Glamping', 'Shuttle', 'Shuttles', 'TicketSwap', 'Teya', 'Stripe', 'Resend',
+    'TicketSwap', 'Teya', 'Stripe', 'Resend',
     'Bunny', 'Lifes Work Glamping',
 })
 

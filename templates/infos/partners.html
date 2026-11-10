@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}{{ _('Partners') }} — HIM Dub Festival{% endblock %}
+{% block title %}{{ _('Parceiros') }} — HIM Dub Festival{% endblock %}
 {% block body_class %}immersive-page{% endblock %}
 
 {% block content %}
 
 <section class="immersive-hero immersive-hero--partners">
-  {% with prev_url=url_for('main.sustainability'), prev_label=_('Sustainability'), next_url=url_for('main.contact'), next_label=_('Contact') %}
+  {% with prev_url=url_for('main.sustainability'), prev_label=_('Sustentabilidade'), next_url=url_for('main.contact'), next_label=_('Contactos') %}
     {% include "partials/_hero_arrows.html" %}
   {% endwith %}
 

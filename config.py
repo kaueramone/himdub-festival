@@ -32,6 +32,7 @@ class Config:
     ALLOW_LEGACY_LOGIN = not PRODUCTION and os.environ.get("ALLOW_LEGACY_LOGIN", "true").lower() == "true"
     AUTO_MIGRATE = not PRODUCTION
     GEOIP_COUNTRY_DATABASE = os.environ.get('GEOIP_COUNTRY_DATABASE', '')
+    TRANSLATION_WORKER_ENABLED = PRODUCTION and os.environ.get('TRANSLATION_WORKER_ENABLED', 'true').lower() == 'true'
 
     # Algumas plataformas (ex: Render, Heroku) dao o URL da base de dados
     # Postgres com o prefixo antigo "postgres://", que o SQLAlchemy 1.4+
