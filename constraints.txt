@@ -28,3 +28,8 @@ typing-extensions==4.16.0
 tzdata==2024.2
 urllib3==2.8.0
 werkzeug==3.1.9
+
+# Teya signature verification dependencies (2026-11-10).
+cryptography==50.0.2
+cffi==2.1.1
+pycparser==3.12

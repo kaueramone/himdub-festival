@@ -162,6 +162,30 @@ class Order(db.Model):
         return self.total_cents / 100
 
 
+class PaymentGatewayConfiguration(db.Model):
+    __tablename__ = "payment_gateway_configurations"
+    id = db.Column(db.Integer, primary_key=True)
+    provider = db.Column(db.String(20), nullable=False, default="stripe")
+    revision = db.Column(db.Integer, nullable=False, default=0)
+
+
+class PaymentCheckout(db.Model):
+    __tablename__ = "payment_checkouts"
+    id = db.Column(db.String(36), primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False, unique=True)
+    provider = db.Column(db.String(20), nullable=False, default="teya")
+    environment = db.Column(db.String(20), nullable=False)
+    store_id = db.Column(db.String(36), nullable=False)
+    reference = db.Column(db.String(100), nullable=False, unique=True)
+    session_id = db.Column(db.String(80), unique=True)
+    session_url = db.Column(db.Text, default="")
+    transaction_id = db.Column(db.String(100), unique=True)
+    status = db.Column(db.String(30), nullable=False, default="preparing")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    next_check_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    last_error = db.Column(db.String(160), default="")
+
+
 class AdminUser(db.Model):
     __tablename__ = "admin_users"
     id = db.Column(db.Integer, primary_key=True)

@@ -40,7 +40,7 @@ def init_security(app):
         if request.path.startswith(('/admin/ticket-sales/', '/admin/content/edit', '/admin/content/original/edit', '/admin/appearance', '/admin/gallery/')):
             request.max_content_length = 16 * 1024 * 1024
         # This endpoint authenticates the original payload with Stripe's signature.
-        if request.endpoint == "shop.stripe_webhook":
+        if request.endpoint in ("shop.stripe_webhook", "shop.teya_webhook"):
             return
         expected = session.get("csrf_token", "")
         provided = request.form.get("csrf_token") or request.headers.get("X-CSRF-Token", "")

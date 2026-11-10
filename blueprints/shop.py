@@ -633,6 +633,12 @@ def checkout():
                 processing_fee=cart_processing_fee_cents(lines) / 100,
             )
 
+        from teya_gateway import provider, ready, start_checkout
+        checkout_gateway = provider()
+        if checkout_gateway == 'teya' and not ready():
+            abort(503, description='O pagamento está temporariamente indisponível.')
+        if checkout_gateway == 'stripe' and current_app.config.get('PRODUCTION') and not current_app.config.get('STRIPE_SECRET_KEY'):
+            abort(503, description='O pagamento está temporariamente indisponível.')
         order = Order(
             name=name,
             email=email,
@@ -672,8 +678,12 @@ def checkout():
         db.session.add(order)
         db.session.commit()
 
+        if checkout_gateway == 'teya':
+            return start_checkout(order)
         if current_app.config["PAYMENTS_LIVE"]:
             return _start_stripe_checkout(order)
+        if current_app.config.get('PRODUCTION'):
+            abort(503, description='O pagamento está temporariamente indisponível.')
 
         # --- Modo demo: sem Stripe configurado, marca como paga na hora ---
         order.status = "demo-paid"
@@ -784,6 +794,15 @@ def checkout_success(order_id):
     except (BadSignature, SignatureExpired):
         abort(404)
     order = Order.query.get_or_404(order_id)
+    from models import PaymentCheckout
+    from teya_gateway import reconcile
+    teya_payment = PaymentCheckout.query.filter_by(order_id=order.id, provider='teya').first()
+    if teya_payment and order.status in ('pending', 'processing', 'paid'):
+        try:
+            reconcile(teya_payment.id)
+        except Exception:
+            db.session.rollback()
+            current_app.logger.warning('Teya return deferred to payment reconciliation for order %s', order.id)
     if current_app.config["PAYMENTS_LIVE"] and order.status in ("pending", "processing", "paid") and order.stripe_session_id:
         import stripe
         stripe.api_key = current_app.config["STRIPE_SECRET_KEY"]
@@ -801,6 +820,10 @@ def checkout_success(order_id):
 @shop_bp.route("/checkout/cancel")
 def checkout_cancel():
     return render_template("checkout_cancel.html")
+
+
+from teya_gateway import init_teya
+init_teya(shop_bp)
 
 
 @shop_bp.route("/webhooks/stripe", methods=["POST"])

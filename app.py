@@ -157,6 +157,8 @@ def create_app():
 
     # Blueprints = grupos de rotas, para nao ter tudo num ficheiro gigante.
     from ticket_sales import website_image, sale_available
+    from teya_gateway import provider as checkout_provider
+    app.jinja_env.globals["checkout_provider"] = checkout_provider
     app.jinja_env.globals.update(ticket_sale_image=website_image, ticket_sale_available=sale_available)
     from blueprints.main import main_bp
     from blueprints.shop import shop_bp

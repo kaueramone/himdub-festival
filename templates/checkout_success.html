@@ -12,7 +12,7 @@
     {% else %}
       <span class="result-icon result-icon--success">⏳</span>
       <h1>{% if order.name %}{{ _('Quase lá, %(name)s!', name=order.name) }}{% else %}{{ _('Quase lá!') }}{% endif %}</h1>
-      <p>{{ _('Estamos a confirmar o teu pagamento junto do Stripe — costuma demorar só alguns segundos. Vais receber a confirmação da encomenda #%(id)s assim que estiver concluído.', id=order.id) }}</p>
+      <p>{{ _('Estamos a confirmar o teu pagamento junto do fornecedor de pagamentos — costuma demorar só alguns segundos. Vais receber a confirmação da encomenda #%(id)s assim que estiver concluído.', id=order.id) }}</p>
     {% endif %}
     <p>{{ _('Total:') }} <strong>€{{ '%.2f'|format(order.total) }}</strong></p>
     <a href="{{ url_for('customer.login') }}" class="btn btn--outline">A minha área de cliente</a>

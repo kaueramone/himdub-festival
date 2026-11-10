@@ -19,3 +19,6 @@ tzdata==2024.2
 # o SQLAlchemy a uma base de dados PostgreSQL (em vez do SQLite local).
 gunicorn==23.0.0
 psycopg2-binary==2.9.10
+
+# RSA verification for signed Teya payment webhooks.
+cryptography==50.0.2

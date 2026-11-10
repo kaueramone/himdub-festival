@@ -118,6 +118,8 @@ def init_outbox(app):
                 process_pending(app)
                 from website_jobs import process_website_jobs
                 process_website_jobs(app)
+                from teya_gateway import reconcile_pending
+                reconcile_pending(app)
             except Exception:
                 app.logger.warning("Email queue temporarily unavailable")
     threading.Thread(target=consume, name="email-outbox", daemon=True).start()

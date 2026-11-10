@@ -257,3 +257,57 @@ Os clientes continuam sem palavra-passe. `/account/recover` usa o mesmo fluxo
 verificado de `/account/login` para enviar um novo link de entrada, com a mesma
 validade, limites e utilização única. Não cria contas de equipa nem altera a
 titularidade de bilhetes. Perder o acesso ao email exige verificação assistida.
+
+
+## Escolha Stripe/Teya no checkout
+
+`/admin/payments` permite a um administrador escolher o fornecedor para novas
+compras, com confirmação, código MFA novo em produção, controlo de versão e
+registo de auditoria. A ausência de configuração na tabela aditiva
+`payment_gateway_configurations` mantém Stripe; consultar não cria registos.
+`payment_checkouts` guarda a ligação de cada encomenda Teya à sua loja, ambiente,
+sessão, referência e transacção. Ambas as tabelas são criadas por `db-upgrade`.
+As encomendas e referências Stripe anteriores são preservadas.
+
+Usa-se Teya Hosted Checkout: OAuth no servidor com apenas
+`checkout/sessions/create checkout/sessions/id/get`, sem guardar cartões ou
+solicitar permissão de reembolso. URLs das APIs são fixas por ambiente e pedidos
+não seguem redireccionamentos. O segredo e o token OAuth nunca chegam ao browser.
+A URL de pagamento devolvida tem de pertencer a checkout.teya.com (produção) ou
+checkout.teya.xyz (staging). Os valores são enviados em cêntimos e não se enviam
+NIF, email nem outros dados pessoais do comprador na criação da sessão.
+
+Configurar TEYA_CLIENT_ID, TEYA_CLIENT_SECRET, TEYA_STORE_ID, TEYA_ENVIRONMENT e
+TEYA_WEBHOOK_PUBLIC_KEY no Render, mantendo as chaves Stripe. O webhook é
+https://himdubfestival.com/webhooks/teya e recebe payment.succeeded.v1.
+A assinatura x-teya-signature é RSA PKCS1 v1.5/SHA256 sobre o corpo original.
+Mesmo com assinatura válida, consulta-se a sessão na API e verifica-se referência,
+ID, tipo SALE, montante EUR, estado COMPLETED/SUCCESS e transacção antes de emitir.
+A volta do navegador por si só nunca confirma um pagamento. Repetições não duplicam
+bilhetes nem emails. Preservar o par ambiente/loja enquanto existirem pendentes.
+
+TEYA_CHECKOUT_READY=true liberta a opção no selector depois da validação técnica;
+não activa Teya automaticamente. Stripe continua seleccionado até decisão expressa
+da organização no dashboard. Sem staging, documentar os testes automáticos e a
+validação de autenticação/criação/consulta sem cobrança. Não declarar uma cobrança
+real validada até a organização concluir o primeiro pagamento acompanhado.
+
+Uma sessão Teya expira normalmente em 15 minutos, mas uma autorização em curso
+não pode libertar stock apenas pelo relógio local. Por isso encomendas Teya passam
+a processing e mantêm a reserva até a API confirmar pagamento, falha ou expiração.
+A thread existente consulta pendentes (máximo 3 por ciclo), com claim atómico e
+repetição idempotente de criação após timeout. Se a API estiver indisponível,
+mantém a reserva e sinaliza reconciliação pendente. Não há fallback automático
+para Stripe que possa originar dois pagamentos. O cancelamento no browser não
+invalida um pagamento que ainda possa ser concluído.
+
+A Teya actualmente só notifica pagamentos bem-sucedidos. Reembolsos efectuados
+no portal não actualizam o website por webhook. Em Pagamentos, depois de verificar
+um reembolso integral concluído no portal Teya, o administrador regista a referência,
+confirma e introduz MFA: o website marca refunded e impede entrada/download dos
+bilhetes. Este formulário não efectua operações financeiras. Reembolsos parciais
+exigem análise individual, sem presumir cancelamento de todos os bilhetes.
+A troca de titular com taxa continua com o Stripe próprio e permanece desactivada.
+
+Referências oficiais consultadas: https://docs.teya.com/online-payments/hosted-checkout/get-started,
+https://docs.teya.com/apis/online-payments/apis e https://docs.teya.com/online-payments/webhooks.

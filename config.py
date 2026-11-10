@@ -61,6 +61,13 @@ class Config:
     # cria a encomenda como paga sem ligar a nenhum processador de pagamentos.
     # Isto permite testar o fluxo todo no PyCharm sem precisares de uma conta Stripe.
     PAYMENTS_LIVE = bool(STRIPE_SECRET_KEY)
+    TEYA_ENVIRONMENT = os.environ.get("TEYA_ENVIRONMENT", "production")
+    TEYA_CLIENT_ID = os.environ.get("TEYA_CLIENT_ID", "")
+    TEYA_CLIENT_SECRET = os.environ.get("TEYA_CLIENT_SECRET", "")
+    TEYA_STORE_ID = os.environ.get("TEYA_STORE_ID", "")
+    TEYA_WEBHOOK_PUBLIC_KEY = os.environ.get("TEYA_WEBHOOK_PUBLIC_KEY", "").replace("\\n", "\n")
+    # Operational release gate, never editable through the public checkout.
+    TEYA_CHECKOUT_READY = os.environ.get("TEYA_CHECKOUT_READY", "false").lower() == "true"
 
     DOMAIN = os.environ.get("DOMAIN", "http://127.0.0.1:5000")
 

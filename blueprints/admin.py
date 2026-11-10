@@ -759,3 +759,6 @@ init_customer_admin(admin_bp, admin_required)
 
 from password_recovery import init_password_recovery
 init_password_recovery(admin_bp)
+
+from payment_admin import init_payment_admin
+init_payment_admin(admin_bp, admin_required)
