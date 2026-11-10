@@ -36,7 +36,7 @@ class AutomaticTranslationTests(unittest.TestCase):
         db.session.add(NativeContent(key='rules:0', page_key='rules', payload=json.dumps({
             'kind': 'legal', 'title': secret, 'text': secret, 'published': False, 'sort_order': 0})))
         db.session.add(PageBlock(page_key='experience', title=secret, text=secret, published=False))
-        db.session.add(Product(slug='private-draft', category='ticket', name=secret,
+        db.session.add(Product(id=3, slug='private-draft', category='ticket', name=secret,
                                price_cents=1000, is_active=False))
         db.session.add(PageBlock(page_key='experience', title='Published editorial title', published=True))
         db.session.commit()
