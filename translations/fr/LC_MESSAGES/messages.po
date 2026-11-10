@@ -1299,6 +1299,18 @@ msgstr "Le festival"
 msgid "Embaixadores"
 msgstr "Ambassadeurs"
 
+msgid "O mapa"
+msgstr "Le plan"
+
+msgid "As áreas"
+msgstr "Les espaces"
+
+msgid "O que é o HIM Dub?"
+msgstr "Qu’est-ce que le HIM Dub ?"
+
+msgid "O que é o HIM Dub"
+msgstr "Qu’est-ce que le HIM Dub"
+
 #~ msgid "Um festival que se sente em familia, do primeiro ao ultimo dia."
 #~ msgstr "Un festival qui se vit en famille, du premier au dernier jour."
 

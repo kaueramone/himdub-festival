@@ -210,3 +210,15 @@ msgstr "Embajadores"
 
 msgid "6ª Edição"
 msgstr "6.ª edición"
+
+msgid "O mapa"
+msgstr "El mapa"
+
+msgid "As áreas"
+msgstr "Las áreas"
+
+msgid "O que é o HIM Dub?"
+msgstr "¿Qué es HIM Dub?"
+
+msgid "O que é o HIM Dub"
+msgstr "Qué es HIM Dub"

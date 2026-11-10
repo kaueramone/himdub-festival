@@ -1280,6 +1280,18 @@ msgstr "The festival"
 msgid "Embaixadores"
 msgstr "Ambassadors"
 
+msgid "O mapa"
+msgstr "The map"
+
+msgid "As áreas"
+msgstr "The areas"
+
+msgid "O que é o HIM Dub?"
+msgstr "What is HIM Dub?"
+
+msgid "O que é o HIM Dub"
+msgstr "What is HIM Dub"
+
 #~ msgid "Um festival que se sente em familia, do primeiro ao ultimo dia."
 #~ msgstr "A festival that feels like family, from the first day to the last."
 

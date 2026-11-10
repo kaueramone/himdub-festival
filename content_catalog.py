@@ -5,7 +5,7 @@ DEFAULT_CONTENT = {
         {
             "key": "experience:festival",
             "kind": "card",
-            "title": "What is HIM Dub?",
+            "title": "O que é o HIM Dub?",
             "text": "",
             "image_url": "/static/img/experience-what-is.jpg",
             "link_url": "/the-festival",
@@ -13,7 +13,7 @@ DEFAULT_CONTENT = {
         {
             "key": "experience:areas",
             "kind": "card",
-            "title": "The areas",
+            "title": "As áreas",
             "text": "",
             "image_url": "/static/img/experience-areas.jpg",
             "link_url": "/line-up",
@@ -21,7 +21,7 @@ DEFAULT_CONTENT = {
         {
             "key": "experience:map",
             "kind": "card",
-            "title": "The map",
+            "title": "O mapa",
             "text": "",
             "image_url": "/static/img/experience-map.png",
             "link_url": "/the-map",
