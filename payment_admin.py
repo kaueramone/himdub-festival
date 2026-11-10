@@ -1,7 +1,7 @@
 """Audited, administrator-only checkout provider selection."""
 from flask import abort, current_app, flash, redirect, render_template, request, session, url_for
 from sqlalchemy.exc import IntegrityError
-from auth import totp_counter
+from auth import totp_counter, check_login_throttle
 from extensions import db
 from models import AdminUser, AuditEvent, Order, PaymentCheckout, PaymentGatewayConfiguration
 from teya_gateway import provider, configured, ready
@@ -12,6 +12,7 @@ def init_payment_admin(bp, admin_required):
     @admin_required
     def payments():
         if request.method=='POST':
+            check_login_throttle('payment-settings:'+str(session.get('user_id')))
             user=AdminUser.query.filter_by(id=session.get('user_id'),active=True,role='admin').populate_existing().with_for_update().first()
             if not user:
                 abort(403)
@@ -61,6 +62,7 @@ def init_payment_admin(bp, admin_required):
     @bp.post('/payments/refunds/<int:order_id>')
     @admin_required
     def record_teya_refund(order_id):
+        check_login_throttle('payment-refund:'+str(session.get('user_id')))
         user=AdminUser.query.filter_by(id=session.get('user_id'),active=True,role='admin').populate_existing().with_for_update().first()
         if not user:
             abort(403)

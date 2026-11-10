@@ -1825,3 +1825,12 @@ msgstr "Aucun produit disponible dans cette catégorie pour le moment."
 #~ msgid "A venda de bilhetes estará disponível a partir das %(hora)s."
 #~ msgstr "La vente de billets sera disponible à partir de %(hora)s."
 
+
+
+msgid "Pagar com Teya"
+msgstr "Payer avec Teya"
+
+
+#, python-format
+msgid "Estamos a confirmar o teu pagamento junto do fornecedor de pagamentos — costuma demorar só alguns segundos. Vais receber a confirmação da encomenda #%(id)s assim que estiver concluído."
+msgstr "Nous confirmons votre paiement auprès du prestataire de paiement — cela ne prend généralement que quelques secondes. Vous recevrez la confirmation de la commande #%(id)s dès que le paiement sera confirmé."

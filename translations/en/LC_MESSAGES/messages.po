@@ -1791,3 +1791,12 @@ msgstr "No products available in this category yet."
 #~ msgid "A venda de bilhetes estará disponível a partir das %(hora)s."
 #~ msgstr "Ticket sales will be available from %(hora)s."
 
+
+
+msgid "Pagar com Teya"
+msgstr "Pay with Teya"
+
+
+#, python-format
+msgid "Estamos a confirmar o teu pagamento junto do fornecedor de pagamentos — costuma demorar só alguns segundos. Vais receber a confirmação da encomenda #%(id)s assim que estiver concluído."
+msgstr "We are confirming your payment with the payment provider — this usually takes just a few seconds. You will receive confirmation of order #%(id)s as soon as it is completed."

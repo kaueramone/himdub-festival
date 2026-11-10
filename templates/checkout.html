@@ -91,7 +91,7 @@
           {% if checkout_provider()=='teya' %}{{ _('Pagar com Teya') }}{% elif config.PAYMENTS_LIVE %}{{ _('Pagar com Stripe') }}{% else %}{{ _('Concluir encomenda (demo)') }}{% endif %}
         </button>
 
-        {% if config.PAYMENTS_LIVE %}
+        {% if config.PAYMENTS_LIVE or checkout_provider()=='teya' %}
           {# Pedido explicito do Joao: alguns metodos de pagamento (ex: MB WAY)
              confirmam de forma assincrona -- se a pessoa fechar/atualizar a
              pagina demasiado cedo, o pagamento pode ainda ser cobrado mas o

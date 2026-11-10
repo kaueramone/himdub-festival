@@ -8,7 +8,7 @@
     {% if order.status in ("paid", "demo-paid") %}
       <span class="result-icon result-icon--success">✓</span>
       <h1>{% if order.name %}{{ _('Obrigado, %(name)s!', name=order.name) }}{% else %}{{ _('Obrigado!') }}{% endif %}</h1>
-      <p>{% if not config.PAYMENTS_LIVE %}{{ _('A tua encomenda #%(id)s foi confirmada (modo demo).', id=order.id) }}{% else %}{{ _('A tua encomenda #%(id)s foi confirmada.', id=order.id) }}{% endif %}</p>
+      <p>{% if order.status=='demo-paid' %}{{ _('A tua encomenda #%(id)s foi confirmada (modo demo).', id=order.id) }}{% else %}{{ _('A tua encomenda #%(id)s foi confirmada.', id=order.id) }}{% endif %}</p>
     {% else %}
       <span class="result-icon result-icon--success">⏳</span>
       <h1>{% if order.name %}{{ _('Quase lá, %(name)s!', name=order.name) }}{% else %}{{ _('Quase lá!') }}{% endif %}</h1>
