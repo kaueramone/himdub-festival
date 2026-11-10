@@ -7,7 +7,29 @@ from sqlalchemy import func
 from openpyxl import Workbook
 from extensions import db
 from festival_time import local_day_bounds_utc, to_local_time
-from models import Order, OrderItem, Product, Ticket, EmailDelivery
+from models import Order, OrderItem, Product, Ticket, EmailDelivery, PaymentCheckout
+
+
+def recent_order_indicator(order, payment=None):
+    """Presentation only: never infer a successful payment from a checkout."""
+    if order.status == 'paid':
+        return ('green', 'Pago', 'Pagamento confirmado.')
+    if order.status == 'comp':
+        return ('green', 'Cortesia', 'Entrada oferecida, sem pagamento necessário.')
+    if order.status == 'refunded':
+        return ('red', 'Reembolsado', 'Encomenda registada como reembolsada.')
+    if order.status == 'cancelled':
+        label = 'Pagamento expirado' if payment and payment.status == 'expired' else 'Cancelado'
+        if payment and payment.status == 'failed':
+            label = 'Pagamento falhado'
+        return ('red', label, 'Encomenda sem pagamento válido para emitir bilhetes.')
+    if order.status == 'demo-paid':
+        return ('yellow', 'Teste', 'Encomenda de teste, separada das vendas reais.')
+    if payment and payment.last_error:
+        return ('yellow', 'Pagamento por verificar', 'Confirmação indisponível; verificar antes de repetir o pagamento.')
+    if order.status == 'pending' or (payment and payment.status == 'active' and not payment.transaction_id):
+        return ('yellow', 'A aguardar pagamento', 'Checkout aberto, ainda sem pagamento confirmado pelo fornecedor.')
+    return ('yellow', 'Em confirmação', 'A aguardar confirmação do fornecedor; ainda não conta como venda paga.')
 
 
 def date_filters(query):
@@ -101,6 +123,9 @@ def init_reports(bp, admin_required, write_sheet):
         attention = EmailDelivery.query.filter(
             EmailDelivery.status.in_(("failed", "review"))
         ).count()
+        recent = Order.query.order_by(Order.created_at.desc(), Order.id.desc()).limit(5).all()
+        payments = {p.order_id: p for p in PaymentCheckout.query.filter(
+            PaymentCheckout.order_id.in_([o.id for o in recent])).all()}
         return render_template(
             "admin/dashboard.html",
             paid_orders=total[0],
@@ -110,9 +135,8 @@ def init_reports(bp, admin_required, write_sheet):
             comps=comps,
             pending=pending,
             attention=attention,
-            recent=Order.query.order_by(Order.created_at.desc(), Order.id.desc())
-            .limit(5)
-            .all(),
+            recent=recent,
+            order_indicators={o.id: recent_order_indicator(o, payments.get(o.id)) for o in recent},
         )
 
     @bp.route("/sales")
