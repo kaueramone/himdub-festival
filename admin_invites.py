@@ -40,6 +40,8 @@ def init_invites(bp, admin_required):
                 410,
                 description="Este convite expirou, foi utilizado ou foi revogado. Pede um novo convite à organização.",
             )
+        if row.role not in ("admin", "checkin"):
+            abort(410, description="Categoria de acesso inválida. Pede um novo convite.")
         issuer = (
             AdminUser.query.filter_by(id=row.created_by).with_for_update().first()
             if lock
@@ -57,6 +59,9 @@ def init_invites(bp, admin_required):
             if not session.get("user_id"):
                 abort(403)
             email = request.form.get("email", "").strip().lower()
+            role = request.form.get("role", "admin")
+            if role not in ("admin", "checkin"):
+                abort(400, description="Escolhe Administrador ou Staff — Check-in.")
             if email and (
                 len(email) > 180 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email)
             ):
@@ -67,6 +72,7 @@ def init_invites(bp, admin_required):
                 token_hash=hashlib.sha256(token.encode()).hexdigest(),
                 created_by=session["user_id"],
                 email=email,
+                role=role,
                 expires_at=datetime.utcnow() + timedelta(hours=24),
             )
             db.session.add(invitation)
@@ -170,7 +176,7 @@ def init_invites(bp, admin_required):
                     user = AdminUser(
                         email=enrollment.email,
                         password_hash=enrollment.password_hash,
-                        role="admin",
+                        role=invite.role,
                         totp_secret=enrollment.totp_secret,
                         totp_last_counter=counter,
                     )
@@ -195,10 +201,10 @@ def init_invites(bp, admin_required):
                         is_admin=True,
                         user_id=user.id,
                         session_version=user.session_version,
-                        admin_role="admin",
+                        admin_role=user.role,
                         admin_name=user.email,
                     )
-                    return redirect(url_for("admin.dashboard"))
+                    return redirect(url_for("checkin.scan" if user.role == "checkin" else "admin.dashboard"))
             else:
                 email = request.form.get("email", "").strip().lower()
                 password = request.form.get("password", "")

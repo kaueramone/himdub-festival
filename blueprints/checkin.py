@@ -9,7 +9,8 @@ from datetime import datetime
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, abort, current_app
 from extensions import db
-from models import Ticket, Order
+from models import Ticket, Order, AuditEvent
+import re
 from sqlalchemy.exc import IntegrityError
 from blueprints.admin import login_required
 from festival_time import to_local_time
@@ -24,6 +25,11 @@ def scan():
     static/js/checkin.js). Ao ler um código com sucesso, navega para
     /checkin/<code> automaticamente.
     """
+    code = request.args.get("code", "").strip().upper()
+    if code:
+        if re.fullmatch(r"[A-Z0-9]{4,60}", code):
+            return redirect(url_for("checkin.ticket_detail", code=code))
+        flash("Introduz apenas o código do bilhete, sem espaços ou ligações.", "error")
     return render_template("checkin/scan.html")
 
 
@@ -42,7 +48,7 @@ def ticket_detail(code):
     if not current_app.config.get("PRODUCTION"):
         allowed.add("demo-paid")
     if order.status not in allowed:
-        abort(403, description="Este bilhete não tem uma entrada válida.")
+        return render_template("checkin/invalid.html"), 403
 
     if request.method == "POST":
         wristband_code = request.form.get("wristband_code", "").strip()
@@ -70,13 +76,15 @@ def ticket_detail(code):
                 f"Este bilhete já tinha feito check-in às "
                 f"{to_local_time(ticket.checked_in_at).strftime('%H:%M')}, associado à pulseira "
                 f"{ticket.wristband_code}. Não foi alterado nada -- se for mesmo "
-                f"preciso corrigir, confirma a caixa no formulário abaixo.",
+                f"preciso corrigir, pede a intervenção de um administrador.",
                 "error",
             )
         else:
             ticket.wristband_code = wristband_code
             ticket.checked_in_at = datetime.utcnow()
             ticket.checked_in_by = session.get("admin_name", "porteiro")
+            db.session.add(AuditEvent(actor=ticket.checked_in_by,
+                action="checkin_corrected" if already_checked_in else "checkin_completed", target=str(ticket.id)))
             if already_checked_in:
                 current_app.logger.warning("Check-in correction ticket=%s operator=%s reason=%s", ticket.id, ticket.checked_in_by, request.form.get("override_reason", "")[:200])
             try:

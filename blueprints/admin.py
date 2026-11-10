@@ -71,6 +71,8 @@ def login_required(view):
     def wrapped(*args, **kwargs):
         if not session_valid():
             return redirect(url_for("admin.login", next=request.path))
+        if session.get("admin_role") not in (ROLE_ADMIN, ROLE_CHECKIN):
+            abort(403)
         return view(*args, **kwargs)
     return wrapped
 

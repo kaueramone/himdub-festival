@@ -31,7 +31,7 @@ from i18n import (
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    asset_files=['js/main.js','js/admin.js','js/gallery.js','js/admin_tickets.js','css/admin.css','css/managed.css']
+    asset_files=['js/checkin.js','js/checkin_connection.js','js/main.js','js/admin.js','js/gallery.js','js/admin_tickets.js','css/admin.css','css/managed.css']
     app.jinja_env.globals['asset_version']=hashlib.sha256(b''.join(
         (Path(app.static_folder)/name).read_bytes() for name in asset_files)).hexdigest()[:12]
     from security import init_security

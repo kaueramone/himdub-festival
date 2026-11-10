@@ -11,6 +11,8 @@
 
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   let scanning = true;
+  let cameraStream = null;
+  const retry = document.getElementById("retryCamera");
 
   function setStatus(text) {
     if (statusEl) statusEl.textContent = text;
@@ -21,17 +23,33 @@
     return;
   }
 
-  navigator.mediaDevices
+  function startCamera() {
+    if (retry) retry.hidden = true;
+    setStatus("A iniciar câmara…");
+    navigator.mediaDevices
     .getUserMedia({ video: { facingMode: "environment" } })
     .then((stream) => {
+      cameraStream = stream;
       video.srcObject = stream;
-      video.play();
+      video.play().catch(() => setStatus("Toca no vídeo para iniciar a imagem ou introduz o código manualmente."));
       setStatus("A ler…");
       requestAnimationFrame(tick);
     })
     .catch((err) => {
       setStatus("Não foi possível aceder à câmara (" + err.message + "). Confirma que deste permissão ao browser para usar a câmara.");
+      if (retry) retry.hidden = false;
     });
+  }
+  if (retry) retry.addEventListener("click", startCamera);
+  video.addEventListener("click", () => video.play().catch(() => {}));
+  window.addEventListener("pagehide", () => {
+    scanning = false;
+    if (cameraStream) cameraStream.getTracks().forEach((track) => track.stop());
+  });
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) window.location.reload();
+  });
+  startCamera();
 
   function tick() {
     if (!scanning) return;

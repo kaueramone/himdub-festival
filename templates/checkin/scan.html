@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "checkin/base.html" %}
 {% block title %}Scanner de bilhetes — Admin{% endblock %}
 
 {% block content %}
@@ -15,8 +15,10 @@
       <div class="scanner-frame"></div>
     </div>
 
-    <p id="scannerStatus" class="scanner-status">A iniciar câmara…</p>
+    <p id="scannerStatus" class="scanner-status" role="status" aria-live="polite">A iniciar câmara…</p>
 
+    <button type="button" id="retryCamera" class="btn btn--outline" hidden>Voltar a tentar a câmara</button>
+    <form method="get" action="{{ url_for('checkin.scan') }}" class="app-form checkin-manual"><label for="manualCode">Sem câmara? Introduz o código do bilhete<input id="manualCode" name="code" maxlength="60" pattern="[A-Za-z0-9]{4,60}" autocomplete="off" autocapitalize="characters" spellcheck="false" required placeholder="Código junto ao QR"></label><button class="btn btn--primary">Consultar bilhete</button></form>
     <div class="admin-filters" data-reveal style="margin-top:20px;">
       {% if session.get('admin_role') == 'admin' %}
         <a href="{{ url_for('admin.orders') }}">← Voltar às encomendas</a>
@@ -28,6 +30,6 @@
 </section>
 
 <script src="{{ url_for('static', filename='js/jsqr.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/checkin.js') }}"></script>
+<script src="{{ url_for('static', filename='js/checkin.js',v=asset_version) }}"></script>
 
 {% endblock %}

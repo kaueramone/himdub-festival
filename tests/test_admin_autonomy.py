@@ -168,6 +168,67 @@ class AdminAutonomyTests(unittest.TestCase):
             self.assertIn("/checkin", response.location)
         self.assertEqual(AdminInvite.query.count(), 0)
 
+    def test_staff_invitation_cannot_escalate_role_and_redirects_to_checkin(self):
+        self.login()
+        response = self.post('/admin/team', {'email':'gate@example.invalid','role':'checkin'})
+        token = re.search(r'/admin/join/([A-Za-z0-9_-]{43})', response.get_data(as_text=True))[1]
+        self.assertEqual(AdminInvite.query.one().role, 'checkin')
+        guest = self.app.test_client()
+        self.post('/admin/join/'+token, {'email':'gate@example.invalid',
+            'password':'staff-password-test-123','password_confirm':'staff-password-test-123',
+            'role':'admin'}, guest)
+        enrollment = AdminEnrollment.query.one()
+        response = self.post('/admin/join/'+token,
+            {'step':'verify','totp':code(enrollment.totp_secret),'role':'admin'}, guest)
+        self.assertTrue(response.location.endswith('/checkin/scan'))
+        user = AdminUser.query.filter_by(email='gate@example.invalid').one()
+        self.assertEqual(user.role, 'checkin')
+        self.assertTrue(user.totp_secret)
+        for path in ('/admin/team','/admin/orders','/admin/export-excel','/admin/payments','/admin/dashboard'):
+            response = guest.get(path)
+            self.assertIn(response.status_code, (302, 404))
+            if response.status_code == 302:
+                self.assertIn('/checkin/scan', response.location)
+        user.active = False
+        user.session_version += 1
+        db.session.commit()
+        self.assertIn('/admin/login', guest.get('/checkin/scan').location)
+
+    def test_staff_checkin_manual_entry_duplicate_and_override_protection(self):
+        from ticketing import generate_tickets_for_order
+        from models import AuditEvent
+        self.login(role='checkin')
+        order = self.order('paid')
+        generate_tickets_for_order(order)
+        ticket = order.tickets[0]
+        response = self.client.get('/checkin/scan?code='+ticket.code.lower())
+        self.assertTrue(response.location.endswith('/'+ticket.code))
+        page = self.client.get(response.location).get_data(as_text=True)
+        self.assertIn('entrada por confirmar', page)
+        self.assertNotIn(order.email, page)
+        self.assertNotIn('Corrigir pulseira', page)
+        self.assertEqual(self.post('/checkin/'+ticket.code, {'wristband_code':'STAFF-TEST-001'}).status_code,302)
+        db.session.refresh(ticket)
+        first_time = ticket.checked_in_at
+        self.assertTrue(first_time)
+        self.assertEqual(ticket.checked_in_by, 'checkin@example.invalid')
+        self.post('/checkin/'+ticket.code, {'wristband_code':'STAFF-TEST-002'})
+        db.session.refresh(ticket)
+        self.assertEqual(ticket.wristband_code,'STAFF-TEST-001')
+        self.assertEqual(ticket.checked_in_at,first_time)
+        self.assertEqual(self.post('/checkin/'+ticket.code,
+            {'wristband_code':'STAFF-TEST-002','confirm_override':'yes','override_reason':'attempt'}).status_code,403)
+        self.assertEqual(AuditEvent.query.filter_by(action='checkin_completed').count(),1)
+        order.status='refunded'
+        db.session.commit()
+        self.assertEqual(self.client.get('/checkin/'+ticket.code).status_code,403)
+        self.assertEqual(self.post('/checkin/'+ticket.code,{'wristband_code':'STAFF-TEST-003'}).status_code,403)
+
+    def test_invite_rejects_unknown_role(self):
+        self.login()
+        self.assertEqual(self.post('/admin/team',{'role':'owner'}).status_code,400)
+        self.assertEqual(AdminInvite.query.count(),0)
+
     def test_dashboard_shell_and_all_admin_routes_render(self):
         self.login()
         for path in (

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "checkin/base.html" %}
 {% block title %}Bilhete {{ ticket.code }} — Check-in{% endblock %}
 
 {% block content %}
@@ -19,7 +19,7 @@
       <div class="notice-box notice-box--danger" data-reveal>
         ⚠️ <strong>Bilhete já usado.</strong> Fez check-in em {{ (ticket.checked_in_at | local_time).strftime("%d/%m/%Y %H:%M") }},
         associado à pulseira <strong>{{ ticket.wristband_code }}</strong>. Não voltes a dar entrada com este
-        código -- se a pessoa que está à tua frente não tem essa pulseira, não é o dono deste bilhete.
+        código. Confere a pulseira e encaminha qualquer divergência para um administrador.
       </div>
 
       {% if session.get("admin_role") == "admin" %}
@@ -29,7 +29,7 @@
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="field">
             <label for="wristband_code">Número da pulseira (GoFun)</label>
-            <input type="text" id="wristband_code" name="wristband_code" required value="{{ ticket.wristband_code }}">
+            <input type="text" id="wristband_code" name="wristband_code" maxlength="60" required value="{{ ticket.wristband_code }}">
           </div>
           <label>Justificação <input name="override_reason" maxlength="200" required></label>
           <label class="checkin-override__confirm">
@@ -41,11 +41,12 @@
       </details>
       {% endif %}
     {% else %}
+      <div class="app-notice checkin-valid"><strong>Bilhete válido — entrada por confirmar</strong><br>Confere o titular e associa a pulseira antes de confirmar.</div>
       <form method="post" class="checkout-form" data-reveal style="max-width:360px;">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="field">
           <label for="wristband_code">Número da pulseira (GoFun)</label>
-          <input type="text" id="wristband_code" name="wristband_code" autofocus required value="{{ ticket.wristband_code }}">
+          <input type="text" id="wristband_code" name="wristband_code" maxlength="60" autocomplete="off" autofocus required value="{{ ticket.wristband_code }}">
         </div>
         <button type="submit" class="btn btn--primary btn--lg">Confirmar entrada</button>
       </form>

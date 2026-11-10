@@ -26,6 +26,7 @@ def run(app):
     with app.app_context():
         inspector = inspect(db.engine)
         with db.engine.connect() as conn:
+            _ensure_column(conn, inspector, "admin_invites", "role", "VARCHAR(20) NOT NULL DEFAULT 'admin'")
             _ensure_column(conn, inspector, "orders", "reservation_expires_at", "TIMESTAMP")
             _ensure_column(conn, inspector, "tickets", "product_slug", "VARCHAR(120) DEFAULT ''")
             _ensure_column(conn, inspector, "tickets", "batch_tier", "INTEGER")

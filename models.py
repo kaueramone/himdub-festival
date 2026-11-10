@@ -216,6 +216,7 @@ class AdminInvite(db.Model):
     token_hash = db.Column(db.String(64), unique=True, nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey("admin_users.id"), nullable=False)
     email = db.Column(db.String(180), default="")
+    role = db.Column(db.String(20), nullable=False, default="admin")
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
     used_at = db.Column(db.DateTime)

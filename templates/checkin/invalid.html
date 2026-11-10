@@ -1,0 +1,1 @@
+{% extends 'checkin/base.html' %}{% block content %}<section class="app-card"><h1>Entrada não autorizada</h1><p class="app-notice error" role="alert">Este bilhete não tem um pagamento ou uma entrada válida. Não confirmes a entrada. Encaminha para um administrador.</p><a class="app-checkin-button" href="{{ url_for('checkin.scan') }}">Ler outro bilhete</a></section>{% endblock %}
