@@ -43,7 +43,7 @@
         <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
         <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
         <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
-        <a href="{{ url_for('main.gallery') }}">{{ _('Galeria') }}</a>
+        <a href="{{ url_for('main.gallery') }}">{{ _('Gallery') }}</a>
         <a href="{{ url_for('customer.dashboard') }}">{{ _('A minha conta') }}</a>
         <div class="main-nav__dropdown">
           <button type="button" class="main-nav__dropdown-btn">{{ _('Infos') }} <span aria-hidden="true">▾</span></button>
@@ -84,7 +84,7 @@
     <a href="{{ url_for('shop.glamping') }}">{{ _('The Experience') }}</a>
     <a href="{{ url_for('shop.tickets') }}">{{ _('Tickets') }}</a>
     <a href="{{ url_for('main.participate') }}">{{ _('Participate') }}</a>
-    <a href="{{ url_for('main.gallery') }}">{{ _('Galeria') }}</a>
+    <a href="{{ url_for('main.gallery') }}">{{ _('Gallery') }}</a>
     <a href="{{ url_for('customer.dashboard') }}">{{ _('A minha conta') }}</a>
     <a href="{{ url_for('main.faq') }}">{{ _('FAQ') }}</a>
     <a href="{{ url_for('main.sustainability') }}">{{ _('Sustainability') }}</a>
@@ -93,7 +93,7 @@
     {% if request.blueprint in ('main', 'shop') %}
       <div class="lang-switch lang-switch--mobile">
         {% for code in languages %}
-          <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_names[code] }}</a>
+          <a href="{{ lang_url(code) }}" class="{{ 'is-active' if code == current_lang else '' }}">{{ language_labels[code] }}</a>
         {% endfor %}
       </div>
     {% endif %}

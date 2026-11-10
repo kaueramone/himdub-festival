@@ -47,7 +47,7 @@ def create_app():
 
     # /en/... e /fr/... perdem o prefixo antes de chegar ao Flask; o
     # português fica sem prefixo (/tickets, etc). Ver i18n.py.
-    app.wsgi_app = LanguagePrefixMiddleware(app.wsgi_app, ["en", "fr"])
+    app.wsgi_app = LanguagePrefixMiddleware(app.wsgi_app, [code for code in LANGUAGES if code != 'pt'])
 
     db.init_app(app)
     from cms import page_context
@@ -105,6 +105,9 @@ def create_app():
     @app.before_request
     def set_request_language():
         g.lang_code = request.environ.get("himdub.lang_code") or DEFAULT_LANGUAGE
+
+    from i18n import init_language_selection
+    init_language_selection(app)
 
     @app.before_request
     def enforce_coming_soon():
@@ -178,6 +181,9 @@ def create_app():
         """Apply additive schema changes after a verified backup."""
         db.create_all()
         run_migrations(app)
+
+    from auto_translation import init_translations
+    init_translations(app)
 
     if app.config["AUTO_MIGRATE"]:
         with app.app_context():

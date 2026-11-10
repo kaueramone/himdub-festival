@@ -219,10 +219,6 @@ def init_cms(bp, admin_required):
             block.title = title
             for field, limit in [
                 ("text", 10000),
-                ("title_en", 180),
-                ("title_fr", 180),
-                ("text_en", 10000),
-                ("text_fr", 10000),
                 ("link_label", 80),
             ]:
                 setattr(block, field, request.form.get(field, "").strip()[:limit])

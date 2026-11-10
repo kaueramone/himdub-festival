@@ -36,7 +36,9 @@ class PublicLegalPageTests(unittest.TestCase):
         response=self.client.get('/infos/rules')
         self.assertIn('&lt;script&gt;',response.text)
         self.assertNotIn('<script>injection()',response.text)
-        self.assertIn('Admission information',self.client.get('/en/infos/rules').text)
+        self.assertNotIn('Admission information',self.client.get('/en/infos/rules').text)
+        # Hidden legacy inputs are no longer accepted as manual translations.
+        self.assertNotIn('title_en',self.client.get(url).text)
         form.pop('published')
         self.assertEqual(self.post(url,form).status_code,302)
         self.assertNotIn('injection()',self.client.get('/infos/rules').text)

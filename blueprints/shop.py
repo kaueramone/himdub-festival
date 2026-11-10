@@ -13,7 +13,7 @@ from flask import (
     Blueprint, render_template, request, redirect, session, flash,
     jsonify, current_app, abort,
 )
-from flask_babel import gettext as _
+from auto_translation import gettext as _
 from extensions import db
 from models import Product, Order, OrderItem, encode_ticket_names
 from countries import COUNTRIES

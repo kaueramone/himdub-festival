@@ -4,7 +4,7 @@ import json
 import re
 import secrets
 from flask import abort, flash, redirect, render_template, request, url_for
-from flask_babel import gettext, force_locale
+from auto_translation import translate_public
 from content_catalog import DEFAULT_CONTENT
 from legal_content import LEGAL_DEFAULT_CONTENT
 from extensions import db
@@ -31,11 +31,6 @@ def page_items(page, *, admin=False):
             "sort_order": i * 10,
             **original,
         }
-        # Carry translations into the editor, preserving the site's existing catalogues.
-        for language in ("en", "fr"):
-            with force_locale(language):
-                item["title_" + language] = gettext(item["title"])
-                item["text_" + language] = gettext(item["text"])
         item.update(overrides.pop(original["key"], {}))
         items.append(item)
     items.extend(dict(data, key=key) for key, data in overrides.items())
@@ -46,8 +41,8 @@ def page_items(page, *, admin=False):
         items = [item for item in items if item.get("published")]
         for item in items:
             if language != "pt":
-                for field in ("title", "text"):
-                    item[field] = item.get(field + "_" + language) or item[field]
+                for field in ("title", "text", "link_label"):
+                    item[field] = translate_public(item.get(field, ''), language)
             if item.get("link_url", "").startswith("/") and language != "pt":
                 item["link_url"] = "/" + language + item["link_url"]
     return sorted(items, key=lambda item: (item["sort_order"], item["key"]))
@@ -87,10 +82,6 @@ def init_native_content(bp, admin_required):
             item["title"] = title
             for field, limit in (
                 ("text", 10000),
-                ("title_en", 180),
-                ("title_fr", 180),
-                ("text_en", 10000),
-                ("text_fr", 10000),
                 ("link_label", 80),
             ):
                 item[field] = request.form.get(field, "").strip()[:limit]

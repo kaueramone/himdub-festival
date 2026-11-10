@@ -17,6 +17,7 @@ _to_delete/
 *.sqlite3
 .pytest_cache/
 instance/
+.translation-work/
 *.db
 .idea/
 .DS_Store

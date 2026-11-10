@@ -1,0 +1,32 @@
+name: Build public translations
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17,47 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: public-editorial-translations
+  cancel-in-progress: false
+jobs:
+  translate:
+    if: github.repository == 'kaueramone/himdub-festival' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Check for published editorial changes
+        id: prepare
+        run: python scripts/build_public_translations.py prepare
+      - name: Build website language assets with LibreTranslate
+        if: steps.prepare.outputs.changed == 'true'
+        run: python scripts/build_public_translations.py build
+      - name: Publish only generated public translations
+        if: steps.prepare.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/build_public_translations.py publish

@@ -42,6 +42,7 @@ class PurchaseSecurityTests(unittest.TestCase):
         db.session.add(Product(id=2, slug="test-shirt", category="merch", name="Shirt", price_cents=1000, variants="S,M"))
         db.session.commit()
         self.client = self.app.test_client()
+        self.client.environ_base['HTTP_ACCEPT_LANGUAGE'] = 'pt-PT'
         self.http = patch("requests.sessions.Session.request", side_effect=AssertionError("External HTTP forbidden"))
         self.http.start()
         self.alerts = patch.object(shop, "_check_low_stock_alerts")

@@ -1,7 +1,7 @@
 """Paginas de conteudo do site (tudo o que nao e loja/carrinho)."""
 
 from flask import Blueprint, render_template, request, redirect, flash, abort
-from flask_babel import gettext as _
+from auto_translation import gettext as _
 from i18n import localized_url_for as url_for
 
 main_bp = Blueprint("main", __name__)

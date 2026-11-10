@@ -4,7 +4,7 @@
 
 Em Administração → Conteúdos, escolher Regras e normas, Privacidade,
 Termos e condições ou Cookies. Cada secção tem título, texto, ordem,
-traduções e a opção de publicação. É possível editar e duplicar secções.
+e a opção de publicação. É possível editar e duplicar secções.
 Os conteúdos legais fornecidos começam como **rascunho**. Abrir uma página
 pública não cria nem publica registos na base de dados.
 
@@ -32,16 +32,51 @@ para `/infos/rules`; o link das FAQ foi actualizado.
 
 ## Como funcionam as línguas
 
-Português usa o URL sem prefixo; inglês e francês usam `/en/` e `/fr/`.
-Flask-Babel carrega traduções manuais dos catálogos `.po`, compilados em `.mo`.
-Não existe serviço de tradução automática nem custo de API de tradução.
-Conteúdos editáveis têm campos próprios de inglês e francês; na ausência de
-uma tradução, aparece o português. Alterar o português não actualiza uma
-tradução antiga: é necessário revê-la. Administração e área de cliente
-mantêm a interface própria em português.
+Português usa o URL sem prefixo; inglês, francês e espanhol usam `/en/`,
+`/fr/` e `/es/`. Os botões são PT, EN, FR e ES. A escolha manual é guardada
+num cookie de preferência durante um ano e tem prioridade na próxima entrada.
 
-Os novos rótulos do rodapé e das páginas legais estão traduzidos. As minutas
-legais são fornecidas em português para validação, antes da tradução final.
+Na página inicial, sem preferência guardada, o país aproximado do IP é
+consultado localmente na base DB-IP Lite. Não é pedido GPS e o IP não é enviado
+para uma API de localização. Países sem idioma suportado usam inglês. Sem país
+disponível, usa-se o primeiro idioma do navegador se suportado, ou inglês.
+Localização por IP é aproximada e pode corresponder à localização de uma VPN.
+A base de países deve ser actualizada durante a manutenção.
+
+A Chloé escreve uma única versão do conteúdo. Os campos manuais de inglês e
+francês foram retirados de Conteúdos; os dados antigos são preservados.
+A tarefa «Build public translations» do GitHub verifica alterações de meia em
+meia hora e gera as versões EN, FR e ES com LibreTranslate. São traduzidos
+somente textos publicados e mensagens públicas do site. Rascunhos, encomendas,
+dados pessoais dos compradores, credenciais e ecrãs administrativos ficam fora.
+
+Os nomes de navegação e áreas de identidade inglesa estão protegidos em
+`translation_terms.py`: The Experience, Tickets, Participate, Dub Temple,
+River Station e os restantes termos dessa lista. São reconstruídos exactamente,
+sem passarem pelo motor. Textos explicativos são traduzidos normalmente.
+
+As traduções são guardadas na branch `site-translations`, que não activa deploys
+do website. O site actualiza a cópia em memória de cinco em cinco minutos.
+O conteúdo original é publicado imediatamente; as traduções podem levar mais
+de meia hora, consoante a fila e o tempo de processamento do GitHub. Uma alteração
+de texto nunca reutiliza a tradução de uma versão antiga desse texto.
+Durante uma falha conservam-se as traduções carregadas e os catálogos existentes.
+Na ausência da tradução pedida, tenta-se inglês e, em último recurso, o original.
+
+**Custo adicional configurado: zero.** Esta solução depende de o repositório
+continuar público e de usar apenas executores padrão gratuitos. Não cria um
+servidor, não usa uma API paga, não guarda modelos em caches ou artefactos do
+Actions e não activa executores de maiores dimensões. As tarefas têm um limite
+de 55 minutos. A gratuidade não significa capacidade ou disponibilidade ilimitada.
+Se o repositório passar a privado, o workflow recusa executar. As tarefas
+agendadas podem atrasar e o GitHub pode desactivá-las após 60 dias sem actividade
+no repositório público; nesse caso é necessário reactivá-las. Uma execução manual
+pode ser iniciada em GitHub → Actions → Build public translations → Run workflow.
+
+As traduções automáticas de regras, privacidade e termos devem ser revistas pela
+organização, tal como o texto de origem. A administração e a área de cliente
+mantêm a sua interface própria em português; os emails transaccionais existentes
+mantêm o seu mecanismo separado. Não é apresentada uma certificação RGPD.
 
 ## Referências utilizadas
 
@@ -52,3 +87,7 @@ legais são fornecidas em português para validação, antes da tradução final
 - Contratos à distância: https://diariodarepublica.pt/dr/detalhe/decreto-lei/24-2014-572450
 - Ícones locais: Simple Icons, CC0; atribuição em `templates/partials/icons/NOTICE.txt`.
 - Caveat é servido localmente; licença SIL OFL junto ao ficheiro em `static/fonts/`.
+
+- LibreTranslate: https://docs.libretranslate.com/
+- GitHub Actions gratuito: https://docs.github.com/en/billing/concepts/product-billing/github-actions
+- DB-IP Lite: https://db-ip.com/db/download/ip-to-country-lite

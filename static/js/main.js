@@ -461,6 +461,7 @@ function initSwipeHint(hero) {
     pt: "Desliza para navegar",
     en: "Swipe to navigate",
     fr: "Glissez pour naviguer",
+    es: "Desliza para navegar",
   };
   const label = LABELS[lang] || LABELS.pt;
 
@@ -622,7 +623,7 @@ function initCart() {
 
   function refreshDrawerLines() {
     if (!bodyEl) return;
-    fetch(window.location.origin + (["en", "fr"].includes(document.documentElement.lang) ? "/" + document.documentElement.lang : "") + "/cart/mini-fragment", { headers: { "X-Requested-With": "XMLHttpRequest" } })
+    fetch(window.location.origin + (["en", "fr", "es"].includes(document.documentElement.lang) ? "/" + document.documentElement.lang : "") + "/cart/mini-fragment", { headers: { "X-Requested-With": "XMLHttpRequest" } })
       .then((res) => (res.ok ? res.text() : null))
       .then((html) => { if (html) bodyEl.innerHTML = html; })
       .catch(() => {});

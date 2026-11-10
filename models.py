@@ -95,12 +95,9 @@ class Product(db.Model):
         return [v.strip() for v in self.variants.split(",") if v.strip()]
 
     def _localized(self, field):
-        lang = current_lang()
-        if lang != DEFAULT_LANGUAGE:
-            translated = getattr(self, f"{field}_{lang}", "") or ""
-            if translated.strip():
-                return translated
-        return getattr(self, field) or ""
+        from auto_translation import translate_public
+        return translate_public(getattr(self, field) or '',
+                                legacy=getattr(self, f'{field}_{current_lang()}', '') or '')
 
     def name_in(self, lang_code):
         """Como `_localized("name")`, mas para um idioma explícito em vez do
@@ -108,11 +105,9 @@ class Product(db.Model):
         de um pedido (ex: a partir do webhook do Stripe), onde não há
         sessão/idioma "atual" fiável (usa-se antes o idioma guardado na
         própria encomenda, `order.lang_code`)."""
-        if lang_code and lang_code != DEFAULT_LANGUAGE:
-            translated = getattr(self, f"name_{lang_code}", "") or ""
-            if translated.strip():
-                return translated
-        return self.name or ""
+        from auto_translation import translate_public
+        return translate_public(self.name or '', lang_code or DEFAULT_LANGUAGE,
+                                legacy=getattr(self, f'name_{lang_code}', '') or '')
 
     @property
     def localized_name(self):
