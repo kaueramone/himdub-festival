@@ -11,7 +11,7 @@ concurrency:
 jobs:
   discover:
     if: github.repository == 'kaueramone/himdub-festival' && github.event.repository.private == false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
       contents: write
@@ -22,6 +22,10 @@ jobs:
       - name: Check pending public galleries
         id: prepare
         run: python scripts/discover_public_galleries.py prepare
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        if: steps.prepare.outputs.changed == 'true'
+        with:
+          python-version: '3.13'
       - name: Install public gallery browser
         if: steps.prepare.outputs.changed == 'true'
         run: |

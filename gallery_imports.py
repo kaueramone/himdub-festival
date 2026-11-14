@@ -189,7 +189,7 @@ def process_import(app):
         identifier=job.id
         claimed=GalleryImport.query.filter_by(id=identifier).filter(
             or_(GalleryImport.lease_until.is_(None),GalleryImport.lease_until<now)).update(
-                {'lease_until':now+timedelta(minutes=10),'status':'running'},synchronize_session=False)
+                {'lease_until':now+timedelta(minutes=3),'status':'running'},synchronize_session=False)
         db.session.commit()
         if not claimed:
             return True
@@ -220,6 +220,7 @@ def process_import(app):
                     if not GalleryPhoto.query.filter_by(album_id=job.album_id,source_key=item['key']).first():
                         store_photo(job.album_id,fetch(item['url'],MAX_IMAGE),item['key'],item['name'])
                     job.processed+=1
+                    job.lease_until=datetime.utcnow()+timedelta(minutes=3)
                     db.session.commit()
                 job.status='complete' if job.processed==job.total else 'pending'
             elif ('.zip' in urlsplit(job.source_url).path.lower()
@@ -240,7 +241,7 @@ def process_import(app):
                             if not GalleryPhoto.query.filter_by(album_id=job.album_id,source_key=key).first():
                                 store_photo(job.album_id,z.read(item),key,item.filename)
                             job.processed=index+1
-                            job.lease_until=datetime.utcnow()+timedelta(minutes=10)
+                            job.lease_until=datetime.utcnow()+timedelta(minutes=3)
                             db.session.commit()
                 job.status='complete'
             else:
