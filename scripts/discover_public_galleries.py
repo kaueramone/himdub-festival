@@ -59,8 +59,12 @@ def discover():
                     errors.append(response.status)
             page.on('response',on_response)
             try:
-                page.goto(source['url'],wait_until='domcontentloaded',timeout=60000)
-                page.get_by_role('button',name=re.compile('view gallery',re.I)).click(timeout=15000)
+                response=page.goto(source['url'],wait_until='domcontentloaded',timeout=60000)
+                result['diagnostic']={'http_status':response.status if response else None,'page_title':page.title()}
+                if response and response.status>=400:raise ValueError('Public gallery refused access')
+                cover=page.get_by_text(re.compile(r'^view gallery$',re.I)).first
+                if cover.count() and cover.is_visible():cover.click(timeout=10000)
+                else:page.mouse.wheel(0,1000)
                 page.locator('li[data-id] img').first.wait_for(timeout=30000)
                 result['title']=page.locator('h1').first.inner_text()[:180]
                 business=page.locator('#business-link').first
@@ -114,7 +118,8 @@ def discover():
             except Exception as error:
                 # No CAPTCHA solvers, cookies, PIN guessing or downloads behind access restrictions.
                 result['error']=type(error).__name__
-                print('Public gallery requires attention:',type(error).__name__,flush=True)
+                result['diagnostic']={**result.get('diagnostic',{}),'message':str(error)[:1000]}
+                print('Public gallery requires attention:',result['diagnostic'],flush=True)
             finally:
                 context.close()
             (WORK/(source['key']+'.json')).write_text(json.dumps(result,ensure_ascii=False))
