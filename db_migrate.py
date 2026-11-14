@@ -26,6 +26,15 @@ def run(app):
     with app.app_context():
         inspector = inspect(db.engine)
         with db.engine.connect() as conn:
+            for column, ddl in [("photographer", "VARCHAR(180) DEFAULT ''"),
+                                ("photographer_url", "VARCHAR(500) DEFAULT ''"),
+                                ("source_url", "VARCHAR(500) DEFAULT ''"),
+                                ("legacy_block_id", "INTEGER"), ("deleted_at", "TIMESTAMP")]:
+                _ensure_column(conn, inspector, "gallery_albums", column, ddl)
+            _ensure_column(conn, inspector, "gallery_photos", "source_key", "VARCHAR(64)")
+            _ensure_column(conn, inspector, "gallery_photos", "photographer", "VARCHAR(180) DEFAULT ''")
+            conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_gallery_legacy_block ON gallery_albums (legacy_block_id)"))
+            conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_gallery_photo_source_idx ON gallery_photos (album_id, source_key)"))
             _ensure_column(conn, inspector, "admin_invites", "role", "VARCHAR(20) NOT NULL DEFAULT 'admin'")
             _ensure_column(conn, inspector, "orders", "reservation_expires_at", "TIMESTAMP")
             _ensure_column(conn, inspector, "tickets", "product_slug", "VARCHAR(120) DEFAULT ''")
@@ -59,3 +68,5 @@ def run(app):
                 if product:
                     ticket.product_slug = product.slug
             db.session.commit()
+        from gallery_imports import migrate_gallery_blocks
+        migrate_gallery_blocks()

@@ -322,6 +322,12 @@ class GalleryAlbum(db.Model):
     cover_url = db.Column(db.String(500), default="")
     published = db.Column(db.Boolean, default=False, nullable=False)
     sort_order = db.Column(db.Integer, default=0)
+    photographer = db.Column(db.String(180), default="")
+    photographer_url = db.Column(db.String(500), default="")
+    source_url = db.Column(db.String(500), default="")
+    legacy_block_id = db.Column(db.Integer, unique=True)
+    deleted_at = db.Column(db.DateTime)
+    imports = db.relationship("GalleryImport", backref="album", cascade="all, delete-orphan")
     photos = db.relationship("GalleryPhoto", backref="album", cascade="all, delete-orphan", order_by="GalleryPhoto.sort_order, GalleryPhoto.id")
 
 
@@ -332,6 +338,23 @@ class GalleryPhoto(db.Model):
     image_url = db.Column(db.String(500), nullable=False)
     caption = db.Column(db.String(255), default="")
     sort_order = db.Column(db.Integer, default=0)
+    source_key = db.Column(db.String(64))
+    photographer = db.Column(db.String(180), default="")
+    __table_args__ = (db.UniqueConstraint("album_id", "source_key", name="uq_gallery_photo_source"),)
+
+
+class GalleryImport(db.Model):
+    __tablename__ = "gallery_imports"
+    id = db.Column(db.Integer, primary_key=True)
+    album_id = db.Column(db.Integer, db.ForeignKey("gallery_albums.id"), nullable=False, index=True)
+    source_url = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(24), nullable=False, default="pending")
+    manifest = db.Column(db.Text, default="")
+    processed = db.Column(db.Integer, default=0, nullable=False)
+    total = db.Column(db.Integer, default=0, nullable=False)
+    last_error = db.Column(db.String(500), default="")
+    lease_until = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
 
 class NewsletterSubscriber(db.Model):

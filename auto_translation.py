@@ -82,7 +82,7 @@ def public_sources():
         sources.update((block.title, block.text, block.link_label))
     for product in Product.query.filter_by(is_active=True):
         sources.update((product.name, product.short_description, product.description))
-    for album in GalleryAlbum.query.filter_by(published=True):
+    for album in GalleryAlbum.query.filter_by(published=True,deleted_at=None):
         sources.update((album.title, album.description))
         sources.update(photo.caption for photo in album.photos)
     return sorted(text for text in sources if text and not is_fixed(text))

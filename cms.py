@@ -18,7 +18,7 @@ from flask import (
     url_for,
 )
 from extensions import db
-from models import PageAppearance, PageBlock, GalleryAlbum, GalleryPhoto, AuditEvent
+from models import PageAppearance, PageBlock, GalleryAlbum, GalleryPhoto, GalleryImport, AuditEvent
 
 PAGES = {
     "home": ("Página inicial", "/"),
@@ -146,6 +146,7 @@ def page_context():
         "page_settings": appearance,
         "native_content": page_items(key),
         "page_blocks": PageBlock.query.filter_by(page_key=key, published=True)
+        .filter(PageBlock.page_key != 'gallery')
         .order_by(PageBlock.sort_order, PageBlock.id)
         .all(),
     }
@@ -160,6 +161,8 @@ def init_cms(bp, admin_required):
     @admin_required
     def content():
         page = request.args.get("page", "experience")
+        if page == 'gallery':
+            return redirect(url_for('admin.gallery'))
         if page not in PAGES:
             abort(404)
         return render_template(
@@ -177,6 +180,8 @@ def init_cms(bp, admin_required):
     @admin_required
     def duplicate_block():
         original = db.get_or_404(PageBlock, request.form.get("id", type=int))
+        if original.page_key == 'gallery':
+            return redirect(url_for('admin.gallery'))
         fields = (
             "page_key",
             "title",
@@ -209,6 +214,9 @@ def init_cms(bp, admin_required):
         if identifier and not block:
             abort(404)
         page = block.page_key if block else request.values.get("page", "experience")
+        if page == 'gallery':
+            album = GalleryAlbum.query.filter_by(legacy_block_id=identifier).first() if identifier else None
+            return redirect(url_for('admin.edit_album',album_id=album.id) if album and not album.deleted_at else url_for('admin.gallery'))
         if page not in PAGES:
             abort(404)
         if request.method == "POST":
@@ -303,12 +311,16 @@ def init_cms(bp, admin_required):
     @admin_required
     def edit_album(album_id):
         album = db.get_or_404(GalleryAlbum, album_id)
+        if album.deleted_at:
+            return redirect(url_for('admin.gallery'))
         if request.method == "POST":
             title = request.form.get("title", "").strip()
             if not title or len(title) > 180:
                 abort(400, description="Indica o título do álbum.")
             album.title = title
             album.description = request.form.get("description", "")[:5000]
+            album.photographer = request.form.get('photographer','').strip()[:180]
+            album.photographer_url = safe_url(request.form.get('photographer_url',''))
             album.cover_url = image_input("cover_url", "cover")
             album.published = request.form.get("published") == "on"
             album.sort_order = max(
@@ -325,10 +337,61 @@ def init_cms(bp, admin_required):
             return redirect(url_for("admin.edit_album", album_id=album.id))
         return render_template("admin/edit_album.html", album=album)
 
+    @bp.post('/gallery/<int:album_id>/delete')
+    @admin_required
+    def delete_album(album_id):
+        from datetime import datetime
+        album=GalleryAlbum.query.filter_by(id=album_id).with_for_update().first_or_404()
+        album.deleted_at=datetime.utcnow()
+        album.published=False
+        GalleryImport.query.filter_by(album_id=album_id).filter(GalleryImport.status.in_(('pending','running'))).update({'status':'cancelled'})
+        audit('album_deleted',album_id)
+        db.session.commit()
+        flash('Álbum eliminado do website. Podes recuperá-lo na reciclagem; as fotografias foram preservadas.','success')
+        return redirect(url_for('admin.gallery'))
+
+    @bp.post('/gallery/<int:album_id>/restore')
+    @admin_required
+    def restore_album(album_id):
+        album=db.get_or_404(GalleryAlbum,album_id)
+        album.deleted_at=None
+        album.published=False
+        audit('album_restored',album_id)
+        db.session.commit()
+        flash('Álbum recuperado como rascunho.','success')
+        return redirect(url_for('admin.edit_album',album_id=album_id))
+
+    @bp.post('/gallery/<int:album_id>/import')
+    @admin_required
+    def import_album(album_id):
+        from gallery_imports import trusted_url, ImportProblem
+        album=GalleryAlbum.query.filter_by(id=album_id,deleted_at=None).with_for_update().first_or_404()
+        if GalleryImport.query.filter_by(album_id=album_id).filter(GalleryImport.status.in_(('pending','running'))).first():
+            flash('Já existe uma importação em curso neste álbum.','error')
+            return redirect(url_for('admin.edit_album',album_id=album_id))
+        source=request.form.get('source_url','').strip()
+        try:
+            trusted_url(source)
+        except (ImportProblem,OSError,ValueError):
+            abort(400,description='Usa uma pasta pública do Google Drive ou uma ligação oficial HTTPS de descarga da Pixieset.')
+        previous=GalleryImport.query.filter_by(album_id=album_id,source_url=source,status='failed').order_by(GalleryImport.id.desc()).first()
+        if previous:
+            previous.status='pending'
+            previous.last_error=''
+            previous.lease_until=None
+        else:
+            db.session.add(GalleryImport(album_id=album_id,source_url=source))
+        audit('album_import_requested',album_id)
+        db.session.commit()
+        flash('Importação iniciada em segundo plano. Podes sair desta página e consultar o progresso mais tarde.','success')
+        return redirect(url_for('admin.edit_album',album_id=album_id))
+
     @bp.route("/gallery/<int:album_id>/photos", methods=["POST"])
     @admin_required
     def add_photo(album_id):
         album = db.get_or_404(GalleryAlbum, album_id)
+        if album.deleted_at:
+            abort(404)
         files = [f for f in request.files.getlist("photos") if f.filename]
         if len(files) > 20:
             abort(400, description="Carrega até 20 fotografias de cada vez.")

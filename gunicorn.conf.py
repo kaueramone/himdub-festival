@@ -11,6 +11,8 @@ os.environ['HIMDUB_GUNICORN_WORKER_HOOKS'] = 'true'
 def post_worker_init(worker):
     from auto_translation import start_translation_worker
     start_translation_worker(worker.wsgi)
+    from gallery_imports import start_gallery_worker
+    start_gallery_worker(worker.wsgi)
 
 
 class PrivatePathLogger(Logger):

@@ -25,13 +25,13 @@ def legacy_rules():
 def gallery():
     from models import GalleryAlbum
     return render_template('gallery.html', album=None,
-        albums=GalleryAlbum.query.filter_by(published=True).order_by(GalleryAlbum.sort_order,GalleryAlbum.id.desc()).all())
+        albums=GalleryAlbum.query.filter_by(published=True,deleted_at=None).order_by(GalleryAlbum.sort_order,GalleryAlbum.id.desc()).all())
 
 
 @main_bp.route('/gallery/<int:album_id>')
 def gallery_album(album_id):
     from models import GalleryAlbum
-    album=GalleryAlbum.query.filter_by(id=album_id,published=True).first_or_404()
+    album=GalleryAlbum.query.filter_by(id=album_id,published=True,deleted_at=None).first_or_404()
     return render_template('gallery.html',album=album)
 
 # Fotos de cada área (ver templates/area_detail.html) -- ficheiros em

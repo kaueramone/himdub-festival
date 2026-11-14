@@ -73,3 +73,5 @@ body:not(.immersive-page) main>.section:first-child,body:not(.immersive-page) ma
   main input:not([type=checkbox]):not([type=radio]),main select,main textarea{font-size:16px;max-width:100%}
 }
 @media(max-width:640px){.customer-shell{padding:22px 18px}.customer-ticket-grid{grid-template-columns:1fr}.customer-nav{gap:7px;padding-bottom:28px}.customer-nav>a{padding:8px 11px;font-size:14px}.customer-nav form{margin-left:0}.customer-header img{width:104px}.customer-access{margin:28px auto!important}}
+
+.gallery-credit{display:block;font-family:var(--font-body);font-size:14px;line-height:1.5;margin-top:10px;overflow-wrap:anywhere}.gallery-credit a{text-decoration:underline;text-underline-offset:3px}
