@@ -36,6 +36,8 @@ def create_app():
         (Path(app.static_folder)/name).read_bytes() for name in asset_files)).hexdigest()[:12]
     from security import init_security
     init_security(app)
+    from gallery_imports import init_gallery_discovery
+    init_gallery_discovery(app)
     from auth import init_auth
     init_auth(app)
     if app.config["PRODUCTION"]:

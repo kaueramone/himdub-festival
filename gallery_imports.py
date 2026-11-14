@@ -41,6 +41,8 @@ def trusted_url(url):
     for result in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM):
         if not ipaddress.ip_address(result[4][0]).is_global:
             raise ImportProblem('O endereço não corresponde a um serviço público permitido.')
+    if host.endswith('.pixieset.com') and re.fullmatch(r'/[\w-]+',p.path) and not p.query and not p.fragment:
+        return url+'/'
     return url
 
 
@@ -179,7 +181,7 @@ def store_photo(album_id, raw, key, name):
 def process_import(app):
     with app.app_context():
         now=datetime.utcnow()
-        job=GalleryImport.query.filter(GalleryImport.status.in_(('pending','running')),
+        job=GalleryImport.query.filter(GalleryImport.status.in_(('pending','running','discovering')),
             or_(GalleryImport.lease_until.is_(None),GalleryImport.lease_until<now))\
             .order_by(GalleryImport.id).first()
         if not job:
@@ -195,9 +197,21 @@ def process_import(app):
         try:
             if job.album.deleted_at:
                 job.status='cancelled'
-            elif urlsplit(job.source_url).hostname == 'drive.google.com':
+            elif (urlsplit(job.source_url).hostname == 'drive.google.com'
+                    or (urlsplit(job.source_url).hostname or '').endswith('.pixieset.com')
+                    and re.fullmatch(r'/[\w-]+/',urlsplit(job.source_url).path)):
                 if not job.manifest:
-                    job.manifest=json.dumps(drive_manifest(job.source_url))
+                    if urlsplit(job.source_url).hostname == 'drive.google.com':
+                        entries=drive_manifest(job.source_url)
+                    else:
+                        entries=discovered_pixieset(job)
+                        if entries is None:
+                            job.status='discovering'
+                            job.lease_until=datetime.utcnow()+timedelta(seconds=60)
+                            job.last_error='A recolher as fotografias públicas. Este passo pode demorar alguns minutos.'
+                            db.session.commit()
+                            return True
+                    job.manifest=json.dumps(entries)
                     job.total=len(json.loads(job.manifest))
                     db.session.commit()
                 entries=json.loads(job.manifest)
@@ -257,3 +271,59 @@ def start_gallery_worker(app):
             except Exception as error:
                 app.logger.warning('Gallery import worker unavailable (%s)',type(error).__name__)
     threading.Thread(target=consume,name='gallery-import',daemon=True).start()
+
+
+def discovery_key(job):
+    return hashlib.sha256((str(job.id)+':'+str(job.created_at)+':'+job.source_url).encode()).hexdigest()
+
+
+def discovered_pixieset(job):
+    """Consume only validated public image manifests produced by our own workflow."""
+    url='https://raw.githubusercontent.com/kaueramone/himdub-festival/gallery-discovery/'+discovery_key(job)+'.json'
+    with requests.get(url,timeout=(5,20),stream=True,allow_redirects=False) as response:
+        if response.status_code==404:
+            return None
+        if response.status_code!=200:
+            raise ImportProblem('A recolha está temporariamente indisponível. Tenta retomar mais tarde.')
+        raw=bytearray()
+        for chunk in response.iter_content(65536):
+            raw.extend(chunk)
+            if len(raw)>4*1024*1024:
+                raise ImportProblem('Lista de fotografias demasiado grande.')
+    document=json.loads(raw)
+    if document.get('source')!=job.source_url or document.get('version')!=1:
+        raise ImportProblem('A lista recebida não corresponde a este álbum.')
+    if document.get('error'):
+        raise ImportProblem('Não foi possível recolher automaticamente esta galeria pública. Confirma que não exige login ou PIN e tenta novamente.')
+    photos=document.get('photos')
+    if not isinstance(photos,list) or not 0<len(photos)<=MAX_PHOTOS:
+        raise ImportProblem('A galeria não apresentou fotografias públicas importáveis.')
+    entries=[]
+    for photo in photos:
+        p=urlsplit(photo['url'])
+        if p.scheme!='https' or p.hostname!='images.pixieset.com' or p.username or p.password or p.port not in (None,443):
+            raise ImportProblem('A galeria apresentou uma origem de imagem não permitida.')
+        entries.append({'url':photo['url'],'name':str(photo.get('name',''))[:255],
+            'key':hashlib.sha256(('pixieset:'+str(photo['id'])).encode()).hexdigest()})
+    if len({e['key'] for e in entries})!=len(entries):
+        raise ImportProblem('A lista da galeria contém fotografias repetidas.')
+    if not job.album.photographer and document.get('photographer'):
+        job.album.photographer=str(document['photographer'])[:180]
+    if job.album.title=='Álbum importado' and document.get('title'):
+        job.album.title=str(document['title'])[:180]
+    return entries
+
+
+def init_gallery_discovery(app):
+    @app.get('/gallery-import-sources.json')
+    def gallery_import_sources():
+        # Public collection links only, no ZIP capabilities, PINs, buyer data or editorial text.
+        sources=[]
+        for job in GalleryImport.query.join(GalleryAlbum).filter(
+                GalleryAlbum.deleted_at.is_(None),GalleryImport.manifest=='',
+                GalleryImport.status.in_(('pending','running','discovering'))).order_by(GalleryImport.id).limit(100):
+            p=urlsplit(job.source_url)
+            if (p.scheme=='https' and (p.hostname or '').endswith('.pixieset.com')
+                    and re.fullmatch(r'/[\w-]+/',p.path) and not p.query and not p.fragment):
+                sources.append({'key':discovery_key(job),'url':job.source_url})
+        return {'sources':sources[:10]},200,{'X-Robots-Tag':'noindex','Cache-Control':'no-store'}

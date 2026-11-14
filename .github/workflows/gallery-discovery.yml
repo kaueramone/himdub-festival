@@ -1,0 +1,37 @@
+name: Discover public gallery images
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '3,13,23,33,43,53 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: public-gallery-discovery
+  cancel-in-progress: false
+jobs:
+  discover:
+    if: github.repository == 'kaueramone/himdub-festival' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Check pending public galleries
+        id: prepare
+        run: python scripts/discover_public_galleries.py prepare
+      - name: Install public gallery browser
+        if: steps.prepare.outputs.changed == 'true'
+        run: |
+          pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Discover public images without credentials
+        if: steps.prepare.outputs.changed == 'true'
+        run: python scripts/discover_public_galleries.py discover
+      - name: Publish validated image manifests
+        if: steps.prepare.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/discover_public_galleries.py publish

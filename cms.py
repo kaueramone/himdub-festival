@@ -290,11 +290,22 @@ def init_cms(bp, admin_required):
     def gallery():
         if request.method == "POST":
             title = request.form.get("title", "").strip()
+            source=request.form.get('source_url','').strip()
+            if source:
+                from gallery_imports import trusted_url, ImportProblem
+                try:
+                    source=trusted_url(source)
+                except (ImportProblem,ValueError,OSError):
+                    abort(400,description='Usa a ligação de uma pasta pública Google Drive ou de uma galeria pública Pixieset.')
+                title=title or 'Álbum importado'
             if not title or len(title) > 180:
                 abort(400, description="Indica o título do álbum.")
-            album = GalleryAlbum(title=title)
+            album = GalleryAlbum(title=title,source_url=source,
+                photographer=request.form.get('photographer','').strip()[:180])
             db.session.add(album)
             db.session.flush()
+            if source:
+                db.session.add(GalleryImport(album_id=album.id,source_url=source))
             audit("album_created", album.id)
             db.session.commit()
             return redirect(url_for("admin.edit_album", album_id=album.id))
@@ -344,7 +355,7 @@ def init_cms(bp, admin_required):
         album=GalleryAlbum.query.filter_by(id=album_id).with_for_update().first_or_404()
         album.deleted_at=datetime.utcnow()
         album.published=False
-        GalleryImport.query.filter_by(album_id=album_id).filter(GalleryImport.status.in_(('pending','running'))).update({'status':'cancelled'})
+        GalleryImport.query.filter_by(album_id=album_id).filter(GalleryImport.status.in_(('pending','running','discovering'))).update({'status':'cancelled'})
         audit('album_deleted',album_id)
         db.session.commit()
         flash('Álbum eliminado do website. Podes recuperá-lo na reciclagem; as fotografias foram preservadas.','success')
@@ -366,16 +377,19 @@ def init_cms(bp, admin_required):
     def import_album(album_id):
         from gallery_imports import trusted_url, ImportProblem
         album=GalleryAlbum.query.filter_by(id=album_id,deleted_at=None).with_for_update().first_or_404()
-        if GalleryImport.query.filter_by(album_id=album_id).filter(GalleryImport.status.in_(('pending','running'))).first():
+        if GalleryImport.query.filter_by(album_id=album_id).filter(GalleryImport.status.in_(('pending','running','discovering'))).first():
             flash('Já existe uma importação em curso neste álbum.','error')
             return redirect(url_for('admin.edit_album',album_id=album_id))
         source=request.form.get('source_url','').strip()
         try:
-            trusted_url(source)
+            source=trusted_url(source)
         except (ImportProblem,OSError,ValueError):
             abort(400,description='Usa uma pasta pública do Google Drive ou uma ligação oficial HTTPS de descarga da Pixieset.')
         previous=GalleryImport.query.filter_by(album_id=album_id,source_url=source,status='failed').order_by(GalleryImport.id.desc()).first()
         if previous:
+            if not previous.manifest:
+                from datetime import datetime
+                previous.created_at=datetime.utcnow()
             previous.status='pending'
             previous.last_error=''
             previous.lease_until=None

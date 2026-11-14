@@ -59,6 +59,25 @@ class GalleryTests(unittest.TestCase):
         self.assertIsNone(album.deleted_at)
         self.assertEqual(GalleryImport.query.count(),0)
 
+    def test_one_link_creates_draft_and_public_discovery_feed_has_no_editorial_or_tokens(self):
+        self.login()
+        with patch('gallery_imports.socket.getaddrinfo',return_value=[(2,1,6,'',('8.8.8.8',443))]):
+            response=self.post('/admin/gallery',{'source_url':'https://example.pixieset.com/event','photographer':'@artist'})
+        self.assertEqual(response.status_code,302)
+        album=GalleryAlbum.query.one()
+        self.assertFalse(album.published)
+        self.assertEqual(album.title,'Álbum importado')
+        job=GalleryImport.query.one()
+        self.assertEqual(job.source_url,'https://example.pixieset.com/event/')
+        db.session.add(GalleryImport(album_id=album.id,source_url='https://example.pixieset.com/download/file/?filekey=private-token'))
+        db.session.commit()
+        response=self.client.get('/gallery-import-sources.json')
+        self.assertEqual(len(response.json['sources']),1)
+        self.assertNotIn(b'private-token',response.data)
+        self.assertNotIn(b'@artist',response.data)
+        self.assertNotIn(b'importado',response.data)
+        self.assertNotIn(b'album',self.client.get('/gallery').data.lower())
+
     def test_drive_lists_more_than_fifty_and_nested_folders_without_duplicates(self):
         folder='a'*25;child='b'*25
         listing=''.join('<a href="https://drive.google.com/file/d/'+str(i).zfill(25)+'/view">photo'+str(i)+'.jpg</a>' for i in range(75))
