@@ -95,7 +95,7 @@ def discover():
                 if sample_url.startswith('//'):sample_url='https:'+sample_url
                 first.click()
                 page.wait_for_timeout(1200)
-                large=page.locator('img').evaluate_all('els => els.filter(e=>e.getBoundingClientRect().width>0&&e.naturalWidth>=1000).map(e=>({url:e.currentSrc||e.src,width:e.naturalWidth})).sort((a,b)=>b.width-a.width)')
+                large=page.locator('img').evaluate_all('els => els.filter(e=>e.getBoundingClientRect().width>0&&Math.max(e.naturalWidth,e.naturalHeight)>=1000).map(e=>({url:e.currentSrc||e.src,width:Math.max(e.naturalWidth,e.naturalHeight)})).sort((a,b)=>b.width-a.width)')
                 if large:
                     base=re.sub(r'-[a-z0-9]+\.(?:jpg|jpeg|png|webp)$','',sample_url,flags=re.I)
                     enlarged=next((p['url'] for p in large if p['url'].startswith(base+'-')),None)
