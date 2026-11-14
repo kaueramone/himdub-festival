@@ -154,6 +154,9 @@ def store_photo(album_id, raw, key, name):
             credit = str(image.getexif().get(315) or image.getexif().get(33432) or '')[:180].strip()
             if image.width*image.height > 50_000_000:
                 raise ImportProblem('Fotografia demasiado grande. Reduz para até 50 megapíxeis.')
+            # Decode JPEG originals at web resolution rather than allocating several
+            # full-size RGB copies on the 512 MB production service.
+            image.draft('RGB',(2400,2400))
             image.load()
             # Re-encode upstream originals first, without retaining EXIF/GPS metadata.
             from PIL import ImageOps
@@ -295,6 +298,8 @@ def discovered_pixieset(job):
     if document.get('source')!=job.source_url or document.get('version')!=1:
         raise ImportProblem('A lista recebida não corresponde a este álbum.')
     if document.get('error'):
+        if (document.get('diagnostic') or {}).get('http_status')==403:
+            raise ImportProblem('A Pixieset bloqueou o acesso automático a esta galeria (HTTP 403). O álbum e os créditos foram preservados. A cópia das fotografias depende de uma origem que autorize a recolha; a galeria original continua acessível.')
         raise ImportProblem('Não foi possível recolher automaticamente esta galeria pública. Confirma que não exige login ou PIN e tenta novamente.')
     photos=document.get('photos')
     if not isinstance(photos,list) or not 0<len(photos)<=MAX_PHOTOS:

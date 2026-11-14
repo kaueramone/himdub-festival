@@ -35,7 +35,7 @@ jobs:
         if: steps.prepare.outputs.changed == 'true'
         run: python scripts/discover_public_galleries.py discover
       - name: Publish validated image manifests
-        if: steps.prepare.outputs.changed == 'true'
+        if: always() && steps.prepare.outputs.changed == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/discover_public_galleries.py publish

@@ -47,6 +47,7 @@ def prepare():
 def discover():
     from playwright.sync_api import sync_playwright
     sources=json.loads((WORK/'pending.json').read_text())
+    failures=0
     with sync_playwright() as browser_runtime:
         browser=browser_runtime.chromium.launch(headless=True)
         for source in sources:
@@ -117,6 +118,7 @@ def discover():
                 print('Discovered public photographs:',len(result['photos']),flush=True)
             except Exception as error:
                 # No CAPTCHA solvers, cookies, PIN guessing or downloads behind access restrictions.
+                failures+=1
                 result['error']=type(error).__name__
                 result['diagnostic']={**result.get('diagnostic',{}),'message':str(error)[:1000]}
                 print('Public gallery requires attention:',result['diagnostic'],flush=True)
@@ -124,6 +126,7 @@ def discover():
                 context.close()
             (WORK/(source['key']+'.json')).write_text(json.dumps(result,ensure_ascii=False))
         browser.close()
+    if failures:raise SystemExit('Public galleries blocked or incomplete: '+str(failures))
 
 
 def publish():
