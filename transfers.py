@@ -21,7 +21,7 @@ from flask import (
 from sqlalchemy.exc import IntegrityError
 from auth import check_login_throttle
 from extensions import db
-from models import TicketTransfer, Ticket, Order, Setting, AuditEvent
+from models import TicketTransfer, TransferCheckout, Ticket, Order, Setting, AuditEvent
 from website_jobs import enqueue
 
 
@@ -101,7 +101,11 @@ def lock_transfer(identifier):
 
 
 def refresh_expired_checkout(transfer):
-    """Release an abandoned request only after Stripe confirms expiration."""
+    """Release a request only after its original provider confirms expiration."""
+    if transfer.payment_provider == "teya":
+        from teya_transfers import refresh_transfer
+        refresh_transfer(transfer)
+        return
     if (
         transfer.status != "pending_payment"
         or not transfer.stripe_session_id
@@ -132,6 +136,8 @@ def handle_transfer_event(event_type, obj):
     if not transfer:
         return False
     transfer, ticket = lock_transfer(transfer.id)
+    if transfer.payment_provider != "stripe":
+        raise ValueError("Transfer provider mismatch")
     if transfer.stripe_session_id and transfer.stripe_session_id != obj.get("id"):
         raise ValueError("Transfer session mismatch")
     if event_type in (
@@ -167,12 +173,18 @@ def handle_transfer_event(event_type, obj):
     transfer.payment_intent = obj.get("payment_intent", "")
     if not transfer.new_email or not transfer.new_name:
         raise ValueError("Transfer not prepared")
-    # Stripe enforces checkout expiry. A delayed webhook must still complete
-    # a payment made within the checkout window that was agreed beforehand.
-    if not ticket_eligible(ticket, transfer):
+    return complete_transfer(transfer, ticket)
+
+
+def complete_transfer(transfer, ticket):
+    if not transfer.new_email or not transfer.new_name:
+        raise ValueError("Transfer not prepared")
+    # The provider confirms the payment server-side, including delayed callbacks.
+    if transfer.status != "pending_payment" or not ticket_eligible(ticket, transfer):
         transfer.status = "refund_pending"
         transfer.active_ticket_id = None
-        enqueue("transfer_refund", {"transfer_id": transfer.id}, transfer.id)
+        if transfer.payment_provider == "stripe":
+            enqueue("transfer_refund", {"transfer_id": transfer.id}, transfer.id)
         db.session.commit()
         return True
     old_code = ticket.code
@@ -307,6 +319,10 @@ def init_transfers(main, bp, admin_required):
             "transfer.html", rules=rules, available=available, transfer=None
         )
 
+    @main.get("/ticket-transfer/return")
+    def transfer_return():
+        return render_template("transfer_return.html")
+
     @main.route("/ticket-transfer/accept", methods=["GET", "POST"])
     def transfer_accept():
         token = request.values.get("token", "")
@@ -343,6 +359,10 @@ def init_transfers(main, bp, admin_required):
                     )
                 if request.form.get("accept_terms") != "yes":
                     abort(400, description="Confirma as condições da transferência.")
+                from teya_gateway import provider, ready
+                if provider() == "teya" and not ready():
+                    abort(503, description="Este meio de pagamento ainda não está disponível.")
+                transfer.payment_provider = provider()
                 transfer.new_name = name
                 transfer.new_email = email
                 transfer.status = "pending_payment"
@@ -350,6 +370,9 @@ def init_transfers(main, bp, admin_required):
                     datetime.utcnow() + timedelta(minutes=35), rules["deadline"]
                 )
                 db.session.commit()
+            if transfer.payment_provider == "teya":
+                from teya_transfers import start_transfer_checkout
+                return start_transfer_checkout(transfer)
             stripe.api_key = current_app.config["STRIPE_SECRET_KEY"]
             try:
                 checkout = stripe.checkout.Session.create(
@@ -440,10 +463,11 @@ def init_transfers(main, bp, admin_required):
             flash("Condições de transferência guardadas.", "success")
             return redirect(url_for("admin.transfers_admin"))
         rules = policy()
+        recent=TicketTransfer.query.order_by(TicketTransfer.created_at.desc()).limit(50).all()
+        payments=TransferCheckout.query.filter(TransferCheckout.transfer_id.in_([t.id for t in recent])).all() if recent else []
         return render_template(
             "admin/transfers.html",
             rules=rules,
-            recent=TicketTransfer.query.order_by(TicketTransfer.created_at.desc())
-            .limit(50)
-            .all(),
+            transfer_payments={p.transfer_id:p for p in payments},
+            recent=recent,
         )

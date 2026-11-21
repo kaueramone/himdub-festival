@@ -69,7 +69,12 @@ def lineup():
         {"name": "Workshops", "slug": "workshops", "desc": _("Artesanato, arte, DIY e muito mais.")},
         {"name": "Healing Area", "slug": "healing-area", "desc": _("Terapias, massagens, yoga e bem-estar geral.")},
     ]
-    return render_template("lineup.html", areas=areas)
+    from lineup import lineup_data
+    data=lineup_data()
+    originals={a['name']:a for a in areas}
+    areas=[dict(name=s.name,slug=s.slug if s.slug in AREA_DETAIL_IMAGES else None,
+        desc=s.description or originals.get(s.name,{}).get('desc','')) for s in data['lineup_stages']]
+    return render_template("lineup.html", areas=areas, **data)
 
 
 @main_bp.route("/line-up/<slug>")
@@ -129,8 +134,14 @@ def area_detail(slug):
             "Brianna Pastor",
         ),
     }
-    if slug not in names:
+    from models import LineupStage
+    from lineup import lineup_data
+    stage=LineupStage.query.filter_by(slug=slug).first()
+    if slug not in names or (stage and not stage.published):
         abort(404)
+    if stage:
+        names[slug]=stage.name
+        texts[slug]=stage.description or texts[slug]
     quote = quotes.get(slug)
     return render_template(
         "area_detail.html",
@@ -139,6 +150,7 @@ def area_detail(slug):
         images=AREA_DETAIL_IMAGES.get(slug, []),
         quote=quote[0] if quote else None,
         quote_author=quote[1] if quote else None,
+        **lineup_data(stage_slug=slug),
     )
 
 

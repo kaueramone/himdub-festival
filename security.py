@@ -37,7 +37,7 @@ def init_security(app):
     def protect_mutations():
         if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
             return
-        if request.path.startswith(('/admin/ticket-sales/', '/admin/content/edit', '/admin/content/original/edit', '/admin/appearance', '/admin/gallery/')):
+        if request.path.startswith(('/admin/ticket-sales/', '/admin/content/edit', '/admin/content/original/edit', '/admin/appearance', '/admin/gallery/', '/admin/lineup/')):
             request.max_content_length = 16 * 1024 * 1024
         # This endpoint authenticates the original payload with Stripe's signature.
         if request.endpoint in ("shop.stripe_webhook", "shop.teya_webhook"):

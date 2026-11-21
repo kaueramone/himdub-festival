@@ -85,6 +85,14 @@ def public_sources():
     for album in GalleryAlbum.query.filter_by(published=True,deleted_at=None):
         sources.update((album.title, album.description))
         sources.update(photo.caption for photo in album.photos)
+    from lineup import lineup_data
+    lineup = lineup_data()
+    for artist in lineup['lineup_artists']:
+        sources.add(artist.biography)
+    for phase in lineup['lineup_phases']:
+        sources.update((phase.title,phase.description))
+    for stage in lineup['lineup_stages']:
+        sources.add(stage.description)
     return sorted(text for text in sources if text and not is_fixed(text))
 
 

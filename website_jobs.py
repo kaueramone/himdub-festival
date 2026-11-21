@@ -77,6 +77,7 @@ def process_website_jobs(app, limit=5):
                     transfer = db.session.get(TicketTransfer, payload["transfer_id"])
                     if (
                         not transfer
+                        or transfer.payment_provider != "stripe"
                         or transfer.status != "refund_pending"
                         or not transfer.payment_intent
                     ):

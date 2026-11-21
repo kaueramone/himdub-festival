@@ -225,6 +225,8 @@ def reconcile(payment_id, webhook=None):
 
 
 def reconcile_pending(app, limit=3):
+    from teya_transfers import reconcile_pending as reconcile_transfers
+    reconcile_transfers(app, limit)
     with app.app_context():
         if not configured():
             return
@@ -275,10 +277,16 @@ def init_teya(bp):
         if not isinstance(data,dict):
             return '',400
         payment=PaymentCheckout.query.filter_by(reference=data.get('merchant_reference'),provider='teya').first()
-        if not payment:
-            return '',200  # Other payment links/terminal payments are not website orders.
+        from models import TransferCheckout
+        transfer_payment = TransferCheckout.query.filter_by(reference=data.get('merchant_reference')).first() if not payment else None
+        if not payment and not transfer_payment:
+            return '',200  # Ignore payments unrelated to this website.
         try:
-            reconcile(payment.id,webhook=data)
+            if transfer_payment:
+                from teya_transfers import reconcile as reconcile_transfer
+                reconcile_transfer(transfer_payment.id, webhook=data)
+            else:
+                reconcile(payment.id,webhook=data)
         except ValueError:
             db.session.rollback()
             current_app.logger.warning('Teya payment/order mismatch rejected')

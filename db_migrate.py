@@ -26,6 +26,7 @@ def run(app):
     with app.app_context():
         inspector = inspect(db.engine)
         with db.engine.connect() as conn:
+            _ensure_column(conn, inspector, "ticket_transfers", "payment_provider", "VARCHAR(20) NOT NULL DEFAULT 'stripe'")
             for column, ddl in [("photographer", "VARCHAR(180) DEFAULT ''"),
                                 ("photographer_url", "VARCHAR(500) DEFAULT ''"),
                                 ("source_url", "VARCHAR(500) DEFAULT ''"),
@@ -70,3 +71,10 @@ def run(app):
             db.session.commit()
         from gallery_imports import migrate_gallery_blocks
         migrate_gallery_blocks()
+
+        from models import LineupStage
+        from lineup import DEFAULT_STAGES
+        if not LineupStage.query.first():
+            for index, (slug, name) in enumerate(DEFAULT_STAGES):
+                db.session.add(LineupStage(slug=slug, name=name, sort_order=index*10))
+            db.session.commit()

@@ -400,9 +400,26 @@ class TicketTransfer(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
     checkout_expires_at = db.Column(db.DateTime)
+    payment_provider = db.Column(db.String(20), default="stripe", nullable=False)
     stripe_session_id = db.Column(db.String(255), unique=True, nullable=True)
     payment_intent = db.Column(db.String(255), default="")
     completed_at = db.Column(db.DateTime)
+
+
+class TransferCheckout(db.Model):
+    """Durable Teya payment for a holder change, separate from ticket purchases."""
+    __tablename__ = "transfer_checkouts"
+    id = db.Column(db.String(40), primary_key=True)
+    transfer_id = db.Column(db.String(40), db.ForeignKey("ticket_transfers.id"), unique=True, nullable=False)
+    environment = db.Column(db.String(20), nullable=False)
+    store_id = db.Column(db.String(100), nullable=False)
+    reference = db.Column(db.String(150), unique=True, nullable=False)
+    session_id = db.Column(db.String(100), unique=True)
+    session_url = db.Column(db.Text, default="")
+    transaction_id = db.Column(db.String(100), default="")
+    status = db.Column(db.String(20), default="preparing", nullable=False)
+    next_check_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    last_error = db.Column(db.String(200), default="")
 
 
 class AuditEvent(db.Model):
@@ -594,3 +611,41 @@ class Setting(db.Model):
 
     key = db.Column(db.String(60), primary_key=True)
     value = db.Column(db.String(255), default="")
+
+
+class LineupStage(db.Model):
+    __tablename__ = "lineup_stages"
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.Text, default="")
+    sort_order = db.Column(db.Integer, default=0, nullable=False)
+    published = db.Column(db.Boolean, default=True, nullable=False)
+
+
+class LineupAnnouncement(db.Model):
+    __tablename__ = "lineup_announcements"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(180), nullable=False)
+    description = db.Column(db.Text, default="")
+    poster_url = db.Column(db.String(500), default="")
+    publish_at = db.Column(db.DateTime)
+    published = db.Column(db.Boolean, default=False, nullable=False)
+    sort_order = db.Column(db.Integer, default=0, nullable=False)
+
+
+class LineupArtist(db.Model):
+    __tablename__ = "lineup_artists"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(180), nullable=False)
+    country = db.Column(db.String(100), default="")
+    biography = db.Column(db.Text, default="")
+    image_url = db.Column(db.String(500), default="")
+    music_url = db.Column(db.String(500), default="")
+    stage_id = db.Column(db.Integer, db.ForeignKey("lineup_stages.id"), nullable=False, index=True)
+    announcement_id = db.Column(db.Integer, db.ForeignKey("lineup_announcements.id"), index=True)
+    published = db.Column(db.Boolean, default=False, nullable=False)
+    sort_order = db.Column(db.Integer, default=0, nullable=False)
+    deleted_at = db.Column(db.DateTime)
+    stage = db.relationship("LineupStage")
+    announcement = db.relationship("LineupAnnouncement")

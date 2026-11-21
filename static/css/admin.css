@@ -28,3 +28,5 @@
 .checkin-main .app-notice.success{border-color:#71d99b;background:#19382a;color:#d0ffdd}
 
 .app-notice progress{display:block;width:100%;height:12px;margin-top:12px;accent-color:var(--terracotta)}
+
+.lineup-admin-image{display:block;max-width:min(100%,320px);max-height:400px;object-fit:contain;border-radius:8px}
