@@ -80,3 +80,37 @@ A alteração de origem no Render deve acontecer depois da validação do novo
 repositório, mantendo a base de dados e as configurações do serviço existente.
 
 Ver [operação e sequência de migração](docs/OPERATIONS.md).
+
+
+### Público e comportamento
+
+Área exclusiva de administradores em `/admin/audience`, integrada na base de dados
+existente, sem serviço externo de analytics. Filtros de 7/30/90 dias ou datas
+personalizadas; dias em Portugal continental. A recolha começa após consentimento
+expresso, exclui equipa autenticada, bots identificados, DNT e GPC. Não reconstrói
+visitas anteriores nem representa quem recusa estatísticas.
+
+- Visita: 30 minutos de inactividade; navegador estimado por identificador aleatório
+  assinado, guardado sob hash (dados pseudónimos). Sem IP persistido, User-Agent
+  integral, URLs/query strings integrais, campos de formulários ou gravações.
+- Origem: primeira origem conhecida da visita; apenas domínio de referência e
+  etiquetas públicas de campanha filtradas. Nunca colocar nomes/emails em UTM.
+- Tempo: estimativa com página visível e actividade recente; heartbeat de 30 s,
+  limites de 200 páginas/visita, 30 min/página e 1000 eventos/hora por consentimento.
+- Funil: carrinho confirmado no servidor → encomenda criada/retomada → estado
+  `paid` real. Uma visita pode ter várias encomendas; conversão conta a visita
+  uma única vez. Compras demo e bilhetes oferecidos não são conversões.
+- Abandono: carrinho sem compra observada há 24h, sem falha conhecida nem pagamento
+  por verificar; não cancela encomendas nem liberta stock. Falha seguida de compra
+  na mesma visita conta como conversão. Vendas globais aparecem separadamente.
+- Retenção: 90 dias de navegação; limpeza horária no trabalhador existente e na
+  recolha. Comando operacional idempotente: `flask --app app audience-prune`.
+  Retirar consentimento elimina visitas/páginas/atribuição e mantém encomendas.
+  Preferência `himdub_statistics`: 180 dias; identificador `himdub_audience`:
+  90 dias; visita `himdub_visit`: 30 min. Cookies HttpOnly, SameSite=Lax e Secure
+  em produção. Preferências acessíveis no rodapé; textos PT/EN/FR/ES revistos.
+
+Novas tabelas aditivas criadas pelo `db-upgrade`: `audience_consents`,
+`audience_visits`, `audience_pages` e `audience_orders`. As falhas de atribuição
+estão isoladas por savepoint e não devem impedir compras. A navegação pública
+com grant/consentimento usa `private, no-store`; assets continuam em cache.

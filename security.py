@@ -35,6 +35,8 @@ def init_security(app):
 
     @app.before_request
     def protect_mutations():
+        if request.path.startswith('/audience/'):
+            request.max_content_length = 4096
         if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
             return
         if request.path.startswith(('/admin/ticket-sales/', '/admin/content/edit', '/admin/content/original/edit', '/admin/appearance', '/admin/gallery/', '/admin/lineup/')):

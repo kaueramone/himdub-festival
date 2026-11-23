@@ -30,6 +30,7 @@
       <a href="{{ url_for('main.legal_page',document='terms') }}">{{ _('Termos') }}</a>
       <a href="{{ url_for('main.legal_page',document='privacy') }}">{{ _('Privacidade') }}</a>
       <a href="{{ url_for('main.legal_page',document='cookies') }}">Cookies</a>
+      <button type="button" class="site-footer__cart-btn" data-audience-settings>{{ audience_copy.settings }}</button>
       <a href="{{ url_for('customer.dashboard') }}">{{ _('Área de cliente') }}</a>
       <button type="button" id="cartToggle" class="site-footer__cart-btn">{{ _('Carrinho') }}</button>
     </nav>

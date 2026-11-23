@@ -31,7 +31,7 @@ from i18n import (
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    asset_files=['js/checkin.js','js/checkin_connection.js','js/main.js','js/admin.js','js/gallery.js','js/admin_tickets.js','css/admin.css','css/managed.css']
+    asset_files=['js/checkin.js','js/checkin_connection.js','js/main.js','js/audience.js','js/admin.js','js/gallery.js','js/admin_tickets.js','css/admin.css','css/managed.css']
     app.jinja_env.globals['asset_version']=hashlib.sha256(b''.join(
         (Path(app.static_folder)/name).read_bytes() for name in asset_files)).hexdigest()[:12]
     from security import init_security
@@ -178,6 +178,9 @@ def create_app():
     app.register_blueprint(shop_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(checkin_bp)
+    from audience import audience_bp, init_audience
+    app.register_blueprint(audience_bp)
+    init_audience(app)
     from customer_portal import customer_bp
     app.register_blueprint(customer_bp)
 

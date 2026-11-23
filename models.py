@@ -165,6 +165,59 @@ class PaymentGatewayConfiguration(db.Model):
     revision = db.Column(db.Integer, nullable=False, default=0)
 
 
+class AudienceConsent(db.Model):
+    __tablename__ = 'audience_consents'
+    key = db.Column(db.String(64), primary_key=True)
+    granted_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False, index=True)
+    revoked_at = db.Column(db.DateTime)
+    version = db.Column(db.String(20), nullable=False, default='2026-11-v1')
+    event_window = db.Column(db.DateTime)
+    event_count = db.Column(db.Integer, nullable=False, default=0)
+
+
+class AudienceVisit(db.Model):
+    __tablename__ = 'audience_visits'
+    id = db.Column(db.String(36), primary_key=True)
+    visitor_key = db.Column(db.String(64), db.ForeignKey('audience_consents.key'), nullable=False, index=True)
+    started_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+    is_returning = db.Column(db.Boolean, nullable=False, default=False)
+    source = db.Column(db.String(100), nullable=False, default='Directo / desconhecido')
+    medium = db.Column(db.String(30), nullable=False, default='direct')
+    campaign = db.Column(db.String(60), nullable=False, default='')
+    country = db.Column(db.String(2), nullable=False, default='')
+    language = db.Column(db.String(5), nullable=False, default='en')
+    device = db.Column(db.String(20), nullable=False, default='Computador')
+    browser = db.Column(db.String(25), nullable=False, default='Outro')
+    entry_page = db.Column(db.String(40), nullable=False)
+    exit_page = db.Column(db.String(40), nullable=False)
+    page_views = db.Column(db.Integer, nullable=False, default=0)
+    active_seconds = db.Column(db.Integer, nullable=False, default=0)
+    cart_at = db.Column(db.DateTime)
+    checkout_at = db.Column(db.DateTime)
+    cart_cleared = db.Column(db.Boolean, nullable=False, default=False)
+    pages = db.relationship('AudiencePage', cascade='all, delete-orphan', passive_deletes=False)
+    orders = db.relationship('AudienceOrder', cascade='all, delete-orphan', passive_deletes=False)
+
+
+class AudiencePage(db.Model):
+    __tablename__ = 'audience_pages'
+    id = db.Column(db.String(64), primary_key=True)
+    visit_id = db.Column(db.String(36), db.ForeignKey('audience_visits.id'), nullable=False, index=True)
+    page = db.Column(db.String(40), nullable=False)
+    started_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    active_seconds = db.Column(db.Integer, nullable=False, default=0)
+    scroll_percent = db.Column(db.Integer, nullable=False, default=0)
+
+
+class AudienceOrder(db.Model):
+    __tablename__ = 'audience_orders'
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), primary_key=True)
+    visit_id = db.Column(db.String(36), db.ForeignKey('audience_visits.id'), nullable=False, index=True)
+    order = db.relationship('Order')
+
+
 class PaymentCheckout(db.Model):
     __tablename__ = "payment_checkouts"
     id = db.Column(db.String(36), primary_key=True)

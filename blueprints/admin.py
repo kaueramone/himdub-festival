@@ -823,3 +823,6 @@ init_payment_admin(admin_bp, admin_required)
 
 from lineup import init_lineup
 init_lineup(admin_bp, admin_required)
+
+from audience_reports import init_audience_admin
+init_audience_admin(admin_bp, admin_required)

@@ -1,0 +1,5 @@
+<section id="audienceConsent" class="audience-consent" aria-labelledby="audience-consent-title" hidden data-error="{{ audience_copy.error }}">
+  <div><p class="audience-consent__eyebrow">HIM DUB FESTIVAL</p><h2 id="audience-consent-title" tabindex="-1">{{ audience_copy.title }}</h2><p>{{ audience_copy.description }}</p><a href="{{ url_for('main.legal_page',document='cookies') }}#audience-privacy">{{ audience_copy.details }}</a></div>
+  <div class="audience-consent__actions"><button type="button" class="btn btn--outline" data-audience-choice="no">{{ audience_copy.reject }}</button><button type="button" class="btn btn--outline" data-audience-choice="yes">{{ audience_copy.accept }}</button></div>
+  <p role="status" aria-live="polite"></p>
+</section>

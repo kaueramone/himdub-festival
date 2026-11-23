@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{% block title %}HIM Dub Festival{% endblock %}</title>
   <meta name="description" content="{{ _('HIM Dub Festival — reggae, sound system e comunidade junto ao rio, em Sabugal, Portugal.') }}">
   <meta name="turbo-cache-control" content="no-cache"><meta name="turbo-prefetch" content="false">
   <script src="{{ url_for('static',filename='vendor/turbo.js') }}" defer data-turbo-track="reload"></script>
   <script src="{{ url_for('static',filename='js/main.js',v=asset_version) }}" defer data-turbo-track="reload"></script>
+  <script src="{{ url_for('static',filename='js/audience.js',v=asset_version) }}" defer data-turbo-track="reload"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/managed.css',v=asset_version) }}" data-turbo-track="reload">
   {% if page_settings and page_settings.mode!='original' %}<style data-turbo-track="dynamic">
     body.custom-page-bg::before { {% if page_settings.mode=='image' %}background:linear-gradient(#0008,#0009),url("{{ page_settings.image_url }}") center/cover no-repeat;{% elif page_settings.mode=='gradient' %}background:linear-gradient(135deg,{{ page_settings.color_start }},{{ page_settings.color_end }});{% else %}background:{{ page_settings.color_start }};{% endif %} }
   </style>{% endif %}
 {% include 'partials/_app_icons.html' %}</head>
-<body data-site-lang="{{ current_lang }}" class="{% block body_class %}{% endblock %} {{ 'custom-page-bg' if page_settings and page_settings.mode!='original' else '' }} {{ 'has-managed-content' if page_blocks else '' }}">
+<body data-site-lang="{{ current_lang }}" data-audience-choice="{{ audience_choice }}" data-audience-token="{{ audience_page_token }}" data-audience-collect="{{ url_for('audience.collect') }}" data-audience-consent="{{ url_for('audience.consent') }}" class="{% block body_class %}{% endblock %} {{ 'custom-page-bg' if page_settings and page_settings.mode!='original' else '' }} {{ 'has-managed-content' if page_blocks else '' }}">
   {% set is_immersive = 'immersive-page' in self.body_class() %}
   <script>
     // Aplica já a animação de entrada "whoosh" (se viemos de um clique numa
@@ -115,6 +117,7 @@
   </main>
 
   {% include 'partials/_site_footer.html' %}
+  {% include 'partials/_audience_consent.html' %}
 
   <aside class="cart-drawer" id="cartDrawer">
     <div class="cart-drawer__header">

@@ -444,6 +444,8 @@ def cart_add():
         abort(400, description="Máximo de 20 unidades por encomenda.")
     cart[key] = combined
     session.modified = True
+    from audience import record_cart
+    record_cart()
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         lines = _cart_lines()
@@ -473,6 +475,8 @@ def cart_update():
         else:
             cart.pop(key, None)
         session.modified = True
+        from audience import record_cart
+        record_cart(empty=not cart)
     return redirect(url_for("shop.view_cart"))
 
 
@@ -480,6 +484,8 @@ def cart_update():
 def cart_remove(key):
     cart = _cart()
     cart.pop(key, None)
+    from audience import record_cart
+    record_cart(empty=not cart)
     session.modified = True
 
     # Chamado via AJAX a partir do drawer lateral (ver initCart em main.js)
@@ -676,6 +682,9 @@ def checkout():
         order.total_cents = sum(i.price_cents * i.quantity for i in order.items)
         order.total_cents += order_processing_fee_cents(order.items, checkout_gateway)
         db.session.add(order)
+        db.session.flush()
+        from audience import link_order
+        link_order(order)
         db.session.commit()
         session['checkout_order_id'] = order.id
 
@@ -858,6 +867,9 @@ def checkout_resume(order_id):
                     and target.port in (None, 443) and not target.fragment):
                 # The original session and original total are reused, even if
                 # the selected provider or catalogue prices changed meanwhile.
+                from audience import link_order
+                link_order(order)
+                db.session.commit()
                 return redirect(payment.session_url, code=303)
         except (TeyaUnavailable, ValueError):
             db.session.rollback()
