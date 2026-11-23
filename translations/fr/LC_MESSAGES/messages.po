@@ -1926,3 +1926,158 @@ msgstr "Qu’est-ce que le HIM Dub"
 
 #~ msgid "A venda de bilhetes estará disponível a partir das %(hora)s."
 #~ msgstr "La vente de billets sera disponible à partir de %(hora)s."
+
+
+#. Reviewed payment status and order resumption
+msgid "Estado da encomenda"
+msgstr "État de la commande"
+
+
+#. Reviewed payment status and order resumption
+msgid "Tentativa de pagamento falhada"
+msgstr "Tentative de paiement échouée"
+
+
+#. Reviewed payment status and order resumption
+msgid "A Teya indicou uma tentativa falhada, sem comunicar o motivo. Não confirma uma recusa bancária. A sessão pode permitir nova tentativa na mesma encomenda."
+msgstr "Teya a signalé une tentative échouée sans en préciser la raison. Cela ne confirme pas un refus bancaire. Une nouvelle tentative peut être possible pour la même commande."
+
+
+#. Reviewed payment status and order resumption
+msgid "Erro de comunicação — a verificar"
+msgstr "Erreur de communication — vérification en cours"
+
+
+#. Reviewed payment status and order resumption
+msgid "Não foi possível consultar o fornecedor. Se já pagaste, aguarda a confirmação antes de tentar novamente."
+msgstr "Impossible de consulter le prestataire de paiement. Si tu as déjà payé, attends la confirmation avant de réessayer."
+
+
+#. Reviewed payment status and order resumption
+msgid "A aguardar confirmação do pagamento"
+msgstr "En attente de confirmation du paiement"
+
+
+#. Reviewed payment status and order resumption
+msgid "O pagamento está em processamento ou por confirmar. Aguarda antes de tentar novamente."
+msgstr "Ton paiement est en cours de traitement ou en attente de confirmation. Attends avant de réessayer."
+
+
+#. Reviewed payment status and order resumption
+msgid "Estado do pagamento por verificar"
+msgstr "État du paiement à vérifier"
+
+
+#. Reviewed payment status and order resumption
+msgid "Ainda não há uma consulta recente ao fornecedor. Abre o estado da encomenda antes de repetir o pagamento."
+msgstr "Aucune vérification récente auprès du prestataire. Consulte l’état de ta commande avant de refaire un paiement."
+
+
+#. Reviewed payment status and order resumption
+msgid "A aguardar pagamento"
+msgstr "En attente de paiement"
+
+
+#. Reviewed payment status and order resumption
+msgid "O fornecedor ainda não registou um pagamento. Podes retomar a mesma encomenda."
+msgstr "Le prestataire n’a pas encore enregistré de paiement. Tu peux reprendre la même commande."
+
+
+#. Reviewed payment status and order resumption
+msgid "Pagamento expirado"
+msgstr "Paiement expiré"
+
+
+#. Reviewed payment status and order resumption
+msgid "A sessão terminou sem pagamento confirmado."
+msgstr "La session s’est terminée sans paiement confirmé."
+
+
+#. Reviewed payment status and order resumption
+msgid "Pagamento falhado"
+msgstr "Paiement échoué"
+
+
+#. Reviewed payment status and order resumption
+msgid "O fornecedor encerrou a sessão sem pagamento confirmado. Não indicou o motivo."
+msgstr "Le prestataire a fermé la session sans paiement confirmé et sans préciser de raison."
+
+
+#. Reviewed payment status and order resumption
+msgid "Em confirmação"
+msgstr "En attente de confirmation"
+
+
+#. Reviewed payment status and order resumption
+msgid "A aguardar confirmação do fornecedor; ainda não conta como venda paga."
+msgstr "En attente de confirmation du prestataire ; la commande n’est pas encore considérée comme payée."
+
+
+#. Reviewed payment status and order resumption
+msgid "Última consulta ao fornecedor:"
+msgstr "Dernière vérification auprès du prestataire :"
+
+
+#. Reviewed payment status and order resumption
+msgid "Vais continuar a mesma encomenda, com os mesmos bilhetes e o mesmo total."
+msgstr "Tu vas reprendre la même commande, avec les mêmes billets et le même montant."
+
+
+#. Reviewed payment status and order resumption
+msgid "Retomar pagamento"
+msgstr "Reprendre le paiement"
+
+
+#. Reviewed payment status and order resumption
+msgid "Actualizar estado"
+msgstr "Actualiser l’état"
+
+
+#. Reviewed payment status and order resumption
+msgid "Ver estado e retomar pagamento"
+msgstr "Voir l’état et reprendre le paiement"
+
+
+#. Reviewed payment status and order resumption
+msgid "Já tens uma encomenda por concluir neste navegador."
+msgstr "Tu as déjà une commande à terminer dans ce navigateur."
+
+
+#. Reviewed payment status and order resumption
+msgid "Ver estado e retomar a encomenda"
+msgstr "Voir l’état et reprendre la commande"
+
+
+#. Reviewed payment status and order resumption
+msgid "Antes de criar outra encomenda, verifica se podes continuar o pagamento anterior."
+msgstr "Avant de créer une autre commande, vérifie si tu peux reprendre le paiement précédent."
+
+
+#. Reviewed payment status and order resumption
+msgid "Consulta o estado abaixo. Se já pagaste, aguarda a confirmação antes de tentar novamente."
+msgstr "Consulte l’état ci-dessous. Si tu as déjà payé, attends la confirmation avant de réessayer."
+
+
+#. Reviewed payment status and order resumption
+msgid "Pagamento não concluído"
+msgstr "Paiement non terminé"
+
+
+#. Reviewed payment status and order resumption
+msgid "Regressaste do pagamento. Se já pagaste, aguarda a confirmação por email antes de tentar novamente."
+msgstr "Tu es de retour du paiement. Si tu as déjà payé, attends la confirmation par email avant de réessayer."
+
+
+#. Reviewed payment status and order resumption
+msgid "Consultar as minhas encomendas"
+msgstr "Consulter mes commandes"
+
+
+#. Reviewed payment status and order resumption
+msgid "Pagamento confirmado. Os bilhetes foram emitidos."
+msgstr "Paiement confirmé. Tes billets ont été émis."
+
+
+#. Reviewed payment status and order resumption
+msgid "Encomenda"
+msgstr "Commande"

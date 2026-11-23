@@ -230,6 +230,19 @@ class TeyaPaymentTests(unittest.TestCase):
         self.assertFalse(payment.payment_state)
         self.assertIsNone(payment.checked_at)
 
+    def test_payment_recovery_messages_in_all_visitor_languages(self):
+        from blueprints.shop import _order_token
+        order,payment=self.payment()
+        token=_order_token(order.id)
+        for lang,label,button in [('en','Payment attempt failed','Resume payment'),
+                                  ('fr','Tentative de paiement échouée','Reprendre le paiement'),
+                                  ('es','Intento de pago fallido','Retomar el pago')]:
+            with patch.object(teya,'api',return_value=self.success(payment,session_status='ACTIVE',payment_status='FAILED',transaction_id=None)):
+                r=self.client.get(f'/{lang}/checkout/success/{order.id}?token={token}')
+            self.assertEqual(r.status_code,200)
+            self.assertIn(label,r.text)
+            self.assertIn(button,r.text)
+
     def test_forged_browser_success_does_not_issue(self):
         order,payment=self.payment()
         token=base.shop._order_token(order.id)

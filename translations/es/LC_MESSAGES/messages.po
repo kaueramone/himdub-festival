@@ -231,3 +231,158 @@ msgstr "Baños secos"
 
 msgid "Regras e Normas de Funcionamento"
 msgstr "Reglamento y normas de funcionamiento"
+
+
+#. Reviewed payment status and order resumption
+msgid "Estado da encomenda"
+msgstr "Estado del pedido"
+
+
+#. Reviewed payment status and order resumption
+msgid "Tentativa de pagamento falhada"
+msgstr "Intento de pago fallido"
+
+
+#. Reviewed payment status and order resumption
+msgid "A Teya indicou uma tentativa falhada, sem comunicar o motivo. Não confirma uma recusa bancária. A sessão pode permitir nova tentativa na mesma encomenda."
+msgstr "Teya ha indicado un intento fallido sin especificar el motivo. Esto no confirma un rechazo bancario. Puede ser posible volver a intentarlo con el mismo pedido."
+
+
+#. Reviewed payment status and order resumption
+msgid "Erro de comunicação — a verificar"
+msgstr "Error de comunicación — pendiente de verificación"
+
+
+#. Reviewed payment status and order resumption
+msgid "Não foi possível consultar o fornecedor. Se já pagaste, aguarda a confirmação antes de tentar novamente."
+msgstr "No se ha podido consultar al proveedor de pagos. Si ya has pagado, espera la confirmación antes de volver a intentarlo."
+
+
+#. Reviewed payment status and order resumption
+msgid "A aguardar confirmação do pagamento"
+msgstr "Esperando confirmación del pago"
+
+
+#. Reviewed payment status and order resumption
+msgid "O pagamento está em processamento ou por confirmar. Aguarda antes de tentar novamente."
+msgstr "Tu pago se está procesando o está pendiente de confirmación. Espera antes de volver a intentarlo."
+
+
+#. Reviewed payment status and order resumption
+msgid "Estado do pagamento por verificar"
+msgstr "Estado del pago pendiente de verificación"
+
+
+#. Reviewed payment status and order resumption
+msgid "Ainda não há uma consulta recente ao fornecedor. Abre o estado da encomenda antes de repetir o pagamento."
+msgstr "No hay una consulta reciente al proveedor. Consulta el estado del pedido antes de repetir el pago."
+
+
+#. Reviewed payment status and order resumption
+msgid "A aguardar pagamento"
+msgstr "Pendiente de pago"
+
+
+#. Reviewed payment status and order resumption
+msgid "O fornecedor ainda não registou um pagamento. Podes retomar a mesma encomenda."
+msgstr "El proveedor aún no ha registrado ningún pago. Puedes retomar el mismo pedido."
+
+
+#. Reviewed payment status and order resumption
+msgid "Pagamento expirado"
+msgstr "Pago caducado"
+
+
+#. Reviewed payment status and order resumption
+msgid "A sessão terminou sem pagamento confirmado."
+msgstr "La sesión ha terminado sin un pago confirmado."
+
+
+#. Reviewed payment status and order resumption
+msgid "Pagamento falhado"
+msgstr "Pago fallido"
+
+
+#. Reviewed payment status and order resumption
+msgid "O fornecedor encerrou a sessão sem pagamento confirmado. Não indicou o motivo."
+msgstr "El proveedor ha cerrado la sesión sin un pago confirmado y sin especificar el motivo."
+
+
+#. Reviewed payment status and order resumption
+msgid "Em confirmação"
+msgstr "Pendiente de confirmación"
+
+
+#. Reviewed payment status and order resumption
+msgid "A aguardar confirmação do fornecedor; ainda não conta como venda paga."
+msgstr "Pendiente de confirmación del proveedor; el pedido aún no se considera pagado."
+
+
+#. Reviewed payment status and order resumption
+msgid "Última consulta ao fornecedor:"
+msgstr "Última consulta al proveedor:"
+
+
+#. Reviewed payment status and order resumption
+msgid "Vais continuar a mesma encomenda, com os mesmos bilhetes e o mesmo total."
+msgstr "Continuarás con el mismo pedido, los mismos billetes y el mismo importe."
+
+
+#. Reviewed payment status and order resumption
+msgid "Retomar pagamento"
+msgstr "Retomar el pago"
+
+
+#. Reviewed payment status and order resumption
+msgid "Actualizar estado"
+msgstr "Actualizar estado"
+
+
+#. Reviewed payment status and order resumption
+msgid "Ver estado e retomar pagamento"
+msgstr "Consultar el estado y retomar el pago"
+
+
+#. Reviewed payment status and order resumption
+msgid "Já tens uma encomenda por concluir neste navegador."
+msgstr "Ya tienes un pedido sin completar en este navegador."
+
+
+#. Reviewed payment status and order resumption
+msgid "Ver estado e retomar a encomenda"
+msgstr "Consultar el estado y retomar el pedido"
+
+
+#. Reviewed payment status and order resumption
+msgid "Antes de criar outra encomenda, verifica se podes continuar o pagamento anterior."
+msgstr "Antes de crear otro pedido, comprueba si puedes continuar con el pago anterior."
+
+
+#. Reviewed payment status and order resumption
+msgid "Consulta o estado abaixo. Se já pagaste, aguarda a confirmação antes de tentar novamente."
+msgstr "Consulta el estado a continuación. Si ya has pagado, espera la confirmación antes de volver a intentarlo."
+
+
+#. Reviewed payment status and order resumption
+msgid "Pagamento não concluído"
+msgstr "Pago no completado"
+
+
+#. Reviewed payment status and order resumption
+msgid "Regressaste do pagamento. Se já pagaste, aguarda a confirmação por email antes de tentar novamente."
+msgstr "Has vuelto de la página de pago. Si ya has pagado, espera la confirmación por email antes de volver a intentarlo."
+
+
+#. Reviewed payment status and order resumption
+msgid "Consultar as minhas encomendas"
+msgstr "Consultar mis pedidos"
+
+
+#. Reviewed payment status and order resumption
+msgid "Pagamento confirmado. Os bilhetes foram emitidos."
+msgstr "Pago confirmado. Tus billetes han sido emitidos."
+
+
+#. Reviewed payment status and order resumption
+msgid "Encomenda"
+msgstr "Pedido"
