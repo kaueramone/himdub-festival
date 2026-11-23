@@ -91,6 +91,16 @@ class TeyaTransferTests(unittest.TestCase):
         self.assertEqual(payment.status,'paid')
         self.assertEqual(WebsiteJob.query.filter_by(kind='transfer_refund').count(),0)
 
+    def test_late_holder_payment_cannot_reactivate_cancelled_ticket(self):
+        ticket,transfer,payment,token,old=self.prepare()
+        ticket.cancelled_at=datetime.utcnow();db.session.commit()
+        with patch.object(gateway,'api',return_value=self.result(payment)):
+            self.assertEqual(self.notify(payment).status_code,200)
+        self.assertEqual(ticket.code,old)
+        self.assertEqual(transfer.status,'refund_pending')
+        self.assertEqual(payment.status,'paid')
+        self.assertIsNotNone(ticket.cancelled_at)
+
     def test_retry_uses_same_session_and_wrong_store_rejects(self):
         ticket,transfer,payment,token,old=self.prepare()
         with patch.object(gateway,'api') as api:

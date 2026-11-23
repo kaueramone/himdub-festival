@@ -56,10 +56,11 @@ from ticketing import _new_ticket_code
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
-# Os dois níveis de acesso possíveis (ver session["admin_role"], preenchido
-# no login()) -- ROLE_ADMIN pode tudo, ROLE_CHECKIN só o scanner.
+# Administradores têm acesso total; check-in e apoio ao cliente têm áreas
+# distintas, autorizadas por decoradores próprios.
 ROLE_ADMIN = "admin"
 ROLE_CHECKIN = "checkin"
+ROLE_CUSTOMER_SERVICE = "customer_service"
 
 
 def login_required(view):
@@ -87,8 +88,24 @@ def admin_required(view):
         if not session_valid():
             return redirect(url_for("admin.login", next=request.path))
         if session.get("admin_role") != ROLE_ADMIN:
+            if session.get('admin_role') == ROLE_CUSTOMER_SERVICE:
+                abort(403, description='Esta área está reservada a administradores.')
             flash("Essa página não está disponível para o login de check-in.", "error")
             return redirect(url_for("checkin.scan"))
+        return view(*args, **kwargs)
+    return wrapped
+
+
+def customer_service_required(view):
+    """Order support, without granting check-in or full administration."""
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not session_valid():
+            return redirect(url_for('admin.login', next=request.path))
+        if session.get('admin_role') not in (ROLE_ADMIN, ROLE_CUSTOMER_SERVICE):
+            if session.get('admin_role') == ROLE_CHECKIN:
+                return redirect(url_for('checkin.scan'))
+            abort(403)
         return view(*args, **kwargs)
     return wrapped
 
@@ -158,7 +175,7 @@ def logout():
 
 
 @admin_bp.route("/orders")
-@admin_required
+@customer_service_required
 def orders():
     status_filter = request.args.get("status", "")
     search_query = request.args.get("q", "").strip()
@@ -177,7 +194,8 @@ def orders():
         # duplicada nos resultados.
         like = f"%{search_query}%"
         query = query.outerjoin(Ticket, Ticket.order_id == Order.id).filter(
-            or_(Order.name.ilike(like), Order.email.ilike(like), Ticket.code.ilike(like))
+            or_(Order.name.ilike(like), Order.email.ilike(like), Ticket.code.ilike(like),
+                Order.id == int(search_query) if re.fullmatch(r'[0-9]{1,9}', search_query) else False)
         ).distinct()
     page = query.paginate(page=request.args.get("page", 1, type=int), per_page=25, error_out=False)
     all_orders = page.items
@@ -278,7 +296,7 @@ def activate_real_sales():
 
 
 @admin_bp.route("/orders/<int:order_id>/resend-ticket", methods=["POST"])
-@admin_required
+@customer_service_required
 def resend_ticket(order_id):
     """Reenvia o email de confirmação (com o(s) bilhete(s)/QR em anexo) de
     uma encomenda já existente -- é a mesma lógica do resend_ticket.py (o
@@ -289,14 +307,15 @@ def resend_ticket(order_id):
     nonce = request.form.get("resend_key", "")
     if not re.fullmatch(r"[A-Za-z0-9_-]{20,80}", nonce):
         abort(400)
-    if order.status not in ("paid", "comp") or not current_app.config.get("EMAILS_LIVE"):
+    if (order.status not in ("paid", "comp") or not current_app.config.get("EMAILS_LIVE")
+            or not any(not ticket.cancelled_at for ticket in order.tickets)):
         flash("A encomenda não tem um envio disponível.", "error")
     else:
         from outbox import enqueue_order_emails
         enqueue_order_emails(order, event_id=nonce)
         db.session.add(AuditEvent(actor=session.get("admin_name", "staff"), action="email-resend", target=str(order.id)))
         db.session.commit()
-        flash("O reenvio foi colocado na fila. Podes acompanhar o estado na fila de emails.", "success")
+        flash("O reenvio dos bilhetes válidos foi colocado na fila.", "success")
     return redirect(url_for("admin.orders"))
 
 
@@ -308,8 +327,39 @@ def email_queue():
     return render_template("admin/email_queue.html", pagination=page)
 
 
+@admin_bp.post('/orders/<int:order_id>/tickets/<int:ticket_id>/cancel')
+@customer_service_required
+def cancel_ticket(order_id, ticket_id):
+    # Preserve financial history: cancelling admission is never a refund.
+    order = Order.query.filter_by(id=order_id).with_for_update().first_or_404()
+    ticket = Ticket.query.filter_by(id=ticket_id, order_id=order.id).with_for_update().first_or_404()
+    if ticket.cancelled_at:
+        flash('Este bilhete já estava cancelado.', 'info')
+        return redirect(url_for('admin.orders'))
+    reason = request.form.get('reason', '').strip()
+    if request.form.get('confirm') != 'yes' or not 5 <= len(reason) <= 300:
+        abort(400, description='Confirma o cancelamento e indica um motivo entre 5 e 300 caracteres.')
+    if order.status not in ('paid', 'comp') or ticket.checked_in_at:
+        abort(409, description='Só podes cancelar bilhetes válidos que ainda não tenham entrada registada.')
+    from models import TicketTransfer
+    if TicketTransfer.query.filter_by(ticket_id=ticket.id, status='pending_payment').first():
+        abort(409, description='Existe uma troca de titular com pagamento em curso. Pede a intervenção de um administrador.')
+    ticket.cancelled_at = datetime.utcnow()
+    ticket.cancelled_by = session.get('admin_name', 'staff')
+    ticket.cancellation_reason = reason
+    db.session.add(AuditEvent(actor=ticket.cancelled_by, action='ticket_cancelled', target=str(ticket.id)))
+    if not order.email_sent and current_app.config.get('EMAILS_LIVE'):
+        # A queued confirmation containing this ticket becomes obsolete. Keep
+        # delivery of the remaining valid tickets without resending past mail.
+        from outbox import enqueue_order_emails
+        enqueue_order_emails(order)
+    db.session.commit()
+    flash('Bilhete cancelado. O QR deixa de permitir a entrada. Não foi efectuado qualquer reembolso.', 'success')
+    return redirect(url_for('admin.orders', q=str(order.id)))
+
+
 @admin_bp.route("/orders/<int:order_id>/edit-name", methods=["POST"])
-@admin_required
+@customer_service_required
 def edit_order_name(order_id):
     """Corrige o nome e/ou o email do comprador de uma encomenda ja emitida
     (ex: o cliente escreveu o nome errado no checkout, o bilhete foi
@@ -353,6 +403,8 @@ def edit_order_name(order_id):
     para o `order.email` atual, portanto para o email novo depois de
     guardares aqui) e so aí o cliente receber o bilhete corrigido."""
     order = Order.query.filter_by(id=order_id).with_for_update().first_or_404()
+    if order.status not in ('paid', 'comp'):
+        abort(409, description='Só é possível editar bilhetes de encomendas pagas ou de cortesia.')
     new_name = request.form.get("new_name", "").strip()
     new_email = request.form.get("new_email", "").strip()
 
@@ -368,12 +420,12 @@ def edit_order_name(order_id):
     missing_ticket_name = False
     invalid_ticket_email = None
     for ticket in editable_tickets:
-        value = request.form.get(f"ticket_name_{ticket.id}", "").strip()[:120]
+        value = (ticket.holder_name or order.name) if ticket.cancelled_at else request.form.get(f"ticket_name_{ticket.id}", "").strip()[:120]
         ticket_name_values[ticket.id] = value
         if not value:
             missing_ticket_name = True
 
-        email_value = request.form.get(f"ticket_email_{ticket.id}", "").strip()[:180]
+        email_value = ticket.holder_email if ticket.cancelled_at else request.form.get(f"ticket_email_{ticket.id}", "").strip()[:180]
         # Vazio é válido (ver docstring, acima) -- só valida o formato
         # quando o João de facto escreveu alguma coisa neste campo.
         if email_value and not EMAIL_RE.match(email_value):
@@ -426,6 +478,8 @@ def edit_order_name(order_id):
                 item.ticket_emails = encode_ticket_names(emails)
 
         for ticket in order.tickets:
+            if ticket.cancelled_at:
+                continue
             if old_name != new_name or (old_email != new_email and not ticket.holder_email):
                 changed_ids.add(ticket.id)
             if ticket.id not in changed_ids:
@@ -501,7 +555,7 @@ def _write_sheet(ws, title, headers, rows):
 
 
 @admin_bp.route("/export")
-@admin_required
+@customer_service_required
 def export_excel():
     """Exporta encomendas, itens e bilhetes para um ficheiro Excel (.xlsx),
     para relatórios/contabilidade fora do site. Inclui encomendas de todos
@@ -745,7 +799,7 @@ from admin_invites import init_invites
 from admin_reports import init_reports
 from cms import init_cms
 init_invites(admin_bp, admin_required)
-init_reports(admin_bp, admin_required, _write_sheet)
+init_reports(admin_bp, customer_service_required, _write_sheet)
 init_cms(admin_bp, admin_required)
 
 from newsletter import init_newsletter

@@ -89,7 +89,7 @@ def init_password_recovery(bp):
                 counter = totp_counter(user.totp_secret, request.form.get('totp', '').strip())
                 if counter is None or counter <= user.totp_last_counter:
                     error = 'Verifica o código do autenticador. Se acabaste de o usar, espera pelo próximo código.'
-            elif current_app.config.get('PRODUCTION') and user.role == 'admin':
+            elif current_app.config.get('PRODUCTION') and user.role in ('admin', 'customer_service'):
                 error = 'Esta conta precisa de recuperação assistida do autenticador. Contacta a organização.'
             if error:
                 needs_mfa = bool(user.totp_secret)

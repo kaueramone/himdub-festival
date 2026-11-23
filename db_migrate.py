@@ -26,6 +26,10 @@ def run(app):
     with app.app_context():
         inspector = inspect(db.engine)
         with db.engine.connect() as conn:
+            for column, ddl in [("cancelled_at", "TIMESTAMP"),
+                                ("cancelled_by", "VARCHAR(180) DEFAULT ''"),
+                                ("cancellation_reason", "VARCHAR(300) DEFAULT ''")]:
+                _ensure_column(conn, inspector, "tickets", column, ddl)
             for column, ddl in [("session_state", "VARCHAR(20) DEFAULT ''"),
                                 ("payment_state", "VARCHAR(20) DEFAULT ''"),
                                 ("checked_at", "TIMESTAMP")]:

@@ -55,7 +55,7 @@ def ticket_eligible(ticket, transfer=None):
         # These include companion/children data and eligibility conditions.
         # The organisation reviews their changes through the existing editor.
         return False
-    if ticket.order.status != "paid" or ticket.checked_in_at:
+    if ticket.order.status != "paid" or ticket.checked_in_at or ticket.cancelled_at:
         return False
     if transfer:
         return (

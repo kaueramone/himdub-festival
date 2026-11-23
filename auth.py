@@ -83,7 +83,7 @@ def authenticate(email, password):
                 db.session.rollback()
                 return False
             user.totp_last_counter = counter
-        elif current_app.config.get("PRODUCTION") and user.role == "admin":
+        elif current_app.config.get("PRODUCTION") and user.role in ("admin", "customer_service"):
             db.session.rollback()
             return False
         session.clear()
@@ -129,7 +129,7 @@ def init_auth(app):
 
     @app.cli.command("user-add")
     @click.argument("email")
-    @click.option("--role", type=click.Choice(["admin", "checkin"]), default="admin")
+    @click.option("--role", type=click.Choice(["admin", "checkin", "customer_service"]), default="admin")
     @click.option("--mfa/--no-mfa", default=True)
     @click.password_option()
     def user_add(email, role, mfa, password):
@@ -139,8 +139,8 @@ def init_auth(app):
             raise click.ClickException("Usa um email válido e uma palavra-passe com pelo menos 14 caracteres.")
         if AdminUser.query.filter_by(email=email).first():
             raise click.ClickException("A conta já existe.")
-        if app.config.get("PRODUCTION") and role == "admin" and not mfa:
-            raise click.ClickException("Administradores de produção precisam de autenticação de dois fatores.")
+        if app.config.get("PRODUCTION") and role in ("admin", "customer_service") and not mfa:
+            raise click.ClickException("Administradores e Customer Service precisam de autenticação de dois fatores em produção.")
         secret = base64.b32encode(secrets.token_bytes(20)).decode() if mfa else ""
         db.session.add(AdminUser(email=email, role=role, password_hash=generate_password_hash(password), totp_secret=secret))
         db.session.commit()

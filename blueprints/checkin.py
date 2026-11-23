@@ -47,7 +47,7 @@ def ticket_detail(code):
     allowed = {"paid", "comp"}
     if not current_app.config.get("PRODUCTION"):
         allowed.add("demo-paid")
-    if order.status not in allowed:
+    if order.status not in allowed or ticket.cancelled_at:
         return render_template("checkin/invalid.html"), 403
 
     if request.method == "POST":

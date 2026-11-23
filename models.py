@@ -580,6 +580,9 @@ class Ticket(db.Model):
     wristband_code = db.Column(db.String(60), default="")
     checked_in_at = db.Column(db.DateTime)
     checked_in_by = db.Column(db.String(80), default="")
+    cancelled_at = db.Column(db.DateTime)
+    cancelled_by = db.Column(db.String(180), default="")
+    cancellation_reason = db.Column(db.String(300), default="")
 
     # Historial de codigos antigos deste bilhete (separados por virgula),
     # preenchido quando um admin corrige o nome da encomenda e o codigo e

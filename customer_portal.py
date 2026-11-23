@@ -101,7 +101,7 @@ def owned_ticket(identifier):
 
 
 def downloadable(ticket):
-    return ticket.order.status == "paid" and not ticket.checked_in_at
+    return ticket.order.status == "paid" and not ticket.checked_in_at and not ticket.cancelled_at
 
 
 @customer_bp.route("/recover", methods=["GET", "POST"], endpoint="recover")

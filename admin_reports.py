@@ -47,7 +47,10 @@ def ticket_query():
     status = request.args.get("state", "paid")
     if status not in ("paid", "comp", "cancelled", "refunded", "demo-paid", "all"):
         abort(400, description="Estado inválido.")
-    if status != "all":
+    if status == 'cancelled':
+        from sqlalchemy import or_
+        query = query.filter(or_(Order.status == 'cancelled', Ticket.cancelled_at.isnot(None)))
+    elif status != "all":
         query = query.filter(Order.status == status)
     return query
 
@@ -200,7 +203,7 @@ def init_reports(bp, admin_required, write_sheet):
                     t.id,
                     t.order_id,
                     to_local_time(t.order.created_at).strftime("%d/%m/%Y %H:%M"),
-                    t.order.status,
+                    'cancelled' if t.cancelled_at else t.order.status,
                     names.get(t.product_slug, t.product_name),
                     t.product_slug,
                     1,

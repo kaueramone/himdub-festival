@@ -32,3 +32,4 @@
 .lineup-admin-image{display:block;max-width:min(100%,320px);max-height:400px;object-fit:contain;border-radius:8px}
 
 .order-payment-cell{min-width:210px;max-width:280px;white-space:normal}.order-payment-cell details{font-size:.85rem;margin-top:6px}.order-payment-cell summary{cursor:pointer}.order-payment-cell details p{margin:.5rem 0}
+.ticket-cancel-form{margin:8px 0;font-size:.85rem;min-width:200px;max-width:300px}.ticket-cancel-form summary{cursor:pointer;color:#eda66f}.ticket-cancel-form form{display:grid;gap:10px;padding:12px 0}.ticket-cancel-form label{white-space:normal;display:block}.ticket-cancel-form input:not([type=checkbox]){display:block;width:100%;box-sizing:border-box}.ticket-cancel-form input[type=checkbox]{width:auto;margin-right:6px}

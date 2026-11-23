@@ -381,6 +381,8 @@ def _group_tickets_by_recipient(order):
     groups = {}
     order_of_emails = []
     for ticket in order.tickets:
+        if ticket.cancelled_at:
+            continue
         email = (ticket.holder_email or "").strip() or order.email
         if email not in groups:
             groups[email] = []

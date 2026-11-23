@@ -15,7 +15,7 @@ from models import EmailDelivery, Order
 def _groups(order):
     from emailing import _group_tickets_by_recipient
     groups = _group_tickets_by_recipient(order)
-    if not groups and order.email:
+    if not groups and order.email and not order.tickets:
         groups = [(order.email, order.name, [])]
     return groups
 

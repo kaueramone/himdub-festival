@@ -40,7 +40,7 @@ def init_invites(bp, admin_required):
                 410,
                 description="Este convite expirou, foi utilizado ou foi revogado. Pede um novo convite à organização.",
             )
-        if row.role not in ("admin", "checkin"):
+        if row.role not in ("admin", "checkin", "customer_service"):
             abort(410, description="Categoria de acesso inválida. Pede um novo convite.")
         issuer = (
             AdminUser.query.filter_by(id=row.created_by).with_for_update().first()
@@ -60,8 +60,8 @@ def init_invites(bp, admin_required):
                 abort(403)
             email = request.form.get("email", "").strip().lower()
             role = request.form.get("role", "admin")
-            if role not in ("admin", "checkin"):
-                abort(400, description="Escolhe Administrador ou Staff — Check-in.")
+            if role not in ("admin", "checkin", "customer_service"):
+                abort(400, description="Escolhe Administrador, Customer Service ou Staff — Check-in.")
             if email and (
                 len(email) > 180 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email)
             ):

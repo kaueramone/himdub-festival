@@ -21,8 +21,8 @@
             </form>
           </div>
         </details>
-        <a href="{{ url_for('admin.issue_ticket') }}" class="btn btn--outline btn--small">Emitir bilhete</a>
-        <a href="{{ url_for('checkin.scan') }}" class="btn btn--primary btn--small">Ler bilhetes (check-in)</a>
+        {% if session.get('admin_role')=='admin' %}<a href="{{ url_for('admin.issue_ticket') }}" class="btn btn--outline btn--small">Emitir bilhete</a>
+        <a href="{{ url_for('checkin.scan') }}" class="btn btn--primary btn--small">Ler bilhetes (check-in)</a>{% endif %}
         <a href="{{ url_for('admin.logout') }}" class="btn btn--outline btn--small">Sair</a>
       </div>
     </div>
@@ -78,9 +78,11 @@
               <td>
                 {% if order.tickets %}
                   {% for ticket in order.tickets %}
-                    <a href="{{ url_for('checkin.ticket_detail', code=ticket.code) }}" class="admin-status {{ 'admin-status--paid' if ticket.is_checked_in else 'admin-status--pending' }}" style="margin:0 4px 4px 0;display:inline-block;">
-                      {{ ticket.code }}{% if ticket.holder_name %} — {{ ticket.holder_name }}{% endif %}{% if ticket.is_checked_in %} ✓{% endif %}
-                    </a>
+                    <span class="admin-status {{ 'admin-status--paid' if ticket.is_checked_in else 'admin-status--pending' }}" style="margin:0 4px 4px 0;display:inline-block;">
+                      #{{ ticket.id }}{% if ticket.holder_name %} — {{ ticket.holder_name }}{% endif %}{% if ticket.is_checked_in %} ✓{% endif %}{% if ticket.cancelled_at %} · Cancelado{% endif %}
+                    </span>
+                    {% if session.get('admin_role')=='admin' and not ticket.cancelled_at %}<a href="{{ url_for('checkin.ticket_detail',code=ticket.code) }}">Ver bilhete ↗</a>{% endif %}
+                    {% if ticket.cancelled_at %}<details><summary>Motivo do cancelamento</summary><p>{{ ticket.cancellation_reason }} · {{ ticket.cancelled_by }} · {{ (ticket.cancelled_at|local_time).strftime('%d/%m/%Y %H:%M') }}</p></details>{% elif not ticket.checked_in_at and order.status in ('paid','comp') %}<details class="ticket-cancel-form"><summary>Cancelar bilhete #{{ ticket.id }}</summary><form method="post" action="{{ url_for('admin.cancel_ticket',order_id=order.id,ticket_id=ticket.id) }}" data-confirm="Cancelar este bilhete e impedir a entrada com o QR? Esta acção não faz um reembolso."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Motivo<input name="reason" minlength="5" maxlength="300" required></label><label><input type="checkbox" name="confirm" value="yes" required> Confirmo a anulação do bilhete. Não efectua um reembolso.</label><button class="btn btn--outline btn--small">Cancelar este bilhete</button></form></details>{% endif %}
                   {% endfor %}
                 {% else %}
                   <span class="admin-status">—</span>
@@ -89,7 +91,7 @@
               <td>€{{ '%.2f'|format(order.total) }}</td>
               <td class="order-payment-cell">{% set info=payment_info(order) %}<span class="recent-order-state" title="{{ info[2] }}"><i class="order-state-dot order-state-dot--{{ info[0] }}" aria-hidden="true"></i>{{ info[1] }}</span><details><summary>Detalhes</summary><p>{{ info[2] }}</p>{% if order.payment_checkout and order.payment_checkout.checked_at %}<small>Consultado em {{ (order.payment_checkout.checked_at|local_time).strftime("%d/%m/%Y %H:%M") }}</small>{% endif %}</details>{% if order.status in ('pending','processing') and order.payment_checkout %}<a href="{{ order_payment_url(order) }}" target="_blank" rel="noopener noreferrer">Ver estado actualizado ↗</a>{% endif %}</td>
               <td>
-                {% if order.tickets %}
+                {% if order.tickets|rejectattr('cancelled_at')|list and order.status in ('paid','comp') %}
                   <form method="post" action="{{ url_for('admin.resend_ticket', order_id=order.id) }}" class="admin-inline-form" onsubmit="return confirm('Reenviar o email com o(s) bilhete(s) desta encomenda?');">
 <input type="hidden" name="resend_key" value="{{ new_form_nonce() }}">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -121,7 +123,7 @@
                            todos só para o email do comprador). O campo de email fica vazio
                            por omissão -- só quem tiver aqui um email próprio é que passa a
                            receber o seu bilhete à parte (ver send_ticket_email em emailing.py). #}
-                        {% set editable_tickets = order.tickets | selectattr('product_slug', 'ne', 'bilhete-acessibilidade') | selectattr('product_slug', 'ne', 'bilhete-familia') | sort(attribute='id') | list %}
+                        {% set editable_tickets = order.tickets | selectattr('product_slug', 'ne', 'bilhete-acessibilidade') | selectattr('product_slug', 'ne', 'bilhete-familia') | rejectattr('cancelled_at') | sort(attribute='id') | list %}
                         {% if editable_tickets %}
                           <div style="display:flex; flex-direction:column; gap:12px; margin:2px 0 4px;">
                             <span style="font-size:0.78rem; opacity:0.75;">Nome e email em cada bilhete</span>
@@ -156,7 +158,7 @@
   </div>
 </section>
 
-<p class="container"><a href="{{ url_for('admin.email_queue') }}">Ver fila de emails</a></p>
+{% if session.get('admin_role')=='admin' %}<p class="container"><a href="{{ url_for('admin.email_queue') }}">Ver fila de emails</a></p>{% endif %}
 <nav aria-label="Paginação das encomendas" class="container admin-filters">
   {% if pagination.has_prev %}<a href="{{ url_for('admin.orders', page=pagination.prev_num, status=status_filter or None, q=search_query or None) }}">← Anterior</a>{% endif %}
   <span>Página {{ pagination.page }} de {{ pagination.pages or 1 }} · {{ pagination.total }} encomendas</span>

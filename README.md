@@ -36,6 +36,13 @@ flask --app app user-revoke email-da-conta
 A criação pede uma palavra-passe de pelo menos 14 caracteres e apresenta o URI
 para a aplicação de autenticação. Guardá-lo em privado. O MFA é obrigatório para
 administradores em produção. Para operadores de entrada, usar `--role checkin`.
+Para apoio ao cliente, usar `--role customer_service` (MFA obrigatório em produção),
+ou escolher **Customer Service** no convite em Equipa. Este cargo acede apenas a
+Início, Vendas e Encomendas, incluindo exportações, edição e reenvio dos bilhetes.
+Pode cancelar bilhetes individuais ainda sem check-in, com motivo e confirmação.
+O cancelamento invalida a entrada e mantém o pagamento e o histórico; não efectua
+reembolsos nem liberta automaticamente lugares de lote. Pagamentos de troca de
+titular em curso exigem intervenção de um administrador antes do cancelamento.
 As contas e sessões podem ser revogadas individualmente. As antigas palavras-passe
 partilhadas só são aceites em desenvolvimento.
 
