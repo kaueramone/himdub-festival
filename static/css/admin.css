@@ -30,3 +30,5 @@
 .app-notice progress{display:block;width:100%;height:12px;margin-top:12px;accent-color:var(--terracotta)}
 
 .lineup-admin-image{display:block;max-width:min(100%,320px);max-height:400px;object-fit:contain;border-radius:8px}
+
+.order-payment-cell{min-width:210px;max-width:280px;white-space:normal}.order-payment-cell details{font-size:.85rem;margin-top:6px}.order-payment-cell summary{cursor:pointer}.order-payment-cell details p{margin:.5rem 0}

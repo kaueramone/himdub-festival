@@ -87,7 +87,7 @@
                 {% endif %}
               </td>
               <td>€{{ '%.2f'|format(order.total) }}</td>
-              <td>{% set info=payment_info(order) %}<span class="recent-order-state" title="{{ info[2] }}"><i class="order-state-dot order-state-dot--{{ info[0] }}" aria-hidden="true"></i>{{ info[1] }}</span><small style="display:block;max-width:260px">{{ info[2] }}</small>{% if order.status in ('pending','processing') and order.payment_checkout %}<a href="{{ order_payment_url(order) }}" target="_blank" rel="noopener noreferrer">Ver estado actualizado ↗</a>{% endif %}</td>
+              <td class="order-payment-cell">{% set info=payment_info(order) %}<span class="recent-order-state" title="{{ info[2] }}"><i class="order-state-dot order-state-dot--{{ info[0] }}" aria-hidden="true"></i>{{ info[1] }}</span><details><summary>Detalhes</summary><p>{{ info[2] }}</p>{% if order.payment_checkout and order.payment_checkout.checked_at %}<small>Consultado em {{ (order.payment_checkout.checked_at|local_time).strftime("%d/%m/%Y %H:%M") }}</small>{% endif %}</details>{% if order.status in ('pending','processing') and order.payment_checkout %}<a href="{{ order_payment_url(order) }}" target="_blank" rel="noopener noreferrer">Ver estado actualizado ↗</a>{% endif %}</td>
               <td>
                 {% if order.tickets %}
                   <form method="post" action="{{ url_for('admin.resend_ticket', order_id=order.id) }}" class="admin-inline-form" onsubmit="return confirm('Reenviar o email com o(s) bilhete(s) desta encomenda?');">
