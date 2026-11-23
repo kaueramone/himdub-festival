@@ -677,6 +677,7 @@ def checkout():
         order.total_cents += order_processing_fee_cents(order.items, checkout_gateway)
         db.session.add(order)
         db.session.commit()
+        session['checkout_order_id'] = order.id
 
         if checkout_gateway == 'teya':
             return start_checkout(order)
@@ -693,6 +694,7 @@ def checkout():
 
     return render_template(
         "checkout.html", lines=lines, countries=COUNTRIES,
+        resumable_order=db.session.get(Order, session.get('checkout_order_id')) if session.get('checkout_order_id') else None,
         processing_fee=cart_processing_fee_cents(lines, checkout_gateway) / 100,
     )
 
@@ -802,6 +804,8 @@ def checkout_success(order_id):
             reconcile(teya_payment.id)
         except Exception:
             db.session.rollback()
+            teya_payment.last_error = 'Consulta ao fornecedor indisponível; reserva mantida'
+            db.session.commit()
             current_app.logger.warning('Teya return deferred to payment reconciliation for order %s', order.id)
     if current_app.config["PAYMENTS_LIVE"] and order.status in ("pending", "processing", "paid") and order.stripe_session_id:
         import stripe
@@ -814,11 +818,61 @@ def checkout_success(order_id):
             current_app.logger.warning("Payment confirmation deferred to webhook for order %s", order.id)
     if order.status in ("paid", "demo-paid"):
         session["cart"] = {}
-    return render_template("checkout_success.html", order=order)
+    can_resume = bool(teya_payment and not teya_payment.last_error
+                      and order.status in ('pending', 'processing')
+                      and teya_payment.session_state == 'ACTIVE'
+                      and teya_payment.payment_state in ('NONE', 'FAILED'))
+    return render_template("checkout_success.html", order=order, can_resume=can_resume,
+                           payment_token=request.args.get('token'))
+
+
+@shop_bp.post('/checkout/resume/<int:order_id>')
+def checkout_resume(order_id):
+    # A signed receipt link (also available in the verified buyer account) is
+    # required in addition to CSRF. Never trust a posted amount or session URL.
+    token = request.form.get('token', '')
+    try:
+        identifier = URLSafeTimedSerializer(current_app.config['SECRET_KEY'], salt='order-confirmation').loads(
+            token, max_age=7 * 24 * 3600)
+        if identifier != order_id:
+            abort(404)
+    except (BadSignature, SignatureExpired):
+        abort(404)
+    from auth import check_login_throttle
+    check_login_throttle('resume-order:' + str(order_id))
+    from models import PaymentCheckout
+    from teya_gateway import reconcile, environment_hosts, TeyaUnavailable
+    from urllib.parse import urlsplit
+    order = db.session.get(Order, order_id)
+    payment = PaymentCheckout.query.filter_by(order_id=order_id, provider='teya').first()
+    if not order or not payment:
+        abort(404)
+    if order.status in ('pending', 'processing'):
+        try:
+            reconcile(payment.id)
+            target = urlsplit(payment.session_url or '')
+            if (order.status in ('pending', 'processing') and payment.session_state == 'ACTIVE'
+                    and payment.payment_state in ('NONE', 'FAILED')
+                    and target.scheme == 'https' and target.hostname == environment_hosts()[2]
+                    and not target.username and not target.password
+                    and target.port in (None, 443) and not target.fragment):
+                # The original session and original total are reused, even if
+                # the selected provider or catalogue prices changed meanwhile.
+                return redirect(payment.session_url, code=303)
+        except (TeyaUnavailable, ValueError):
+            db.session.rollback()
+            payment.last_error = 'Consulta ao fornecedor indisponível; reserva mantida'
+            db.session.commit()
+    flash(_('Consulta o estado abaixo. Se já pagaste, aguarda a confirmação antes de tentar novamente.'), 'info')
+    return redirect(_success_url(order), code=303)
 
 
 @shop_bp.route("/checkout/cancel")
 def checkout_cancel():
+    identifier = session.get('checkout_order_id')
+    order = db.session.get(Order, identifier) if identifier else None
+    if order and order.payment_checkout:
+        return redirect(_success_url(order), code=303)
     return render_template("checkout_cancel.html")
 
 

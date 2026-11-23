@@ -12,24 +12,8 @@ from models import Order, OrderItem, Product, Ticket, EmailDelivery, PaymentChec
 
 def recent_order_indicator(order, payment=None):
     """Presentation only: never infer a successful payment from a checkout."""
-    if order.status == 'paid':
-        return ('green', 'Pago', 'Pagamento confirmado.')
-    if order.status == 'comp':
-        return ('green', 'Cortesia', 'Entrada oferecida, sem pagamento necessário.')
-    if order.status == 'refunded':
-        return ('red', 'Reembolsado', 'Encomenda registada como reembolsada.')
-    if order.status == 'cancelled':
-        label = 'Pagamento expirado' if payment and payment.status == 'expired' else 'Cancelado'
-        if payment and payment.status == 'failed':
-            label = 'Pagamento falhado'
-        return ('red', label, 'Encomenda sem pagamento válido para emitir bilhetes.')
-    if order.status == 'demo-paid':
-        return ('yellow', 'Teste', 'Encomenda de teste, separada das vendas reais.')
-    if payment and payment.last_error:
-        return ('yellow', 'Pagamento por verificar', 'Confirmação indisponível; verificar antes de repetir o pagamento.')
-    if order.status == 'pending' or (payment and payment.status == 'active' and not payment.transaction_id):
-        return ('yellow', 'A aguardar pagamento', 'Checkout aberto, ainda sem pagamento confirmado pelo fornecedor.')
-    return ('yellow', 'Em confirmação', 'A aguardar confirmação do fornecedor; ainda não conta como venda paga.')
+    from payment_status import payment_info
+    return payment_info(order)
 
 
 def date_filters(query):

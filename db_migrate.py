@@ -26,6 +26,10 @@ def run(app):
     with app.app_context():
         inspector = inspect(db.engine)
         with db.engine.connect() as conn:
+            for column, ddl in [("session_state", "VARCHAR(20) DEFAULT ''"),
+                                ("payment_state", "VARCHAR(20) DEFAULT ''"),
+                                ("checked_at", "TIMESTAMP")]:
+                _ensure_column(conn, inspector, "payment_checkouts", column, ddl)
             _ensure_column(conn, inspector, "ticket_transfers", "payment_provider", "VARCHAR(20) NOT NULL DEFAULT 'stripe'")
             for column, ddl in [("photographer", "VARCHAR(180) DEFAULT ''"),
                                 ("photographer_url", "VARCHAR(500) DEFAULT ''"),

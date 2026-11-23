@@ -151,6 +151,7 @@ class Order(db.Model):
     email_sent = db.Column(db.Boolean, default=False)
 
     items = db.relationship("OrderItem", backref="order", cascade="all, delete-orphan", order_by="OrderItem.id")
+    payment_checkout = db.relationship("PaymentCheckout", uselist=False, lazy="selectin")
 
     @property
     def total(self):
@@ -179,6 +180,9 @@ class PaymentCheckout(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     next_check_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     last_error = db.Column(db.String(160), default="")
+    session_state = db.Column(db.String(20), default="")
+    payment_state = db.Column(db.String(20), default="")
+    checked_at = db.Column(db.DateTime)
 
 
 class AdminUser(db.Model):

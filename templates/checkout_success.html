@@ -1,18 +1,28 @@
 {% extends "base.html" %}
-{% block title %}{{ _('Encomenda confirmada') }} — HIM Dub Festival{% endblock %}
+{% block title %}{{ _('Estado da encomenda') }} — HIM Dub Festival{% endblock %}
 
 {% block content %}
 
-<section class="section section--result">
+<section class="section section--result payment-result">
   <div class="container narrow center-cta" data-reveal>
     {% if order.status in ("paid", "demo-paid") %}
       <span class="result-icon result-icon--success">✓</span>
       <h1>{% if order.name %}{{ _('Obrigado, %(name)s!', name=order.name) }}{% else %}{{ _('Obrigado!') }}{% endif %}</h1>
       <p>{% if order.status=='demo-paid' %}{{ _('A tua encomenda #%(id)s foi confirmada (modo demo).', id=order.id) }}{% else %}{{ _('A tua encomenda #%(id)s foi confirmada.', id=order.id) }}{% endif %}</p>
     {% else %}
-      <span class="result-icon result-icon--success">⏳</span>
-      <h1>{% if order.name %}{{ _('Quase lá, %(name)s!', name=order.name) }}{% else %}{{ _('Quase lá!') }}{% endif %}</h1>
-      <p>{{ _('Estamos a confirmar o teu pagamento junto do fornecedor de pagamentos — costuma demorar só alguns segundos. Vais receber a confirmação da encomenda #%(id)s assim que estiver concluído.', id=order.id) }}</p>
+      {% set info = payment_info(order) %}
+      <span class="result-icon {{ 'result-icon--cancel' if info[0]=='red' else 'result-icon--success' }}">{{ '!' if info[0]=='red' else '⏳' }}</span>
+      <h1>{{ _(info[1]) }}</h1>
+      <p>{{ _(info[2]) }}</p><p>{{ _('Encomenda') }} #{{ order.id }}</p>
+      {% if order.payment_checkout and order.payment_checkout.checked_at %}<small>{{ _('Última consulta ao fornecedor:') }} {{ (order.payment_checkout.checked_at|local_time).strftime('%d/%m/%Y %H:%M') }}</small>{% endif %}
+      {% if can_resume %}
+      <form method="post" action="{{ url_for('shop.checkout_resume',order_id=order.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="token" value="{{ payment_token }}">
+        <p>{{ _('Vais continuar a mesma encomenda, com os mesmos bilhetes e o mesmo total.') }}</p>
+        <button class="btn btn--primary" type="submit">{{ _('Retomar pagamento') }}</button>
+      </form>
+      {% endif %}
+      <p><a class="btn btn--outline" href="{{ order_payment_url(order) }}">{{ _('Actualizar estado') }}</a></p>
     {% endif %}
     <p>{{ _('Total:') }} <strong>€{{ '%.2f'|format(order.total) }}</strong></p>
     <a href="{{ url_for('customer.login') }}" class="btn btn--outline">A minha área de cliente</a>

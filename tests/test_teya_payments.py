@@ -111,6 +111,125 @@ class TeyaPaymentTests(unittest.TestCase):
         self.assertEqual(order.status,'cancelled')
         self.assertEqual(payment.status,'expired')
 
+    def test_active_failed_is_visible_but_keeps_reservation_and_can_recover(self):
+        from payment_status import payment_info
+        order,payment=self.payment()
+        with patch.object(teya,'api',return_value=self.success(payment,session_status='ACTIVE',payment_status='FAILED',transaction_id=None)):
+            teya.reconcile(payment.id)
+        self.assertEqual(payment_info(order)[0], 'red')
+        self.assertIn('Tentativa', payment_info(order)[1])
+        self.assertIn('Não confirma uma recusa', payment_info(order)[2])
+        self.assertEqual(order.status,'processing')
+        self.assertIsNone(order.reservation_expires_at)
+        self.assertEqual(Ticket.query.count(),0)
+        self.assertIsNotNone(payment.checked_at)
+        with patch.object(teya,'api',return_value=self.success(payment)):
+            teya.reconcile(payment.id)
+            teya.reconcile(payment.id)
+        self.assertEqual(payment_info(order)[1],'Pago')
+        self.assertEqual(Ticket.query.count(),1)
+
+    def test_resume_reuses_original_session_total_and_provider(self):
+        from blueprints.shop import _order_token
+        order,payment=self.payment()
+        payment.session_url='https://checkout.teya.xyz/pay/'+payment.session_id
+        db.session.commit()
+        token=_order_token(order.id)
+        with patch.object(teya,'api',return_value=self.success(payment,session_status='ACTIVE',payment_status='FAILED',transaction_id=None)) as api:
+            for _ in range(2):
+                r=self.post(f'/checkout/resume/{order.id}',{'token':token,'amount':'1','url':'https://attacker.invalid'})
+                self.assertEqual(r.status_code,303)
+                self.assertEqual(r.location,payment.session_url)
+            self.assertTrue(all(c.args[0]=='GET' for c in api.call_args_list))
+        self.assertEqual(Order.query.count(),1)
+        self.assertEqual(PaymentCheckout.query.count(),1)
+        self.assertEqual(order.total_cents,1000)
+        self.assertEqual(Ticket.query.count(),0)
+
+    def test_resume_requires_valid_matching_token_and_csrf(self):
+        from blueprints.shop import _order_token
+        order,payment=self.payment()
+        with patch.object(teya,'api') as api:
+            self.assertEqual(self.client.post(f'/checkout/resume/{order.id}',data={'token':_order_token(order.id)}).status_code,400)
+            self.assertEqual(self.post(f'/checkout/resume/{order.id}',{'token':'invalid'}).status_code,404)
+            self.assertEqual(self.post(f'/checkout/resume/{order.id}',{'token':_order_token(order.id+1)}).status_code,404)
+            api.assert_not_called()
+
+    def test_processing_unknown_and_unsafe_urls_never_reopen_checkout(self):
+        from blueprints.shop import _order_token
+        order,payment=self.payment()
+        token=_order_token(order.id)
+        payment.session_url='https://checkout.teya.xyz/pay/'+payment.session_id
+        db.session.commit()
+        for state,status in [('PROCESSING','NONE'),('ACTIVE','SUCCESS'),('UNKNOWN','NONE')]:
+            with patch.object(teya,'api',return_value=self.success(payment,session_status=state,payment_status=status,transaction_id=None)):
+                r=self.post(f'/checkout/resume/{order.id}',{'token':token})
+                self.assertIn('/checkout/success/',r.location)
+        payment.session_url='https://attacker.invalid/pay'
+        db.session.commit()
+        with patch.object(teya,'api',return_value=self.success(payment,session_status='ACTIVE',payment_status='NONE',transaction_id=None)):
+            r=self.post(f'/checkout/resume/{order.id}',{'token':token})
+            self.assertIn('/checkout/success/',r.location)
+        self.assertEqual(Ticket.query.count(),0)
+
+    def test_resume_timeout_and_paid_race_never_create_another_payment(self):
+        from blueprints.shop import _order_token
+        from payment_status import payment_info
+        order,payment=self.payment()
+        token=_order_token(order.id)
+        with patch.object(teya,'api',side_effect=teya.TeyaUnavailable('timeout')):
+            r=self.post(f'/checkout/resume/{order.id}',{'token':token})
+        self.assertIn('/checkout/success/',r.location)
+        self.assertIn('Erro de comunicação',payment_info(order)[1])
+        with patch.object(teya,'api',return_value=self.success(payment)):
+            r=self.post(f'/checkout/resume/{order.id}',{'token':token})
+        self.assertIn('/checkout/success/',r.location)
+        self.assertEqual(order.status,'paid')
+        self.assertEqual(Ticket.query.count(),1)
+        self.assertEqual(PaymentCheckout.query.count(),1)
+
+    def test_failure_return_displays_real_status_and_resume_form(self):
+        from blueprints.shop import _order_token
+        order,payment=self.payment()
+        with patch.object(teya,'api',return_value=self.success(payment,session_status='ACTIVE',payment_status='FAILED',transaction_id=None)):
+            r=self.client.get(f'/checkout/success/{order.id}?token={_order_token(order.id)}')
+        self.assertEqual(r.status_code,200)
+        self.assertIn('Tentativa de pagamento falhada',r.text)
+        self.assertIn('Retomar pagamento',r.text)
+        self.assertNotIn('costuma demorar',r.text)
+        self.assertEqual(r.headers['Referrer-Policy'],'no-referrer')
+        with patch.object(teya,'api',return_value=self.success(payment,session_status='PROCESSING',payment_status='NONE')):
+            r=self.client.get(f'/checkout/success/{order.id}?token={_order_token(order.id)}')
+        self.assertNotIn('Retomar pagamento',r.text)
+        self.assertIn('A aguardar confirmação',r.text)
+
+    def test_admin_pending_includes_processing_and_displays_provider_failure(self):
+        order,payment=self.payment()
+        with patch.object(teya,'api',return_value=self.success(payment,session_status='ACTIVE',payment_status='FAILED',transaction_id=None)):
+            teya.reconcile(payment.id)
+        self.login()
+        r=self.client.get('/admin/orders?status=pending')
+        self.assertIn('Tentativa de pagamento falhada',r.text)
+        r=self.client.get('/admin/dashboard')
+        self.assertIn('Tentativa de pagamento falhada',r.text)
+
+    def test_existing_checkout_schema_migrates_without_changing_payment(self):
+        from sqlalchemy import text
+        from db_migrate import run
+        order,payment=self.payment()
+        identifier=payment.id
+        db.session.remove()
+        with db.engine.begin() as conn:
+            for column in ('checked_at','payment_state','session_state'):
+                conn.execute(text('ALTER TABLE payment_checkouts DROP COLUMN '+column))
+        run(self.app)
+        run(self.app)
+        payment=db.session.get(PaymentCheckout,identifier)
+        self.assertEqual(payment.status,'active')
+        self.assertFalse(payment.session_state)
+        self.assertFalse(payment.payment_state)
+        self.assertIsNone(payment.checked_at)
+
     def test_forged_browser_success_does_not_issue(self):
         order,payment=self.payment()
         token=base.shop._order_token(order.id)

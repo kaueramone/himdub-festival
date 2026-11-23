@@ -54,6 +54,8 @@ def init_security(app):
         response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
         if request.path.startswith(("/admin", "/checkin", "/checkout")):
             response.headers["Cache-Control"] = "private, no-store"
+        if request.path.startswith('/checkout'):
+            response.headers['Referrer-Policy'] = 'no-referrer'
         if request.path.startswith(('/newsletter/', '/ticket-transfer', '/account')):
             response.headers['Cache-Control']='private, no-store'
             response.headers['Referrer-Policy']='no-referrer'

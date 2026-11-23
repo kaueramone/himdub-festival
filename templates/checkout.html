@@ -7,6 +7,9 @@
   <div class="container narrow">
     <p class="eyebrow" data-reveal>{{ _('Checkout') }}</p>
     <h1 data-reveal>{{ _('Finaliza a tua encomenda') }}</h1>
+    {% if resumable_order and resumable_order.status in ('pending','processing') and resumable_order.payment_checkout %}
+    <div class="notice-box"><p>{{ _('Já tens uma encomenda por concluir neste navegador.') }} #{{ resumable_order.id }}</p><a class="btn btn--outline" href="{{ order_payment_url(resumable_order) }}">{{ _('Ver estado e retomar a encomenda') }}</a><p>{{ _('Antes de criar outra encomenda, verifica se podes continuar o pagamento anterior.') }}</p></div>
+    {% endif %}
 
     {% if not config.PAYMENTS_LIVE %}
       <div class="notice-box" data-reveal>

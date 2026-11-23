@@ -139,6 +139,10 @@ def create_app():
     # Converte horas UTC (como vêm da base de dados) para hora de Portugal
     # antes de aparecerem no admin/check-in -- ver festival_time.py.
     app.jinja_env.filters["local_time"] = to_local_time
+    from payment_status import payment_info
+    app.jinja_env.globals['payment_info'] = payment_info
+    from blueprints.shop import _success_url
+    app.jinja_env.globals['order_payment_url'] = _success_url
     app.jinja_env.filters['money'] = lambda value: f'{float(value):,.2f}'.replace(',', '\u202f').replace('.', ',')
     app.jinja_env.filters['order_status'] = lambda value: {
         'paid':'Pago','comp':'Cortesia','pending':'Por pagar','processing':'Em confirmação',

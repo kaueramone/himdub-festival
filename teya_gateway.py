@@ -120,8 +120,8 @@ def create_session(payment):
         'merchant_reference':payment.reference,'line_items':lines,
         'language':{'pt':'pt-PT','en':'en-GB','fr':'fr-FR','es':'es-ES'}.get(order.lang_code,'en-GB'),
         'success_url':origin+f'/checkout/success/{order.id}?token={_order_token(order.id)}',
-        'cancel_url':origin+'/checkout/cancel',
-        'failure_url':origin+'/checkout/cancel','post_success_payment':'REDIRECT',
+        'cancel_url':origin+f'/checkout/success/{order.id}?token={_order_token(order.id)}',
+        'failure_url':origin+f'/checkout/success/{order.id}?token={_order_token(order.id)}','post_success_payment':'REDIRECT',
         'save_payment_method':False,
     }, payment.id)
     try:
@@ -196,6 +196,9 @@ def reconcile(payment_id, webhook=None):
         raise ValueError('Teya webhook/session mismatch')
     state=data.get('session_status')
     status=data.get('payment_status')
+    payment.session_state = state if state in ('ACTIVE','PROCESSING','COMPLETED','EXPIRED') else ''
+    payment.payment_state = status if status in ('NONE','SUCCESS','FAILED') else ''
+    payment.checked_at = datetime.utcnow()
     if state=='COMPLETED' and status=='SUCCESS':
         transaction=data.get('transaction_id')
         if not isinstance(transaction,str) or not transaction or len(transaction)>100:
@@ -222,6 +225,7 @@ def reconcile(payment_id, webhook=None):
         payment.last_error=''
         payment.next_check_at=datetime.utcnow()+timedelta(minutes=2)
         db.session.commit()
+    return data
 
 
 def reconcile_pending(app, limit=3):

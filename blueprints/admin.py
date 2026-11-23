@@ -164,7 +164,9 @@ def orders():
     search_query = request.args.get("q", "").strip()
 
     query = Order.query.options(selectinload(Order.items), selectinload(Order.tickets)).order_by(Order.created_at.desc(), Order.id.desc())
-    if status_filter:
+    if status_filter == 'pending':
+        query = query.filter(Order.status.in_(('pending', 'processing')))
+    elif status_filter:
         query = query.filter_by(status=status_filter)
     if search_query:
         # ilike funciona tanto em Postgres (producao) como em SQLite (dev

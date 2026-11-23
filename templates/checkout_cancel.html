@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block title %}{{ _('Pagamento cancelado') }} — HIM Dub Festival{% endblock %}
+{% block title %}{{ _('Pagamento não concluído') }} — HIM Dub Festival{% endblock %}
 
 {% block content %}
 
 <section class="section section--result">
   <div class="container narrow center-cta" data-reveal>
     <span class="result-icon result-icon--cancel">!</span>
-    <h1>{{ _('Pagamento cancelado') }}</h1>
-    <p>{{ _('Não te preocupes, o teu carrinho continua guardado.') }}</p>
+    <h1>{{ _('Pagamento não concluído') }}</h1>
+    <p>{{ _('Regressaste do pagamento. Se já pagaste, aguarda a confirmação por email antes de tentar novamente.') }}</p>
+    <a href="{{ url_for('customer.orders') }}" class="btn btn--outline">{{ _('Consultar as minhas encomendas') }}</a>
     <a href="{{ url_for('shop.view_cart') }}" class="btn btn--primary">{{ _('Voltar ao carrinho') }}</a>
   </div>
 </section>
