@@ -26,6 +26,9 @@ def run(app):
     with app.app_context():
         inspector = inspect(db.engine)
         with db.engine.connect() as conn:
+            _ensure_column(conn, inspector, "customer_accounts", "preferred_language", "VARCHAR(5)")
+            _ensure_column(conn, inspector, "customer_access_tokens", "preferred_language", "VARCHAR(5)")
+            _ensure_column(conn, inspector, "email_deliveries", "language_code", "VARCHAR(5)")
             for column, ddl in [("cancelled_at", "TIMESTAMP"),
                                 ("cancelled_by", "VARCHAR(180) DEFAULT ''"),
                                 ("cancellation_reason", "VARCHAR(300) DEFAULT ''")]:

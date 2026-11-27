@@ -1,0 +1,4 @@
+{% extends 'emails/brand_base.html' %}
+{% block title %}{{ heading }} · HIM Dub Festival{% endblock %}
+{% block preheader %}{{ body }}{% endblock %}
+{% block content %}<h1 style="margin:0 0 20px;font-size:26px;line-height:1.3;color:#fffee6">{{ heading }}</h1><p>{{ body }}</p>{% if link %}<p style="margin:28px 0"><a href="{{ link }}" style="display:inline-block;padding:14px 22px;background:#fffee6;color:#101517;font-weight:bold;text-decoration:none;border-radius:6px">{{ button }}</a></p>{% endif %}{% if hint %}<p style="font-size:13px;color:#c1c6c8">{{ hint }}</p>{% endif %}{% endblock %}

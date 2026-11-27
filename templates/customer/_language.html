@@ -1,0 +1,5 @@
+<label>Idioma das comunicações / Preferred language
+<select name="preferred_language" required>
+{% set selected = selected_language|default(account.preferred_language if account is defined and account else 'pt', true) %}
+{% for code,label in [('pt','Português'),('en','English'),('es','Español'),('fr','Français')] %}<option value="{{ code }}"{% if selected==code %} selected{% endif %}>{{ label }}</option>{% endfor %}
+</select></label>

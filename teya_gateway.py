@@ -104,6 +104,7 @@ def matching_environment(payment):
 
 
 def create_session(payment):
+    from customer_language import preferred_language
     matching_environment(payment)
     order = db.session.get(Order,payment.order_id)
     from blueprints.shop import _order_token
@@ -119,7 +120,7 @@ def create_session(payment):
         'store_id':payment.store_id,'type':'SALE','amount':{'value':order.total_cents,'currency':'EUR'},
         'merchant_reference':payment.reference,'line_items':lines,
         'customer_success_email':order.email,
-        'language':{'pt':'pt-PT','en':'en-GB','fr':'fr-FR','es':'es-ES'}.get(order.lang_code,'en-GB'),
+        'language':{'pt':'pt-PT','en':'en-GB','fr':'fr-FR','es':'es-ES'}[preferred_language(order.email, order.lang_code)],
         'success_url':origin+f'/checkout/success/{order.id}?token={_order_token(order.id)}',
         'cancel_url':origin+f'/checkout/success/{order.id}?token={_order_token(order.id)}',
         'failure_url':origin+f'/checkout/success/{order.id}?token={_order_token(order.id)}','post_success_payment':'REDIRECT',

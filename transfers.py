@@ -25,6 +25,7 @@ from extensions import db
 from models import TicketTransfer, TransferCheckout, Ticket, Order, Setting, AuditEvent
 from website_jobs import enqueue
 from customer_portal import customer_required
+from customer_language import notice_payload
 
 
 def policy():
@@ -215,12 +216,8 @@ def complete_transfer(transfer, ticket):
     )
     enqueue(
         "email",
-        {
-            "from": current_app.config["RESEND_FROM_EMAIL"],
-            "to": [transfer.original_email],
-            "subject": "Transferência de titular concluída — HIM Dub Festival",
-            "text": "A transferência do teu bilhete foi concluída. O QR antigo foi invalidado. O novo titular recebe o bilhete no email que indicaste.",
-        },
+        notice_payload('completed', transfer.original_email, current_app.config['RESEND_FROM_EMAIL'],
+                       fallback=ticket.order.lang_code),
         "transfer-notice:" + transfer.id,
     )
     db.session.commit()
@@ -300,14 +297,8 @@ def init_transfers(main, bp, admin_required):
                     )
                     enqueue(
                         "email",
-                        {
-                            "from": current_app.config["RESEND_FROM_EMAIL"],
-                            "to": [email],
-                            "subject": "Confirmar troca de titular — HIM Dub Festival",
-                            "text": "Foi pedida uma troca de titular do teu bilhete. Para indicar o novo titular e pagar a taxa de serviço, abre: "
-                            + link
-                            + "\nSe não fizeste este pedido, não abras o link. O teu bilhete mantém-se válido.",
-                        },
+                        notice_payload('transfer', email, current_app.config['RESEND_FROM_EMAIL'], link,
+                                       fallback=ticket.order.lang_code),
                         "transfer-link:" + transfer.id,
                     )
                     try:
@@ -320,13 +311,13 @@ def init_transfers(main, bp, admin_required):
             )
             return redirect(url_for("main.ticket_transfer"))
         return render_template(
-            "transfer.html", rules=rules, available=available, transfer=None
+            "transfer.html", rules=rules, available=available, transfer=None, account=g.customer
         )
 
     @main.get("/ticket-transfer/return")
     @customer_required
     def transfer_return():
-        return render_template("transfer_return.html")
+        return render_template("transfer_return.html", account=g.customer)
 
     @main.route("/ticket-transfer/accept", methods=["GET", "POST"])
     @customer_required
@@ -434,7 +425,7 @@ def init_transfers(main, bp, admin_required):
             except stripe.error.StripeError:
                 db.session.rollback()
         return render_template(
-            "transfer.html", rules=rules, available=True, transfer=transfer, token=token
+            "transfer.html", rules=rules, available=True, transfer=transfer, token=token, account=g.customer
         )
 
     @bp.route("/transfers", methods=["GET", "POST"])

@@ -9,6 +9,7 @@ from flask import (
     abort,
     current_app,
     flash,
+    g,
     redirect,
     render_template,
     request,
@@ -21,6 +22,7 @@ from auth import check_login_throttle
 from extensions import db
 from models import NewsletterSubscriber, WebsiteJob
 from website_jobs import enqueue
+from customer_language import notice_payload
 
 CONSENT = "Quero receber novidades, programação e informações de venda do HIM Dub Festival por email. Posso cancelar a qualquer momento."
 
@@ -68,15 +70,8 @@ def subscribe():
         link = current_app.config["DOMAIN"].rstrip("/") + url_for(
             "main.newsletter_confirm", token=token
         )
-        payload = {
-            "from": current_app.config["RESEND_FROM_EMAIL"],
-            "to": [email],
-            "subject": "Confirma a tua subscrição — HIM Dub Festival",
-            "html": render_template("emails/newsletter_confirm.html", link=link),
-            "text": "HIM Dub Festival — confirma a tua subscrição: "
-            + link
-            + "\nSe não pediste esta subscrição, ignora este email.",
-        }
+        payload = notice_payload('newsletter', email, current_app.config['RESEND_FROM_EMAIL'], link,
+                                 fallback=getattr(g, 'lang_code', 'pt'))
         enqueue(
             "email",
             payload,

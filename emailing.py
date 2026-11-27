@@ -372,10 +372,13 @@ def _group_tickets_by_recipient(order):
     return result
 
 
-def _ticket_email_payload(order, config, recipient_email, recipient_name, tickets):
+def _ticket_email_payload(order, config, recipient_email, recipient_name, tickets, language=None):
     """Envia UM email (para um único destinatário, com só os seus
     bilhetes) -- usado por send_ticket_email, abaixo, uma vez por cada
     grupo devolvido por _group_tickets_by_recipient."""
+    from customer_language import LocalizedOrder, preferred_language, normalize_language
+    language = normalize_language(language) if language else preferred_language(recipient_email, order.lang_code)
+    order = LocalizedOrder(order, language)
     domain = config["DOMAIN"]
     s = _strings(order)
     html = build_ticket_email_html(order, domain, tickets, recipient_name)

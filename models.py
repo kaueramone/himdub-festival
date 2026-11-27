@@ -321,6 +321,7 @@ class CustomerAccount(db.Model):
     __tablename__ = "customer_accounts"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(180), unique=True, nullable=False)
+    preferred_language = db.Column(db.String(5))
     name = db.Column(db.String(120), default="")
     phone = db.Column(db.String(40), default="")
     session_version = db.Column(db.Integer, default=1, nullable=False)
@@ -331,6 +332,7 @@ class CustomerAccessToken(db.Model):
     __tablename__ = "customer_access_tokens"
     token_hash = db.Column(db.String(64), primary_key=True)
     email = db.Column(db.String(180), nullable=False, index=True)
+    preferred_language = db.Column(db.String(5))
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
     used_at = db.Column(db.DateTime)
@@ -494,6 +496,7 @@ class EmailDelivery(db.Model):
     id = db.Column(db.String(64), primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False, index=True)
     recipient = db.Column(db.String(180), nullable=False)
+    language_code = db.Column(db.String(5))
     status = db.Column(db.String(20), default="pending", nullable=False, index=True)
     attempts = db.Column(db.Integer, default=0, nullable=False)
     available_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

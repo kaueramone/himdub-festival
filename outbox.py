@@ -34,7 +34,9 @@ def enqueue_order_emails(order, event_id="", recipients=None):
         revision = _revision(order, email, name, tickets)
         key = hashlib.sha256((revision + event_id).encode()).hexdigest() if event_id else revision
         if db.session.get(EmailDelivery, key) is None:
-            db.session.add(EmailDelivery(id=key, revision=revision, order_id=order.id, recipient=email))
+            from customer_language import preferred_language
+            db.session.add(EmailDelivery(id=key, revision=revision, order_id=order.id, recipient=email,
+                                        language_code=preferred_language(email, order.lang_code)))
 
 
 def process_pending(app, limit=10):
@@ -71,7 +73,8 @@ def process_pending(app, limit=10):
                     db.session.commit()
                     continue
                 from emailing import _ticket_email_payload
-                payload = _ticket_email_payload(order, app.config, *group)
+                payload = _ticket_email_payload(order, app.config, *group,
+                                                language=job.language_code or order.lang_code or 'pt')
                 payload_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
                 if job.payload_hash and job.payload_hash != payload_hash:
                     job.status, job.last_error = "review", "Payload changed; provider reconciliation required"

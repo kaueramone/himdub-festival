@@ -9,6 +9,7 @@ import teya_gateway as gateway
 
 
 def create_session(payment):
+    from customer_language import preferred_language
     gateway.matching_environment(payment)
     transfer = db.session.get(TicketTransfer, payment.transfer_id)
     origin = current_app.config['DOMAIN'].rstrip('/')
@@ -19,7 +20,8 @@ def create_session(payment):
         'customer_success_email': transfer.original_email,
         'line_items': [{'description': 'HIM Dub — troca de titular de 1 bilhete',
                         'quantity': 1, 'unit_price': transfer.fee_cents}],
-        'language': 'pt-PT', 'success_url': origin + '/ticket-transfer/return',
+        'language': {'pt':'pt-PT','en':'en-GB','fr':'fr-FR','es':'es-ES'}[preferred_language(transfer.original_email, 'pt')],
+        'success_url': origin + '/ticket-transfer/return',
         'cancel_url': origin + '/ticket-transfer/return',
         'failure_url': origin + '/ticket-transfer/return',
         'post_success_payment': 'REDIRECT', 'save_payment_method': False,

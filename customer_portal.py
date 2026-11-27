@@ -33,6 +33,7 @@ from models import (
     AuditEvent,
 )
 from website_jobs import enqueue
+from customer_language import LANGUAGES, normalize_language, preferred_language, notice_payload
 
 customer_bp = Blueprint("customer", __name__, url_prefix="/account")
 
@@ -112,8 +113,12 @@ def downloadable(ticket):
 @customer_bp.route("/login", methods=["GET", "POST"])
 def login():
     sent = False
+    selected_language = normalize_language(getattr(g, 'lang_code', 'pt'))
     if request.method == "POST":
         email = email_value(request.form.get("email", ""))
+        selected_language = request.form.get('preferred_language', selected_language)
+        if selected_language not in LANGUAGES:
+            abort(400, description="Escolhe um dos idiomas disponíveis.")
         check_login_throttle("customer:" + email)
         now = datetime.utcnow()
         recent = CustomerAccessToken.query.filter(
@@ -126,6 +131,7 @@ def login():
                 CustomerAccessToken(
                     token_hash=digest(token),
                     email=email,
+                    preferred_language=selected_language,
                     expires_at=now + timedelta(minutes=20),
                 )
             )
@@ -134,20 +140,12 @@ def login():
             )
             enqueue(
                 "email",
-                {
-                    "from": current_app.config["RESEND_FROM_EMAIL"],
-                    "to": [email],
-                    "subject": "O teu acesso privado — HIM Dub Festival",
-                    "html": render_template("emails/customer_access.html", link=link),
-                    "text": "Entra na tua área de cliente do HIM Dub Festival: "
-                    + link
-                    + "\nLink privado, válido por 20 minutos e uma única utilização. Se não pediste acesso, ignora este email.",
-                },
+                notice_payload('access', email, current_app.config['RESEND_FROM_EMAIL'], link, selected_language),
                 "customer-access:" + digest(token),
             )
             db.session.commit()
         sent = True
-    return render_template("customer/login.html", sent=sent, recovering=request.path.endswith('/recover'))
+    return render_template("customer/login.html", sent=sent, selected_language=selected_language, recovering=request.path.endswith('/recover'))
 
 
 @customer_bp.route("/access/<token>", methods=["GET", "POST"])
@@ -166,9 +164,12 @@ def access(token):
             410, description="O link expirou ou já foi utilizado. Pede um novo acesso."
         )
     if request.method == "POST":
+        language = request.form.get('preferred_language', access_token.preferred_language or 'pt')
+        if language not in LANGUAGES:
+            abort(400, description="Escolhe um dos idiomas disponíveis.")
         account = CustomerAccount.query.filter_by(email=access_token.email).first()
         if not account:
-            account = CustomerAccount(email=access_token.email)
+            account = CustomerAccount(email=access_token.email, preferred_language=language)
             try:
                 with db.session.begin_nested():
                     db.session.add(account)
@@ -177,6 +178,8 @@ def access(token):
                 account = CustomerAccount.query.filter_by(
                     email=access_token.email
                 ).one()
+        if not account.preferred_language:
+            account.preferred_language = language
         access_token.used_at = now
         db.session.commit()
         session.update(
@@ -189,7 +192,9 @@ def access(token):
         if re.fullmatch(r"[A-Za-z0-9_-]{43}", transfer_token):
             return redirect(url_for("main.transfer_accept", token=transfer_token))
         return redirect(url_for("customer.dashboard"))
-    return render_template("customer/access.html")
+    existing = CustomerAccount.query.filter_by(email=access_token.email).first()
+    return render_template("customer/access.html", new_account=not existing or not existing.preferred_language,
+                           selected_language=normalize_language(access_token.preferred_language, 'pt'))
 
 
 @customer_bp.post("/logout")
@@ -292,7 +297,7 @@ def download(identifier):
             return getattr(ticket, name)
 
     raw = generate_ticket_image_bytes(
-        DownloadView(), current_app.config["DOMAIN"], lang_code="pt"
+        DownloadView(), current_app.config["DOMAIN"], lang_code=preferred_language(g.customer.email, ticket.order.lang_code)
     )
     if raw:
         return send_file(
@@ -317,6 +322,9 @@ def profile():
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         phone = request.form.get("phone", "").strip()
+        language = request.form.get('preferred_language', g.customer.preferred_language or 'pt')
+        if language not in LANGUAGES:
+            abort(400, description="Escolhe um dos idiomas disponíveis.")
         if (
             len(name) > 120
             or len(phone) > 40
@@ -324,6 +332,7 @@ def profile():
         ):
             abort(400, description="Revê o nome e o contacto telefónico.")
         g.customer.name, g.customer.phone = name, phone
+        g.customer.preferred_language = language
         db.session.commit()
         flash(
             "Dados de contacto guardados. Os dados das compras anteriores não foram alterados.",
