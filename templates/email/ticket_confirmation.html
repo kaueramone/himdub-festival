@@ -56,7 +56,7 @@
 
         <!-- Body -->
         <tr>
-          <td class="px" style="background-color:#ffffff; padding:40px;">
+          <td class="px" style="background-color:#ffffff; padding:28px;">
 
             <h1 style="margin:0 0 12px; font-family:'Abel', Arial, sans-serif; font-size:26px; font-weight:700; color:#231f20;">
               {{ s.greeting }}
@@ -93,9 +93,9 @@
                   <![endif]-->
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td align="center" style="background-color:rgba(35,31,32,0.55); padding:32px 28px 24px;">
+                      <td align="center" style="background-color:rgba(35,31,32,0.55); padding:20px 20px 16px;">
 
-                        <div style="font-family:'Abel', Arial, sans-serif; font-size:24px; font-weight:700; color:#ffffff; margin-bottom:24px;">
+                        <div style="font-family:'Abel', Arial, sans-serif; font-size:24px; font-weight:700; color:#ffffff; margin-bottom:16px;">
                           {{ ticket.type_name }}
                         </div>
 
@@ -184,38 +184,7 @@
               </tr>
             </table>
 
-            <!-- Entry info -->
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:32px;">
-              <tr>
-                <td style="font-family:'Abel', Arial, sans-serif; font-size:16px; font-weight:700; color:#231f20; padding-bottom:10px; border-bottom:2px solid #293440;">
-                  {{ s.entry_info_title }}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding-top:14px; font-family:Arial, sans-serif; font-size:14px; line-height:1.7; color:#231f20;">
-                  {% for line in s.entry_info_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding-top:16px; font-family:Arial, sans-serif; font-size:13px; font-weight:bold; color:#231f20;">
-                  {{ s.not_allowed_title }}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding-top:6px; font-family:Arial, sans-serif; font-size:13px; line-height:1.7; color:#696567;">
-                  {% for line in s.not_allowed_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding-top:14px; font-family:Arial, sans-serif; font-size:12px; line-height:1.5; color:#8a8688;">
-                  {{ s.rules_link_label }} <a href="{{ terms_url }}" style="color:#293440;">{{ terms_url_label }}</a>
-                </td>
-              </tr>
-            </table>
-
-            <p style="margin:24px 0 0; font-family:Arial, sans-serif; font-size:13px; line-height:1.6; color:#8a8688;">
-              {{ s.keep_ticket_note }}
-            </p>
+            <p style="margin:24px 0 0;font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#545454;">{{ s.account_hint }}</p>
 
           </td>
         </tr>

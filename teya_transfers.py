@@ -16,6 +16,7 @@ def create_session(payment):
         'store_id': payment.store_id, 'type': 'SALE',
         'amount': {'value': transfer.fee_cents, 'currency': 'EUR'},
         'merchant_reference': payment.reference,
+        'customer_success_email': transfer.original_email,
         'line_items': [{'description': 'HIM Dub — troca de titular de 1 bilhete',
                         'quantity': 1, 'unit_price': transfer.fee_cents}],
         'language': 'pt-PT', 'success_url': origin + '/ticket-transfer/return',

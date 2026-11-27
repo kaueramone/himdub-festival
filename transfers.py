@@ -12,6 +12,7 @@ from flask import (
     abort,
     current_app,
     flash,
+    g,
     redirect,
     render_template,
     request,
@@ -23,6 +24,7 @@ from auth import check_login_throttle
 from extensions import db
 from models import TicketTransfer, TransferCheckout, Ticket, Order, Setting, AuditEvent
 from website_jobs import enqueue
+from customer_portal import customer_required
 
 
 def policy():
@@ -227,6 +229,7 @@ def complete_transfer(transfer, ticket):
 
 def init_transfers(main, bp, admin_required):
     @main.route("/ticket-transfer", methods=["GET", "POST"])
+    @customer_required
     def ticket_transfer():
         rules = policy()
         available = rules["enabled"] and datetime.utcnow() < rules["deadline"]
@@ -235,7 +238,8 @@ def init_transfers(main, bp, admin_required):
                 abort(
                     400, description="O serviço de transferência não está disponível."
                 )
-            email = request.form.get("email", "").strip().lower()[:180]
+            # Identity comes from the verified customer session, never the form.
+            email = g.customer.email.strip().lower()
             code = request.form.get("code", "").strip().upper()[:40]
             check_login_throttle("ticket-transfer:" + email)
             ticket = Ticket.query.filter_by(code=code).first()
@@ -320,13 +324,17 @@ def init_transfers(main, bp, admin_required):
         )
 
     @main.get("/ticket-transfer/return")
+    @customer_required
     def transfer_return():
         return render_template("transfer_return.html")
 
     @main.route("/ticket-transfer/accept", methods=["GET", "POST"])
+    @customer_required
     def transfer_accept():
         token = request.values.get("token", "")
         transfer = transfer_from_token(token)
+        if transfer.original_email != g.customer.email.strip().lower():
+            abort(404)
         rules = policy()
         if request.method == "GET":
             refresh_expired_checkout(transfer)

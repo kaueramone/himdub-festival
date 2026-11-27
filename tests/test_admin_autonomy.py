@@ -55,6 +55,18 @@ class AdminAutonomyTests(unittest.TestCase):
     post = base.PurchaseSecurityTests.post
     order = base.PurchaseSecurityTests.order
 
+    def customer_login(self, email="buyer@example.invalid", client=None):
+        from models import CustomerAccount
+        account = CustomerAccount.query.filter_by(email=email).first()
+        if not account:
+            account = CustomerAccount(email=email)
+            db.session.add(account)
+            db.session.commit()
+        with (client or self.client).session_transaction() as s:
+            s.update(customer_id=account.id, customer_version=account.session_version,
+                     customer_started=time.time())
+        return account
+
     def login(self, client=None, role="admin"):
         client = client or self.client
         user = AdminUser(
@@ -568,6 +580,7 @@ class AdminAutonomyTests(unittest.TestCase):
         generate_tickets_for_order(order)
         db.session.commit()
         ticket = Ticket.query.one()
+        self.customer_login(order.email)
         original = ticket.code
         response = self.post(
             "/ticket-transfer", {"code": original, "email": order.email}
@@ -639,6 +652,7 @@ class AdminAutonomyTests(unittest.TestCase):
         order = self.order("paid")
         generate_tickets_for_order(order)
         db.session.commit()
+        self.customer_login("wrong@example.invalid")
         response = self.post(
             "/ticket-transfer",
             {"code": Ticket.query.one().code, "email": "wrong@example.invalid"},
@@ -657,6 +671,7 @@ class AdminAutonomyTests(unittest.TestCase):
         db.session.commit()
         ticket = Ticket.query.one()
         original = ticket.code
+        self.customer_login(order.email)
         for slug in ("bilhete-familia", "bilhete-acessibilidade"):
             with self.subTest(slug=slug):
                 ticket.product_slug = slug

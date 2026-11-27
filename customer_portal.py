@@ -72,6 +72,10 @@ def customer_required(view):
     def wrapped(*args, **kwargs):
         g.customer = current_customer()
         if not g.customer:
+            if request.endpoint == "main.transfer_accept":
+                token = request.values.get("token", "")
+                if re.fullmatch(r"[A-Za-z0-9_-]{43}", token):
+                    session["customer_transfer_token"] = token
             return redirect(url_for("customer.login"))
         return view(*args, **kwargs)
 
@@ -181,6 +185,9 @@ def access(token):
             customer_started=now.replace(tzinfo=timezone.utc).timestamp(),
             csrf_token=secrets.token_urlsafe(32),
         )
+        transfer_token = session.pop("customer_transfer_token", "")
+        if re.fullmatch(r"[A-Za-z0-9_-]{43}", transfer_token):
+            return redirect(url_for("main.transfer_accept", token=transfer_token))
         return redirect(url_for("customer.dashboard"))
     return render_template("customer/access.html")
 

@@ -126,6 +126,7 @@ _FOOTER_STRINGS = {
     "pt": ("TIPO DE BILHETE", "NOME", "CÓDIGO"),
     "en": ("TICKET TYPE", "NAME", "CODE"),
     "fr": ("TYPE DE BILLET", "NOM", "CODE"),
+    "es": ("TIPO DE ENTRADA", "NOMBRE", "CÓDIGO"),
 }
 
 # 4ª linha, opcional, só para os bilhetes de Acessibilidade (acompanhante)
@@ -137,6 +138,7 @@ _EXTRA_LINE_LABELS = {
     "pt": {"companion": "ACOMPANHANTE", "kids": "CRIANÇAS"},
     "en": {"companion": "COMPANION", "kids": "KIDS"},
     "fr": {"companion": "ACCOMPAGNANT", "kids": "ENFANTS"},
+    "es": {"companion": "ACOMPAÑANTE", "kids": "MENORES"},
 }
 
 

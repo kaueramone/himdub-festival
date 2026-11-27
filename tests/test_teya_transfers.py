@@ -17,6 +17,7 @@ class TeyaTransferTests(unittest.TestCase):
     tearDown=autonomy.AdminAutonomyTests.tearDown
     post=autonomy.AdminAutonomyTests.post
     order=autonomy.AdminAutonomyTests.order
+    customer_login=autonomy.AdminAutonomyTests.customer_login
     store=teya_tests.TeyaPaymentTests.store
     config=teya_tests.TeyaPaymentTests.config
     webhook=teya_tests.TeyaPaymentTests.webhook
@@ -31,6 +32,7 @@ class TeyaTransferTests(unittest.TestCase):
         db.session.add(Setting(key='transfer_enabled',value='true'))
         order=self.order('paid');generate_tickets_for_order(order);db.session.commit()
         ticket=Ticket.query.one(); original=ticket.code
+        self.customer_login(order.email)
         self.assertEqual(self.post('/ticket-transfer',{'code':original,'email':order.email}).status_code,302)
         payload=json.loads(WebsiteJob.query.filter_by(kind='email').one().payload)
         token=parse_qs(urlsplit(re.search(r'https?://\S+',payload['text'])[0]).query)['token'][0]
@@ -40,6 +42,7 @@ class TeyaTransferTests(unittest.TestCase):
         self.assertEqual(r.status_code,303)
         payload=api.call_args.args[2]
         self.assertEqual(payload['amount'],{'value':500,'currency':'EUR'})
+        self.assertEqual(payload['customer_success_email'],order.email)
         self.assertNotIn('token=',payload['success_url'])
         return ticket,TicketTransfer.query.one(),TransferCheckout.query.one(),token,original
 

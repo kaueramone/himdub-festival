@@ -118,6 +118,7 @@ def create_session(payment):
     data = api('POST','/v2/checkout/sessions', {
         'store_id':payment.store_id,'type':'SALE','amount':{'value':order.total_cents,'currency':'EUR'},
         'merchant_reference':payment.reference,'line_items':lines,
+        'customer_success_email':order.email,
         'language':{'pt':'pt-PT','en':'en-GB','fr':'fr-FR','es':'es-ES'}.get(order.lang_code,'en-GB'),
         'success_url':origin+f'/checkout/success/{order.id}?token={_order_token(order.id)}',
         'cancel_url':origin+f'/checkout/success/{order.id}?token={_order_token(order.id)}',
